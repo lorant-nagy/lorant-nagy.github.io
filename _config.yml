@@ -9,6 +9,3 @@ atom_feed:
   hide: true
 
 paginate: 0
-
-head_scripts:
-  - /assets/css/custom.css
