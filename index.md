@@ -17,6 +17,18 @@ classes: wide
   background-image: none !important;
 }
 
+/* Remove container padding to make sections full width */
+.page__content {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+}
+
+.page {
+  width: 100% !important;
+  padding: 0 !important;
+}
+
 /* Welcome section - transparent with parallax effect */
 .welcome-section {
   background-image: url('/assets/images/background.png');
@@ -29,6 +41,8 @@ classes: wide
   justify-content: center;
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
 }
 
 /* Works section - solid background */
@@ -36,6 +50,8 @@ classes: wide
   background-color: #f5f5f5;
   padding: 4em 2em;
   min-height: 100vh;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
 }
 </style>
 
