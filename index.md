@@ -5,7 +5,36 @@ classes: wide
 ---
 
 <style>
-/* Hide background image in masthead (top stripe with your name) */
+
+/* Push header content to edges */
+.masthead__inner-wrap {
+  padding-left: 1em;
+  padding-right: 1em;
+  max-width: 100% !important;
+}
+
+.masthead__menu {
+  width: 100%;
+}
+
+.greedy-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.site-title {
+  margin-right: auto;
+}
+
+.masthead-contact {
+  text-align: right;
+  padding: 0.5em 1em;
+  margin-left: auto;
+}
+
+
 .masthead {
   background-color: #fff;
   background-image: none !important;
