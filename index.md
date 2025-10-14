@@ -1,35 +1,16 @@
 ---
 layout: single
 title: "Welcome"
+author_profile: true
 ---
 
-# Hello World!
+## Welcome
 
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
+Hello! I'm [Your Name], and this is my personal portfolio website.
 
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
-This is my website built with Minimal Mistakes and GitHub Pages.
+[Add a brief introduction about yourself here - what you do, your interests, etc.]
+
+---
+
+## WORKS
+
