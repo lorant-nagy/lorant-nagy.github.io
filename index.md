@@ -98,8 +98,7 @@ classes: wide
 
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em;">
-    <p style="font-size: 1em;">Hello! I'm [Your Name], and this is my personal portfolio website.</p>
-    <p style="font-size: 1em;">[Add a brief introduction about yourself here - what you do, your interests, etc.]</p>
+    <p style="font-size: 5em;">AI &nbsp;&nbsp;&nbsp; OR &nbsp;&nbsp;&nbsp; ML</p>
   </div>
 </div>
 
