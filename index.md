@@ -107,14 +107,14 @@ classes: wide
 </div>
 
 <div class="works-section">
-  <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 1em;">WORKS</h2>
+  <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 1em;">UNDER CONSTRUCTION</h2>
   
-  <h3>Project 1</h3>
+  <!-- <h3>Project 1</h3>
   <p>Description of your first project.</p>
   
   <h3>Project 2</h3>
   <p>Description of your second project.</p>
   
   <h3>Project 3</h3>
-  <p>Description of your third project.</p>
+  <p>Description of your third project.</p> -->
 </div>
