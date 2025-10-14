@@ -42,6 +42,8 @@ classes: wide
   background-image: none !important;
   border-bottom: none !important;
   min-height: auto;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
 
 .masthead-contact {
@@ -79,7 +81,7 @@ classes: wide
   background-attachment: fixed;
   background-position: center;
   background-size: cover;
-  min-height: 20vh;
+  min-height: 10vh;
   display: flex;
   align-items: center;
   justify-content: center;
