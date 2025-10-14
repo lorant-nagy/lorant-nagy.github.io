@@ -11,6 +11,8 @@ classes: wide
   padding-left: 1em;
   padding-right: 1em;
   max-width: 100% !important;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .masthead__menu {
@@ -39,6 +41,7 @@ classes: wide
   background-color: #fff;
   background-image: none !important;
   border-bottom: none !important;
+  min-height: auto;
 }
 
 .masthead-contact {
