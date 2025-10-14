@@ -12,6 +12,17 @@ classes: wide
   border-bottom: none !important;
 }
 
+.masthead-contact {
+  text-align: right;
+  padding: 0.5em 1em;
+}
+
+.masthead__inner-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* Hide background in footer */
 .page__footer {
   background-color: #fff;
