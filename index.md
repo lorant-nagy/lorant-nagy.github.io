@@ -102,7 +102,7 @@ classes: wide
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em; line-height: 1.2;">
     <div style="font-size: 3em;">OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML</div>
-    <div style="font-size: 2em; letter-spacing: 0.2em;">F i n - M a t h</div>
+    <div style="font-size: 2em; letter-spacing: 0.2em;">&thinsp;F i n - M a t h</div>
   </div>
 </div>
 
