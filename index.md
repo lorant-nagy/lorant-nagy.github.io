@@ -99,6 +99,7 @@ classes: wide
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em;">
     <p style="font-size: 3em;">OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML</p>
+    <p style="font-size: 2em; letter-spacing: 2em;">Fin - Math</p>
   </div>
 </div>
 
