@@ -90,8 +90,8 @@ classes: wide
 .works-section {
   background-color: #f5f5f5;
   padding: 4em 2em;
-  min-height: 100vh;
-  width: 50vw;
+  min-height: 50vh;
+  width: 100vw;
   margin-left: calc(-50vw + 50%);
 }
 </style>
