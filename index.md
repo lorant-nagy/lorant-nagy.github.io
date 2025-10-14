@@ -42,8 +42,6 @@ classes: wide
   background-image: none !important;
   border-bottom: none !important;
   min-height: auto;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
 }
 
 .masthead-contact {
@@ -102,9 +100,9 @@ classes: wide
 </style>
 
 <div class="welcome-section">
-  <div style="text-align: center; max-width: 800px; padding: 2em;">
-    <p style="font-size: 3em; margin-bottom: 0.2em;text-align: center;">OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML</p>
-    <p style="font-size: 2.5em; margin-top: 0; text-align: center;">Fin-Math</p>
+  <div style="text-align: center; max-width: 800px; padding: 2em; line-height: 0.8;">
+    <div style="font-size: 3em;">OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML</div>
+    <div style="font-size: 2.5em;">Fin-Math</div>
   </div>
 </div>
 
