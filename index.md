@@ -91,7 +91,7 @@ classes: wide
   background-color: #f5f5f5;
   padding: 4em 2em;
   min-height: 100vh;
-  width: 100vw;
+  width: 50vw;
   margin-left: calc(-50vw + 50%);
 }
 </style>
@@ -99,7 +99,7 @@ classes: wide
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em;">
     <p style="font-size: 3em;">OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML</p>
-    <p style="font-size: 2em; letter-spacing: 2em;">Fin - Math</p>
+    <p style="font-size: 2em; letter-spacing: 0.7em;">Fin - Math</p>
   </div>
 </div>
 
@@ -111,7 +111,4 @@ classes: wide
   
   <h3>Project 2</h3>
   <p>Description of your second project.</p>
-  
-  <h3>Project 3</h3>
-  <p>Description of your third project.</p>
 </div>
