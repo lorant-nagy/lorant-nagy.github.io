@@ -9,6 +9,7 @@ classes: wide
 .masthead {
   background-color: #fff;
   background-image: none !important;
+  border-bottom: none !important;
 }
 
 /* Hide background in footer */
