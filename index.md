@@ -98,7 +98,8 @@ classes: wide
 
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em;">
-    <p style="font-size: 5em;">AI &nbsp;&nbsp;&nbsp; OR &nbsp;&nbsp;&nbsp; ML</p>
+    <p style="font-size: 5em;">AI &nbsp;&nbsp;&nbsp; OR &nbsp;&nbsp;&nbsp; ML &nbsp;&nbsp;&nbsp; FinMath</p>
+    <p style="font-size: 3em;"> Check out some nice graphics below : </p>
   </div>
 </div>
 
