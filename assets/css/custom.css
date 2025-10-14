@@ -1,9 +1,3 @@
----
----
-
-@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
-@import "minimal-mistakes"; // main partials
-
 /* Hide background image in masthead (top stripe with your name) */
 .masthead {
   background-color: #fff;

@@ -4,6 +4,41 @@ title: ""
 classes: wide
 ---
 
+<style>
+/* Hide background image in masthead (top stripe with your name) */
+.masthead {
+  background-color: #fff;
+  background-image: none !important;
+}
+
+/* Hide background in footer */
+.page__footer {
+  background-color: #fff;
+  background-image: none !important;
+}
+
+/* Welcome section - transparent with parallax effect */
+.welcome-section {
+  background-image: url('/assets/images/background.png');
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+/* Works section - solid background */
+.works-section {
+  background-color: #f5f5f5;
+  padding: 4em 2em;
+  min-height: 100vh;
+}
+</style>
+
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em;">
     <h1 style="font-size: 3em; margin-bottom: 0.5em;">Welcome</h1>
