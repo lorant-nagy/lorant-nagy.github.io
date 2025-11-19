@@ -121,24 +121,10 @@ classes: wide
     <h2 style="text-align:center;">Trajectory Forecast Game</h2>
     <p style="text-align:center;">Interactive experiment coming here...</p>
     <div id="game-container" style="display:flex; justify-content:center; padding:1em;">
-      <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
-      <script>
-        function setup() {
-          const canvas = createCanvas(800, 500);
-          canvas.parent('game-container');
-          textAlign(CENTER, CENTER);
-        }
-
-        function draw() {
-          background(240);
-          textSize(32);
-          text('Trajectory Game – Hello p5.js', width / 2, height / 2);
-        }
-      </script>
-
+      <!-- p5 canvas will live here -->
     </div>
   </div>
-
-  
-
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+<script src="{{ '/assets/js/trajectory-game.js' | relative_url }}"></script>
