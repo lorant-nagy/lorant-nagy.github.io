@@ -4,14 +4,19 @@ let gridCols = 80;
 let cellW, cellH;
 
 // --- Time & market primitives ---
-let terminalTime = 40; // number of steps (t = 0..terminalTime)
+let terminalTime = 40; // t = 0..terminalTime
 let currentTime = 0;
 
-let assetPrice = [];      // raw AR(1) series around 0
-let depthSeries = [];     // depth[t]
+let assetPrice = [];       // AR(1) mid-price deviations
+let depthSeries = [];      // depth[t]
 let resilienceSeries = []; // resilience[t]
 
-// AR(1) parameters (mirroring your Python)
+// min/max for chart scaling
+let minPrice = 0, maxPrice = 0;
+let minDepth = 0, maxDepth = 0;
+let minRes = 0, maxRes = 0;
+
+// AR(1) parameters (mirroring your Python idea)
 const arParams = {
   alphaAp: 0.7,
   alphaDp: -0.6,
@@ -21,8 +26,10 @@ const arParams = {
 };
 
 // --- Trading state ---
-let basePriceLevel = 100.0; // shifts AR(1) mid-price to a nicer level
-let currentPrice = basePriceLevel; // displayed price (base + assetPrice[t])
+let basePriceLevel = 100.0; // center around 100
+let currentPrice = basePriceLevel;
+let currentDepth = 0.0;
+let currentResilience = 0.0;
 
 let initialCash = 1.0;
 let initialInventory = 1.0;
@@ -30,7 +37,10 @@ let initialInventory = 1.0;
 let cash = initialCash;
 let inventory = initialInventory;
 let pnl = 0;
-let isRunning = false; // will control price animation later
+
+// animation control
+let isRunning = false;
+let stepFrames = 15; // frames between time steps (~0.5s at 30fps)
 
 // --- Dynamic spread / friction (LinearSpread) ---
 class LinearSpread {
@@ -42,7 +52,7 @@ class LinearSpread {
     this.zetaHistory = [0.0];
   }
 
-  // JS analog of __call__(action, depth, resilience)
+  // analog of __call__(action, depth, resilience)
   valueFor(action, depth, resilience) {
     const prevZeta = this.zetaHistory[this.zetaHistory.length - 1];
     const newZeta =
@@ -59,9 +69,9 @@ let linearSpread = new LinearSpread();
 // --- UI elements inside canvas ---
 let buttons = [];
 
-// ---------------------------------------------------------
+// =====================================================
 // p5 lifecycle
-// ---------------------------------------------------------
+// =====================================================
 function setup() {
   const canvas = createCanvas(800, 500);
   canvas.parent('game-container');
@@ -72,11 +82,9 @@ function setup() {
   generateMarketPrimitives();
 
   currentTime = 0;
-  currentPrice = basePriceLevel + assetPrice[currentTime];
-
   cash = initialCash;
   inventory = initialInventory;
-  recomputePnL();
+  updateFromTime(); // sets currentPrice, depth, resilience, PnL
 
   initButtons();
 }
@@ -84,22 +92,34 @@ function setup() {
 function draw() {
   background(255);
 
-  // 1) Draw grid
+  // Advance time if running
+  if (isRunning && frameCount % stepFrames === 0 && currentTime < terminalTime) {
+    currentTime++;
+    updateFromTime();
+
+    if (currentTime >= terminalTime) {
+      isRunning = false;
+      console.log('Reached terminal time.');
+    }
+  }
+
+  // 1) Grid as background
   drawGrid();
 
-  // 2) (Later) draw price trajectory here, advancing when isRunning === true
+  // 2) Charts for price, depth, resilience
+  drawCharts();
 
-  // 3) Draw control bar, buttons, and HUD
+  // 3) Control bar, buttons, HUD
   drawControlBar();
   drawButtons();
   drawHUD();
 }
 
-// ---------------------------------------------------------
+// =====================================================
 // Drawing helpers
-// ---------------------------------------------------------
+// =====================================================
 function drawGrid() {
-  stroke(220);
+  stroke(240);
   strokeWeight(1);
 
   // horizontal lines
@@ -140,11 +160,11 @@ function drawButtons() {
 }
 
 function drawHUD() {
-  // small panel on the right side of the control bar
+  // HUD panel on the right side of the control bar
   const panelX = width - 260;
   const panelY = height - 75;
   const panelW = 240;
-  const panelH = 65;
+  const panelH = 110;
 
   // background
   stroke(200);
@@ -158,9 +178,15 @@ function drawHUD() {
   textSize(12);
 
   const x = panelX + 10;
-  let y = panelY + 18;
+  let y = panelY + 16;
 
+  text(`t: ${currentTime} / ${terminalTime}`, x, y);
+  y += 15;
   text(`Price: ${currentPrice.toFixed(2)}`, x, y);
+  y += 15;
+  text(`Depth: ${currentDepth.toFixed(2)}`, x, y);
+  y += 15;
+  text(`Resilience: ${currentResilience.toFixed(2)}`, x, y);
   y += 15;
   text(`Inventory: ${inventory.toFixed(2)}`, x, y);
   y += 15;
@@ -169,9 +195,179 @@ function drawHUD() {
   text(`PnL: ${pnl.toFixed(2)}`, x, y);
 }
 
-// ---------------------------------------------------------
+// -----------------------------------------------------
+// Time-series charts for price, depth, resilience
+// -----------------------------------------------------
+function drawCharts() {
+  const left = 40;
+  const right = width - 40;
+
+  const priceTop = 20;
+  const priceHeight = 150;
+
+  const depthTop = priceTop + priceHeight + 10; // ~180
+  const depthHeight = 70;
+
+  const resTop = depthTop + depthHeight + 10; // ~260
+  const resHeight = 70;
+
+  drawPriceChart(left, right, priceTop, priceHeight);
+  drawDepthChart(left, right, depthTop, depthHeight);
+  drawResilienceChart(left, right, resTop, resHeight);
+}
+
+function drawPriceChart(left, right, top, height) {
+  if (!assetPrice || assetPrice.length === 0) return;
+
+  const nSteps = assetPrice.length - 1;
+  if (nSteps <= 0) return;
+
+  const xSpan = right - left;
+  const endIndex = Math.min(currentTime, nSteps);
+
+  // panel background
+  stroke(200);
+  fill(255, 255, 255, 220);
+  rect(left - 10, top - 5, xSpan + 20, height + 10, 5);
+
+  // label
+  noStroke();
+  fill(0);
+  textAlign(LEFT, TOP);
+  textSize(12);
+  text('Price', left - 5, top - 18);
+
+  if (maxPrice <= minPrice) return;
+
+  // series
+  stroke(0);
+  strokeWeight(1.5);
+  noFill();
+
+  beginShape();
+  for (let t = 0; t <= endIndex; t++) {
+    const price = basePriceLevel + assetPrice[t];
+    const x = left + (t / nSteps) * xSpan;
+    const y = mapValueToY(price, minPrice, maxPrice, top, height);
+    vertex(x, y);
+  }
+  endShape();
+
+  // current point highlight
+  if (endIndex >= 0) {
+    const price = basePriceLevel + assetPrice[endIndex];
+    const x = left + (endIndex / nSteps) * xSpan;
+    const y = mapValueToY(price, minPrice, maxPrice, top, height);
+    noStroke();
+    fill(0);
+    circle(x, y, 5);
+  }
+}
+
+function drawDepthChart(left, right, top, height) {
+  if (!depthSeries || depthSeries.length === 0) return;
+
+  const nSteps = depthSeries.length - 1;
+  if (nSteps <= 0) return;
+
+  const xSpan = right - left;
+  const endIndex = Math.min(currentTime, nSteps);
+
+  // panel background
+  stroke(200);
+  fill(255, 255, 255, 220);
+  rect(left - 10, top - 5, xSpan + 20, height + 10, 5);
+
+  // label
+  noStroke();
+  fill(0);
+  textAlign(LEFT, TOP);
+  textSize(12);
+  text('Depth', left - 5, top - 18);
+
+  if (maxDepth <= minDepth) return;
+
+  stroke(0);
+  strokeWeight(1.2);
+  noFill();
+
+  beginShape();
+  for (let t = 0; t <= endIndex; t++) {
+    const d = depthSeries[t];
+    const x = left + (t / nSteps) * xSpan;
+    const y = mapValueToY(d, minDepth, maxDepth, top, height);
+    vertex(x, y);
+  }
+  endShape();
+
+  if (endIndex >= 0) {
+    const d = depthSeries[endIndex];
+    const x = left + (endIndex / nSteps) * xSpan;
+    const y = mapValueToY(d, minDepth, maxDepth, top, height);
+    noStroke();
+    fill(0);
+    circle(x, y, 4);
+  }
+}
+
+function drawResilienceChart(left, right, top, height) {
+  if (!resilienceSeries || resilienceSeries.length === 0) return;
+
+  const nSteps = resilienceSeries.length - 1;
+  if (nSteps <= 0) return;
+
+  const xSpan = right - left;
+  const endIndex = Math.min(currentTime, nSteps);
+
+  // panel background
+  stroke(200);
+  fill(255, 255, 255, 220);
+  rect(left - 10, top - 5, xSpan + 20, height + 10, 5);
+
+  // label
+  noStroke();
+  fill(0);
+  textAlign(LEFT, TOP);
+  textSize(12);
+  text('Resilience', left - 5, top - 18);
+
+  if (maxRes <= minRes) return;
+
+  stroke(0);
+  strokeWeight(1.2);
+  noFill();
+
+  beginShape();
+  for (let t = 0; t <= endIndex; t++) {
+    const r = resilienceSeries[t];
+    const x = left + (t / nSteps) * xSpan;
+    const y = mapValueToY(r, minRes, maxRes, top, height);
+    vertex(x, y);
+  }
+  endShape();
+
+  if (endIndex >= 0) {
+    const r = resilienceSeries[endIndex];
+    const x = left + (endIndex / nSteps) * xSpan;
+    const y = mapValueToY(r, minRes, maxRes, top, height);
+    noStroke();
+    fill(0);
+    circle(x, y, 4);
+  }
+}
+
+// value in [minVal,maxVal] -> y in [top, top+height] (higher = bigger)
+function mapValueToY(value, minVal, maxVal, top, height) {
+  if (maxVal <= minVal) return top + height / 2;
+  const ratio = (value - minVal) / (maxVal - minVal);
+  const clamped = Math.min(1, Math.max(0, ratio));
+  // invert so larger value is visually higher
+  return top + (1 - clamped) * height;
+}
+
+// =====================================================
 // Market primitives: AR(1) processes (asset, depth, resilience)
-// ---------------------------------------------------------
+// =====================================================
 
 // Standard normal via Box–Muller
 function randn() {
@@ -186,7 +382,7 @@ function generateMarketPrimitives() {
   depthSeries = [];
   resilienceSeries = [];
 
-  // Initial values (mirror your Python snippet)
+  // Initial values (similar to Python snippet)
   assetPrice.push(0.0);
   depthSeries.push(arParams.offsetDp);
   resilienceSeries.push(arParams.offsetRe);
@@ -201,17 +397,27 @@ function generateMarketPrimitives() {
     const re = arParams.alphaRe * rePrev + randn() + arParams.offsetRe;
 
     assetPrice.push(ap);
-    depthSeries.push(Math.max(0.1, dp));  // keep positive-ish
+    depthSeries.push(Math.max(0.1, dp));
     resilienceSeries.push(Math.max(0.1, re));
   }
 
-  // Reset spread process whenever we regenerate market primitives
+  // compute min/max for charts using actual values
+  const prices = assetPrice.map(v => basePriceLevel + v);
+  minPrice = Math.min(...prices);
+  maxPrice = Math.max(...prices);
+
+  minDepth = Math.min(...depthSeries);
+  maxDepth = Math.max(...depthSeries);
+
+  minRes = Math.min(...resilienceSeries);
+  maxRes = Math.max(...resilienceSeries);
+
   linearSpread.reset();
 }
 
-// ---------------------------------------------------------
+// =====================================================
 // Buttons & interactions inside the canvas
-// ---------------------------------------------------------
+// =====================================================
 function initButtons() {
   const y = height - 60;
   const w = 100;
@@ -237,12 +443,15 @@ function mousePressed() {
   });
 }
 
-// ---------------------------------------------------------
+// =====================================================
 // Button actions
-// ---------------------------------------------------------
+// =====================================================
 function onStart() {
+  if (currentTime >= terminalTime) {
+    // If we've already finished, restart instead
+    onReset();
+  }
   isRunning = true;
-  // Next step: use this to advance currentTime and reveal the price path
   console.log('START clicked, isRunning =', isRunning);
 }
 
@@ -252,11 +461,9 @@ function onReset() {
   generateMarketPrimitives();
 
   currentTime = 0;
-  currentPrice = basePriceLevel + assetPrice[currentTime];
-
   cash = initialCash;
   inventory = initialInventory;
-  recomputePnL();
+  updateFromTime();
 
   console.log('RESET clicked, market & state reset');
 }
@@ -264,15 +471,13 @@ function onReset() {
 // Unified trade handler: action = +1 (buy), -1 (sell)
 function onTrade(action) {
   // Use current depth & resilience at this time
-  const depth = depthSeries[Math.min(currentTime, depthSeries.length - 1)];
-  const resilience = resilienceSeries[Math.min(currentTime, resilienceSeries.length - 1)];
+  const depth = currentDepth;
+  const resilience = currentResilience;
 
   // Dynamic spread / friction
   const frictionCost = linearSpread.valueFor(action, depth, resilience);
 
   // Cash change: - (action * price + friction)
-  // - Buy (action>0): spend cash and pay cost
-  // - Sell (action<0): receive cash minus cost
   cash += -action * currentPrice - frictionCost;
 
   // Inventory update
@@ -281,9 +486,20 @@ function onTrade(action) {
   recomputePnL();
 
   console.log(
-    `TRADE action=${action}, price=${currentPrice.toFixed(2)}, depth=${depth.toFixed(2)}, ` +
-    `res=${resilience.toFixed(2)}, friction=${frictionCost.toFixed(4)}`
+    `TRADE action=${action}, t=${currentTime}, price=${currentPrice.toFixed(2)}, ` +
+    `depth=${depth.toFixed(2)}, res=${resilience.toFixed(2)}, friction=${frictionCost.toFixed(4)}`
   );
+}
+
+// =====================================================
+// Helpers
+// =====================================================
+function updateFromTime() {
+  const idx = Math.min(currentTime, terminalTime);
+  currentPrice = basePriceLevel + assetPrice[idx];
+  currentDepth = depthSeries[idx];
+  currentResilience = resilienceSeries[idx];
+  recomputePnL();
 }
 
 // Mark-to-market PnL: inventory * currentPrice + cash
