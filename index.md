@@ -6,6 +6,14 @@ classes: wide
 
 <style>
 
+.game-section {
+  background-color: #ffffff;
+  padding: 4em 2em;
+  min-height: 50vh;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
 /* Push header content to edges */
 .masthead__inner-wrap {
   padding-left: 1em;
@@ -109,12 +117,12 @@ classes: wide
 <div class="works-section">
   <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 1em;">UNDER CONSTRUCTION</h2>
   
-  <!-- <h3>Project 1</h3>
-  <p>Description of your first project.</p>
-  
-  <h3>Project 2</h3>
-  <p>Description of your second project.</p>
-  
-  <h3>Project 3</h3>
-  <p>Description of your third project.</p> -->
+  <div class="game-section">
+    <h2 style="text-align:center;">Trajectory Forecast Game</h2>
+    <p style="text-align:center;">Interactive experiment coming here...</p>
+    <div id="game-container" style="display:flex; justify-content:center; padding:1em;">
+      <!-- p5 canvas will live here -->
+    </div>
+  </div>
+
 </div>
