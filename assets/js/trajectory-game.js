@@ -26,12 +26,12 @@ function setup() {
 function draw() {
   background(255);
 
-  // 1) Draw grid (in the background)
+  // 1) Draw grid in the background
   drawGrid();
 
-  // 2) (Later) draw price trajectory here, driven by isRunning & time
+  // 2) (Later) draw price trajectory here when isRunning === true
 
-  // 3) Draw control bar and HUD on top
+  // 3) Draw control bar, buttons, and HUD on top
   drawControlBar();
   drawButtons();
   drawHUD();
