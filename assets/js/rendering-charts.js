@@ -229,7 +229,17 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
   text(label, x + width / 2, top - 15);
   
   textSize(8);
-  text(currentValue.toFixed(0), x + width / 2, top + height + 3);
+  function formatValue(value) {
+    if (Math.abs(value) < 1) {
+      return value.toFixed(4);  // 4 decimals for small values
+    } else if (Math.abs(value) < 100) {
+      return value.toFixed(2);  // 2 decimals for medium values
+    } else {
+      return value.toFixed(1);  // 1 decimal for large values
+    }
+  }
+
+  text(formatValue(currentValue), x + width / 2, top + height + 3);
 }
 
 /**
