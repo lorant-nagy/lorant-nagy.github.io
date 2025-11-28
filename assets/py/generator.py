@@ -48,7 +48,7 @@ AR_PARAMS = {
     'alpha_re': 0.8,          # Resilience autocorrelation
     'offset_ap': 0.0,         # Asset price offset (added after simulation)
     'offset_dp': 6.0,         # Depth mean level (added after simulation)
-    'offset_re': 7.0          # Resilience mean level (added after simulation)
+    'offset_re': 0.5          # Resilience mean level (added after simulation)
 }
 
 # Output settings
