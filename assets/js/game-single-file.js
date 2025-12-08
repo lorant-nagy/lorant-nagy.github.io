@@ -112,15 +112,15 @@ const CONFIG = {
   // Trading mechanics
   allowNegativeCash: true,  // Allow cash to go negative (loans)
   
-  // Chart styling
+  // Chart styling - Blade Runner 2049 color scheme
   chartStyles: {
-    depthColor: [80, 120, 200],
-    resilienceColor: [200, 80, 120],
-    zetaColor: [218, 165, 32],  // Mustard yellow
-    fillAlpha: 80,
-    lineWeight: 1.5,
+    depthColor: [255, 140, 50],      // Warm amber/orange
+    resilienceColor: [0, 180, 220],  // Cyan/blue
+    zetaColor: [255, 100, 30],       // Deep orange
+    fillAlpha: 120,
+    lineWeight: 2,
     zetaLineWeight: 2.5,
-    zetaAlpha: 150,
+    zetaAlpha: 180,
     depthResHeight: 60,
     zetaHeight: 60,
     legendDotSize: 6,
@@ -844,7 +844,7 @@ function drawGrid(width, height, cellW, cellH) {
 function drawControlBar(width, height) {
   noStroke();
   fill(245);
-  rect(0, height - 80, width, 80);
+  rect(0, height - 80, width);
 }
 
 function drawPriceChart(left, right, top, height, gameState, scales) {
@@ -856,12 +856,13 @@ function drawPriceChart(left, right, top, height, gameState, scales) {
   const endIndex = Math.min(gameState.currentTime, nSteps);
   const chartWidth = right - left;
 
-  stroke(200);
-  fill(255, 255, 255, 220);
-  rect(left - 10, top - 5, chartWidth + 20, height + 10, 5);
+  stroke(255, 140, 50);  // Orange border
+  strokeWeight(1);
+  fill(25, 25, 35, 240);  // Very dark background
+  rect(left - 10, top - 5, chartWidth + 20, height + 10);
 
   noStroke();
-  fill(0);
+  fill(255, 140, 50);  // Orange text
   textAlign(LEFT, TOP);
   textSize(12);
   text('Price', left - 5, top - 18);
@@ -905,9 +906,9 @@ function drawCandle(index, left, candleWidth, candleSpacing, top, height, gameSt
   const lowY = mapValueToY(low, scales.priceYMin, scales.priceYMax, top, height);
   
   const isGreen = close >= open;
-  const candleColor = isGreen ? color(50, 200, 50) : color(200, 50, 50);
+  const candleColor = isGreen ? color(0, 220, 180) : color(255, 100, 30);  // Cyan up, deep orange down
   
-  stroke(100);
+  stroke(0, 150, 180);  // Cyan wick
   strokeWeight(1);
   line(candleX + candleWidth / 2, highY, candleX + candleWidth / 2, lowY);
   
@@ -939,9 +940,9 @@ function drawPartialCandle(numCandles, endIndex, left, candleWidth, candleSpacin
   const lowY = mapValueToY(low, scales.priceYMin, scales.priceYMax, top, height);
   
   const isGreen = close >= open;
-  const candleColor = isGreen ? color(50, 200, 50) : color(200, 50, 50);
+  const candleColor = isGreen ? color(0, 220, 180) : color(255, 100, 30);  // Cyan up, deep orange down
   
-  stroke(100);
+  stroke(0, 150, 180);  // Cyan wick
   strokeWeight(1);
   line(candleX + candleWidth / 2, highY, candleX + candleWidth / 2, lowY);
   
@@ -988,9 +989,9 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   // Background stripes
   noStroke();
   fill(240, 240, 245);
-  rect(left, aiStripeY, chartWidth, stripeHeight, 3);
+  rect(left, aiStripeY, chartWidth, stripeHeight);
   fill(245, 240, 240);
-  rect(left, playerStripeY, chartWidth, stripeHeight, 3);
+  rect(left, playerStripeY, chartWidth, stripeHeight);
   
   // Labels
   fill(0);
@@ -1088,9 +1089,10 @@ function drawDepthResilienceChart(left, right, top, height, gameState, scales) {
   const endIndex = Math.min(gameState.currentTime, nSteps);
   const chartWidth = right - left;
 
-  stroke(200);
-  fill(255, 255, 255, 220);
-  rect(left - 10, top - 5, chartWidth + 20, height + 10, 5);
+  stroke(0, 180, 220);  // Cyan border
+  strokeWeight(1);
+  fill(25, 25, 35, 240);  // Dark background
+  rect(left - 10, top - 5, chartWidth + 20, height + 10);
 
   const legendX = right - 80;
   const legendY = top + 8;
@@ -1098,14 +1100,14 @@ function drawDepthResilienceChart(left, right, top, height, gameState, scales) {
   noStroke();
   fill(...CONFIG.chartStyles.depthColor);
   circle(legendX, legendY, CONFIG.chartStyles.legendDotSize);
-  fill(0);
+  fill(255, 140, 50);  // Orange text
   textAlign(LEFT, CENTER);
   textSize(10);
   text('Depth', legendX + 8, legendY);
   
   fill(...CONFIG.chartStyles.resilienceColor);
   circle(legendX, legendY + 12, CONFIG.chartStyles.legendDotSize);
-  fill(0);
+  fill(0, 180, 220);  // Cyan text
   text('Resilience', legendX + 8, legendY + 12);
 
   stroke(230);
@@ -1185,9 +1187,10 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   const chartWidth = right - left;
 
   // Panel background
-  stroke(200);
-  fill(255, 255, 255, 220);
-  rect(left - 10, top - 5, chartWidth + 20, height + 10, 5);
+  stroke(255, 100, 30);  // Deep orange border
+  strokeWeight(1);
+  fill(25, 25, 35, 240);  // Dark background
+  rect(left - 10, top - 5, chartWidth + 20, height + 10);
 
   // Legend
   const legendX = right - 50;
@@ -1196,7 +1199,7 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   noStroke();
   fill(...CONFIG.chartStyles.zetaColor);
   circle(legendX, legendY, CONFIG.chartStyles.legendDotSize);
-  fill(0);
+  fill(255, 100, 30);  // Deep orange text
   textAlign(LEFT, CENTER);
   textSize(10);
   text('Zeta', legendX + 8, legendY);
@@ -1277,10 +1280,10 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
   const range = maxValue - minValue;
   const isCashThermometer = label.includes('Cash');
   
-  stroke(200);
+  stroke(255, 140, 50);  // Orange border
   strokeWeight(1);
-  fill(245);
-  rect(x, top, width, height, 5);
+  fill(30, 30, 40);  // Dark background
+  rect(x, top, width, height);
   
   if (isCashThermometer) {
     drawCashGridLines(x, top, width, height, minValue, maxValue, range);
@@ -1290,7 +1293,7 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
   
   drawThermometerFill(x, top, width, height, currentValue, minValue, maxValue, range, isCashThermometer);
   
-  fill(0);
+  fill(255, 140, 50);  // Orange text
   textAlign(CENTER, TOP);
   textSize(9);
   text(label, x + width / 2, top - 15);
@@ -1310,19 +1313,19 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
 }
 
 function drawCashGridLines(x, top, width, height, minValue, maxValue, range) {
-  stroke(220);
+  stroke(0, 100, 120);  // Dark cyan
   strokeWeight(0.5);
   
   // Draw zero line (very prominent if scale allows negative)
   if (minValue < 0 && maxValue > 0) {
     const zeroNormalized = (0 - minValue) / range;
     const zeroY = top + (1 - zeroNormalized) * height;
-    stroke(0);
+    stroke(0, 180, 220);  // Bright cyan
     strokeWeight(2);
     line(x, zeroY, x + width, zeroY);
     
     noStroke();
-    fill(0);
+    fill(0, 180, 220);  // Cyan text
     textAlign(LEFT, CENTER);
     textSize(9);
     text('0', x + width + 2, zeroY);
@@ -1332,12 +1335,12 @@ function drawCashGridLines(x, top, width, height, minValue, maxValue, range) {
   if (CONFIG.commonCash >= minValue && CONFIG.commonCash <= maxValue) {
     const initNormalized = (CONFIG.commonCash - minValue) / range;
     const initY = top + (1 - initNormalized) * height;
-    stroke(0, 150, 0);  // Green for initial wealth
+    stroke(255, 140, 50);  // Orange for initial wealth
     strokeWeight(1.5);
     line(x, initY, x + width, initY);
     
     noStroke();
-    fill(0, 150, 0);
+    fill(255, 140, 50);  // Orange text
     textAlign(LEFT, CENTER);
     textSize(8);
     text('Init', x + width + 2, initY);
@@ -1379,7 +1382,7 @@ function drawCashGridLines(x, top, width, height, minValue, maxValue, range) {
 }
 
 function drawInventoryGridLines(x, top, width, height, minValue, maxValue, range) {
-  stroke(220);
+  stroke(0, 100, 120);  // Dark cyan
   strokeWeight(0.5);
   const numLines = 10;
   for (let i = 0; i <= numLines; i++) {
@@ -1390,7 +1393,7 @@ function drawInventoryGridLines(x, top, width, height, minValue, maxValue, range
   const zeroNormalized = (0 - minValue) / range;
   if (zeroNormalized >= 0 && zeroNormalized <= 1) {
     const zeroY = top + (1 - zeroNormalized) * height;
-    stroke(100);
+    stroke(0, 180, 220);  // Bright cyan
     strokeWeight(1.5);
     line(x, zeroY, x + width, zeroY);
   }
@@ -1413,12 +1416,12 @@ function drawThermometerFill(x, top, width, height, currentValue, minValue, maxV
       const fillTop = Math.min(valueY, zeroY);
       const fillHeight = Math.abs(zeroY - valueY);
       fill(50, 200, 50, 180);
-      rect(x, fillTop, width, fillHeight, 5);
+      rect(x, fillTop, width, fillHeight);
     } else {
       // Negative: red fill from zero down to current value (loans)
       const fillHeight = Math.abs(zeroY - valueY);
       fill(200, 50, 50, 180);
-      rect(x, zeroY, width, fillHeight, 5);
+      rect(x, zeroY, width, fillHeight);
     }
   } else {
     // Inventory thermometer (unchanged)
@@ -1429,11 +1432,11 @@ function drawThermometerFill(x, top, width, height, currentValue, minValue, maxV
       const fillTop = Math.min(valueY, zeroY);
       const fillHeight = Math.abs(zeroY - valueY);
       fill(50, 200, 50, 180);
-      rect(x, fillTop, width, fillHeight, 5);
+      rect(x, fillTop, width, fillHeight);
     } else {
       const fillHeight = Math.abs(zeroY - valueY);
       fill(200, 50, 50, 180);
-      rect(x, zeroY, width, fillHeight, 5);
+      rect(x, zeroY, width, fillHeight);
     }
   }
 }
@@ -1466,27 +1469,31 @@ function drawButtons(buttons, gameState) {
 
   buttons.forEach(btn => {
     let isClickable = true;
-    let fillColor = 235;
-    let textColor = 0;
+    let fillColor = [40, 40, 50];      // Dark background
+    let strokeColor = [255, 140, 50];  // Orange border
+    let textColor = [255, 140, 50];    // Orange text
     
     if (gameState.isGameOver) {
       isClickable = (btn.label === 'RESET');
       if (!isClickable) {
-        fillColor = 200;
-        textColor = 150;
+        fillColor = [25, 25, 30];
+        strokeColor = [60, 60, 70];
+        textColor = [80, 80, 90];
       }
     } else if (btn.label === 'START') {
       isClickable = !gameState.isRunning;
       if (!isClickable) {
-        fillColor = 200;
-        textColor = 150;
+        fillColor = [25, 25, 30];
+        strokeColor = [60, 60, 70];
+        textColor = [80, 80, 90];
       }
     } else if (btn.label === 'BUY' || btn.label === 'SELL') {
       // Player can trade anytime (no restrictions)
       isClickable = gameState.isRunning && !gameState.isInLiquidationPhase;
       if (!isClickable) {
-        fillColor = 200;
-        textColor = 150;
+        fillColor = [25, 25, 30];
+        strokeColor = [60, 60, 70];
+        textColor = [80, 80, 90];
       }
     }
     
@@ -1495,11 +1502,13 @@ function drawButtons(buttons, gameState) {
                       mouseY >= btn.y && mouseY <= btn.y + btn.h;
     
     if (isHovered) {
-      fillColor = 220;
+      fillColor = [60, 60, 75];       // Lighter on hover
+      strokeColor = [255, 180, 100];  // Brighter orange
+      textColor = [255, 180, 100];
     }
     
-    stroke(0);
-    strokeWeight(isClickable ? 1 : 0.5);
+    stroke(strokeColor);
+    strokeWeight(isClickable ? 2 : 1);
     fill(fillColor);
     rect(btn.x, btn.y, btn.w, btn.h);
 
@@ -1522,7 +1531,7 @@ function drawGameOver(gameState) {
   stroke(0);
   strokeWeight(3);
   fill(255);
-  rect(boxX, boxY, boxW, boxH, 10);
+  rect(boxX, boxY, boxW, boxH);
   
   noStroke();
   fill(200, 50, 50);
@@ -1581,7 +1590,7 @@ function drawGameOver(gameState) {
   stroke(0);
   strokeWeight(2);
   fill(isHovered ? color(70, 180, 70) : color(50, 150, 50));
-  rect(btnX, btnY, btnW, btnH, 8);
+  rect(btnX, btnY, btnW, btnH);
   
   noStroke();
   fill(255);
@@ -1611,17 +1620,19 @@ function drawLiquidationPhase(gameState) {
 }
 
 function initButtons(canvasHeight) {
-  const x = 820;  // Right side, after thermometers
+  const x = 820;
   const w = 70;
-  const h = 90;   // Tall buttons
+  const startY = 20;
+  const endY = 483;  // Where zeta chart ends (20 + 250 + 58 + 15 + 60 + 20 + 60)
+  const totalHeight = endY - startY;  // 463px
   const gap = 8;
-  const startY = 20;  // Align with chart top
+  const h = (totalHeight - gap * 3) / 4;  // Divide remaining space by 4 buttons
 
   return [
-    { label: 'START', x, y: startY,                w, h },
-    { label: 'RESET', x, y: startY + h + gap,      w, h },
-    { label: 'BUY',   x, y: startY + (h + gap) * 2, w, h },
-    { label: 'SELL',  x, y: startY + (h + gap) * 3, w, h },
+    { label: 'START', x, y: startY,                  w, h },
+    { label: 'RESET', x, y: startY + h + gap,        w, h },
+    { label: 'BUY',   x, y: startY + (h + gap) * 2,  w, h },
+    { label: 'SELL',  x, y: startY + (h + gap) * 3,  w, h },
   ];
 }
 
@@ -1706,11 +1717,11 @@ window.setup = async function() {
 };
 
 window.draw = function() {
-  background(255);
+  background(15, 15, 20);  // Very dark blue-black (Blade Runner style)
 
   // Don't draw anything until setup is complete
   if (!gameState || !buttons) {
-    fill(0);
+    fill(255, 140, 50);  // Orange text
     textAlign(CENTER, CENTER);
     textSize(16);
     text('Loading...', width / 2, height / 2);
