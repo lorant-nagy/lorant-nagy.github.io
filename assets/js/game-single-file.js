@@ -1304,11 +1304,14 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
   
   drawThermometerFill(x, top, width, height, currentValue, minValue, maxValue, range, isCashThermometer);
   
+  // Label at top, inside the rectangle
   fill(255, 140, 50);  // Orange text
   textAlign(CENTER, TOP);
   textSize(9);
-  text(label, x + width / 2, top - 15);
+  text(label, x + width / 2, top + 3);  // 3px from top edge, inside
   
+  // Value at bottom, inside the rectangle
+  textAlign(CENTER, BOTTOM);
   textSize(8);
   function formatValue(value) {
     if (Math.abs(value) < 1) {
@@ -1320,7 +1323,7 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
     }
   }
 
-  text(formatValue(currentValue), x + width / 2, top + height + 3);
+  text(formatValue(currentValue), x + width / 2, top + height - 3);  // 3px from bottom edge, inside
 }
 
 function drawCashGridLines(x, top, width, height, minValue, maxValue, range) {
