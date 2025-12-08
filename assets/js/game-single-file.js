@@ -856,16 +856,17 @@ function drawPriceChart(left, right, top, height, gameState, scales) {
   const endIndex = Math.min(gameState.currentTime, nSteps);
   const chartWidth = right - left;
 
+  // Draw background and border exactly at bounds
   stroke(255, 140, 50);  // Orange border
   strokeWeight(1);
   fill(25, 25, 35, 240);  // Very dark background
-  rect(left - 10, top - 5, chartWidth + 20, height + 10);
+  rect(left, top, chartWidth, height);
 
   noStroke();
   fill(255, 140, 50);  // Orange text
   textAlign(LEFT, TOP);
   textSize(12);
-  text('Price', left - 5, top);  // Inside, at the top edge
+  text('Price', left + 5, top + 3);  // Inside, with small padding
 
   const totalCandles = Math.ceil(nSteps / CONFIG.pointsPerCandle);
   const candleSpacing = 2;
@@ -986,12 +987,12 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   const playerStripeY = aiStripeY + stripeHeight + stripeSpacing;
   const playerMarkerY = playerStripeY + stripeHeight / 2;
   
-  // Background stripes - Blade Runner style, full width like charts
+  // Background stripes - exactly at bounds
   stroke(255, 140, 50);  // Orange border
   strokeWeight(1);
   fill(25, 25, 35, 240);  // Dark background
-  rect(left - 10, aiStripeY, chartWidth + 20, stripeHeight);  // Extended width
-  rect(left - 10, playerStripeY, chartWidth + 20, stripeHeight);  // Extended width
+  rect(left, aiStripeY, chartWidth, stripeHeight);
+  rect(left, playerStripeY, chartWidth, stripeHeight);
   
   // Draw vertical dividers between candles
   stroke(0, 100, 120);  // Dark cyan dividers
@@ -1008,8 +1009,8 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   fill(255, 140, 50);  // Orange text
   textAlign(LEFT, CENTER);
   textSize(10);
-  text('AI Agent', left - 5, aiMarkerY);  // Adjusted for new width
-  text('Player', left - 5, playerMarkerY);  // Adjusted for new width
+  text('AI Agent', left + 5, aiMarkerY);
+  text('Player', left + 5, playerMarkerY);
   
   // Count AI trades per candle
   const aiTradesPerCandle = {};
@@ -1100,10 +1101,11 @@ function drawDepthResilienceChart(left, right, top, height, gameState, scales) {
   const endIndex = Math.min(gameState.currentTime, nSteps);
   const chartWidth = right - left;
 
+  // Draw background and border exactly at bounds
   stroke(0, 180, 220);  // Cyan border
   strokeWeight(1);
   fill(25, 25, 35, 240);  // Dark background
-  rect(left - 10, top - 5, chartWidth + 20, height + 10);
+  rect(left, top, chartWidth, height);
 
   const legendX = right - 80;
   const legendY = top + 8;
@@ -1197,11 +1199,11 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   const currentZetaIndex = Math.min(gameState.currentZetaTime, gameState.zetaSeries.length - 1);
   const chartWidth = right - left;
 
-  // Panel background
+  // Panel background - exactly at bounds
   stroke(255, 100, 30);  // Deep orange border
   strokeWeight(1);
   fill(25, 25, 35, 240);  // Dark background
-  rect(left - 10, top - 5, chartWidth + 20, height + 10);
+  rect(left, top, chartWidth, height);
 
   // Legend
   const legendX = right - 50;
@@ -1456,31 +1458,56 @@ function drawThermometerFill(x, top, width, height, currentValue, minValue, maxV
 }
 
 function drawCharts(gameState, scales) {
-  const left = 40;
-  const right = 580;
-  const priceTop = 20;
-  const priceHeight = 250;
-  const spacing = 10;  // Equal spacing between sections
+  // Master container dimensions
+  const containerPadding = 10;  // Uniform padding around everything
+  const containerLeft = 30;
+  const containerTop = 20;
+  const containerRight = 590;
+  const containerBottom = 488;
+  
+  // Inner content area (with padding from container edges)
+  const contentLeft = containerLeft + containerPadding;  // 40
+  const contentRight = containerRight - containerPadding;  // 580
+  const contentTop = containerTop + containerPadding;  // 30
+  const contentBottom = containerBottom - containerPadding;  // 478
+  
+  // Spacing between sections
+  const sectionSpacing = 10;
+  
+  // Calculate section heights
+  const priceHeight = 240;  // Reduced by 10 to account for top padding
   const tradeMarkersHeight = 58;
+  const depthResHeight = 60;
+  const zetaHeight = 60;
   
   // Calculate positions with equal spacing
+  const priceTop = contentTop;  // 30
   const priceBottom = priceTop + priceHeight;  // 270
-  const tradeMarkersTop = priceBottom + spacing;  // 280
-  const tradeMarkersBottom = tradeMarkersTop + tradeMarkersHeight;  // 338
-  const depthResTop = tradeMarkersBottom + spacing;  // 348
-  const depthResHeight = CONFIG.chartStyles.depthResHeight;
-  const zetaTop = depthResTop + depthResHeight + 20;
-  const zetaHeight = CONFIG.chartStyles.zetaHeight;
-  const zetaBottom = zetaTop + zetaHeight;  // 483
-
-  drawPriceChart(left, right, priceTop, priceHeight, gameState, scales);
-  drawTradeMarkers(left, right, tradeMarkersTop, gameState);  // Now using calculated position
-  drawDepthResilienceChart(left, right, depthResTop, depthResHeight, gameState, scales);
-  drawZetaChart(left, right, zetaTop, zetaHeight, gameState, scales);
   
-  // Thermometers span from priceTop (20) to zetaBottom (483)
-  const thermometerHeight = zetaBottom - priceTop;  // 463
-  drawThermometerBars(right + 30, priceTop, thermometerHeight, gameState, scales);
+  const tradeMarkersTop = priceBottom + sectionSpacing;  // 280
+  const tradeMarkersBottom = tradeMarkersTop + tradeMarkersHeight;  // 338
+  
+  const depthResTop = tradeMarkersBottom + sectionSpacing;  // 348
+  const depthResBottom = depthResTop + depthResHeight;  // 408
+  
+  const zetaTop = depthResBottom + sectionSpacing;  // 418
+  const zetaBottom = zetaTop + zetaHeight;  // 478
+  
+  // Draw container box (optional - for debugging/visual reference)
+  stroke(255, 140, 50, 100);  // Semi-transparent orange
+  strokeWeight(1);
+  noFill();
+  rect(containerLeft, containerTop, containerRight - containerLeft, containerBottom - containerTop);
+  
+  // Draw all chart sections
+  drawPriceChart(contentLeft, contentRight, priceTop, priceHeight, gameState, scales);
+  drawTradeMarkers(contentLeft, contentRight, tradeMarkersTop, gameState);
+  drawDepthResilienceChart(contentLeft, contentRight, depthResTop, depthResHeight, gameState, scales);
+  drawZetaChart(contentLeft, contentRight, zetaTop, zetaHeight, gameState, scales);
+  
+  // Thermometers span from containerTop to containerBottom
+  const thermometerHeight = containerBottom - containerTop;  // 468
+  drawThermometerBars(containerRight + 20, containerTop, thermometerHeight, gameState, scales);
 }
 
 // =====================================================
@@ -1646,17 +1673,17 @@ function drawLiquidationPhase(gameState) {
 function initButtons(canvasHeight) {
   const x = 820;
   const w = 70;
-  const startY = 20;
-  const endY = 483;  // Where zeta chart ends (20 + 250 + 58 + 15 + 60 + 20 + 60)
-  const totalHeight = endY - startY;  // 463px
+  const containerTop = 20;
+  const containerBottom = 488;
+  const totalHeight = containerBottom - containerTop;  // 468px
   const gap = 8;
   const h = (totalHeight - gap * 3) / 4;  // Divide remaining space by 4 buttons
 
   return [
-    { label: 'START', x, y: startY,                  w, h },
-    { label: 'RESET', x, y: startY + h + gap,        w, h },
-    { label: 'BUY',   x, y: startY + (h + gap) * 2,  w, h },
-    { label: 'SELL',  x, y: startY + (h + gap) * 3,  w, h },
+    { label: 'START', x, y: containerTop,                  w, h },
+    { label: 'RESET', x, y: containerTop + h + gap,        w, h },
+    { label: 'BUY',   x, y: containerTop + (h + gap) * 2,  w, h },
+    { label: 'SELL',  x, y: containerTop + (h + gap) * 3,  w, h },
   ];
 }
 

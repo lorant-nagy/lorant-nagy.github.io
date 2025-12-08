@@ -79,7 +79,7 @@ classes: wide
 .welcome-section {
   background-image: url('/assets/images/background.png');
   background-attachment: fixed;
-  background-position: center 80%;
+  background-position: center 20%;
   background-size: cover;
   min-height: 50vh;
   display: flex;
