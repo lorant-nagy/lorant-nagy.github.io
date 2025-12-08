@@ -2,6 +2,86 @@
 // TRADING GAME - SINGLE FILE IMPLEMENTATION
 // =====================================================
 // All modules combined into one file
+//
+// =====================================================
+// MATHEMATICAL MODEL
+// =====================================================
+// Based on: Nagy & Rásonyi (2025) "On the utility problem in a market 
+// where price impact is transient" arXiv:2511.12093v1
+//
+// MARKET PRIMITIVES (update once per market time step):
+//   P_t  = Asset midprice (zero-mean deviation from base)
+//   δ_t  = Market depth (liquidity)
+//   r_t  = Resilience rate (speed of spread recovery)
+//
+// SPREAD DYNAMICS (Equation 1 from paper):
+//   ζ_{t+1} = e^{-r_t} * ζ_t + (1/δ_{t+1}) * |X_{t+1} - X_t|
+//
+// Where:
+//   ζ_t = Half-spread at time t (bid-ask spread = 2*ζ_t)
+//   X_t = Position in risky asset at time t
+//   |X_{t+1} - X_t| = Absolute value of trade size
+//
+// WEALTH DYNAMICS (Equation 2 from paper):
+//   Cash_{t+1} = Cash_t - P_{t+1}*(X_{t+1} - X_t) - ζ_{t+1}*|X_{t+1} - X_t|
+//   Wealth_t = Cash_t + X_t * P_t
+//
+// HIGH-FREQUENCY EXTENSION WITH SUBSTEPS:
+//   - Paper uses one time step per market update
+//   - We extend this to allow multiple trades per market step using SUBSTEPS
+//
+//   DUAL-CLOCK MECHANISM:
+//     1. MARKET CLOCK (slow): Updates primitives (P, δ, r) once per step
+//     2. SUBSTEP CLOCK (fast): Ticks 4 times per market step
+//   
+//   SUBSTEP STRUCTURE:
+//     Market step t=5: Primitives P, δ, r are CONSTANT
+//       Substep q=20:
+//         - Trade 1: ζ += (1/δ) * |action|    [NO decay, only jump]
+//         - Trade 2: ζ += (1/δ) * |action|    [NO decay, only jump]
+//       Substep q=21 ADVANCES:
+//         - Apply decay: ζ *= e^{-r/4}        [Decay happens here!]
+//         - Trade 3: ζ += (1/δ) * |action|    [NO decay, only jump]
+//       Substep q=22 ADVANCES:
+//         - Apply decay: ζ *= e^{-r/4}
+//         (no trades this substep)
+//       Substep q=23 ADVANCES:
+//         - Apply decay: ζ *= e^{-r/4}
+//     Market step t=6: Primitives UPDATE to new values
+//   
+//   KEY INSIGHT:
+//     - TRADES add jumps: ζ += (1/δ) * |action|
+//     - SUBSTEP TICKS apply decay: ζ *= e^{-r/4}
+//     - These are SEPARATED: decay happens when clock ticks, not when trading
+//     - Multiple trades within one substep accumulate jumps without decay
+//   
+// SHARED MARKET SPREAD:
+//   - Single ζ process affects both player and rule-based agent
+//   - Both agents pay friction based on current ζ
+//   - Both agents' trades widen the spread additively
+//   - No cancellation: |action_player| + |action_agent| both contribute
+//
+// RULE-BASED AGENT TRADING:
+//   The rule-based agent uses a simple contrarian strategy with threshold filtering:
+//
+//   Trading conditions (ALL must be satisfied):
+//     1. Resilience > threshold_re (high resilience = good market recovery)
+//     2. Depth > threshold_de (high depth = good market liquidity)
+//     3. |Price - meanReversionLevel| > actionThreshold (price deviation large enough)
+//     4. Bernoulli trial with probability p (simple coinflip filter)
+//
+//   If all conditions met:
+//     - If price > mean → SELL (-1)
+//     - If price < mean → BUY (+1)
+//
+//   Default parameters:
+//     meanReversionLevel = 50.0
+//     actionThreshold = 2.5
+//     threshold_re = 0.6
+//     threshold_de = 0.8
+//     tradeProbability = 1.0 (no thinning by default)
+//
+// =====================================================
 
 // =====================================================
 // CONFIGURATION
@@ -9,20 +89,28 @@
 
 const CONFIG = {
   // Data source
-  csvPath: 'assets/data/not_bad.csv?v=' + Date.now(),  // Cache-busting
+  csvPath: 'assets/data/market_primitives.csv?v=' + Date.now(),  // Cache-busting
   
   // Time & market
-  initialTerminalTime: 50,
+  initialTerminalTime: 200,
   pointsPerCandle: 10,
-  zetaStepsPerMarketStep: 4,  // Zeta updates 4x more frequently than market primitives
-  minZetaStepsBetweenTrades: 1,  // Can trade once per zeta step (high frequency)
+  
+  // Three independent clocks (ticks per market step)
+  zetaClockFrequency: 4,  // Zeta decay: 4 ticks per market step
+  aiClockFrequency: 2,     // Rule-based agent trading: 2 ticks per market step
+  // Market clock: always 1 tick per step (implicit)
+  // Player: NO restrictions (can trade anytime)
   
   // Liquidation
   tradingHorizonFraction: 0.8,
+  liquidationFrequency: 'market',  // 'market' = once per market step, 'zeta' = once per zeta substep
   
   // Initial wealth
-  commonCash: 100,
+  commonCash: 10000,  // Increased to make per-trade changes more visible relative to total
   initialInventory: 0,
+  
+  // Trading mechanics
+  allowNegativeCash: true,  // Allow cash to go negative (loans)
   
   // Chart styling
   chartStyles: {
@@ -40,12 +128,20 @@ const CONFIG = {
     priceYMax: 120
   },
   
-  // AI Agent
-  aiAgent: {
+  // Rule-Based Agent - Contrarian Strategy with Threshold Filtering
+  ruleBasedAgent: {
     enabled: true,
-    c0: 1.88,
-    depthExponent: 1/3,
-    actionThreshold: 0.5
+    
+    // Contrarian parameters
+    meanReversionLevel: 50.0,     // Price level for mean reversion (buy low/sell high around this)
+    actionThreshold: 2.7,         // Minimum price deviation to trigger trade
+    
+    // Market quality thresholds (must be ABOVE these to trade - high is good!)
+    thresholdResilience: 0.6,     // Only trade if resilience > 0.6
+    thresholdDepth: 0.8,          // Only trade if depth > 0.8
+    
+    // Simple Bernoulli thinning
+    tradeProbability: 0.3         // Probability of executing trade when conditions met (0.0 to 1.0)
   },
   
   // Display scales
@@ -55,11 +151,13 @@ const CONFIG = {
     resMin: 0,
     resMax: 15,
     zetaMin: 0,
-    zetaMax: 1,
+    zetaMax: 0.6,
     inventoryMin: -50,
     inventoryMax: 50,
-    cashMin: 0,
-    cashMax: 300
+    cashMin: -100,  // Allow negative (loans)
+    cashMax: 300,
+    wealthMin: -100,  // Allow negative wealth
+    wealthMax: 300
   },
   
   // Grid
@@ -68,44 +166,29 @@ const CONFIG = {
   
   // Canvas
   canvasWidth: 900,
-  canvasHeight: 580,  // Increased for zeta chart
+  canvasHeight: 605,  // Increased for more airy spacing (was 580)
   
   // Animation
   stepFrames: 15
 };
 
 CONFIG.scales.cashMax = CONFIG.commonCash * 3;
+CONFIG.scales.wealthMax = CONFIG.commonCash * 3;
 
 // =====================================================
 // MARKET LOGIC
 // =====================================================
-
-class LinearSpread {
-  constructor() {
-    this.zetaHistory = [0.0];
-  }
-
-  reset() {
-    this.zetaHistory = [0.0];
-  }
-
-  valueFor(action, depth, resilience) {
-    const prevZeta = this.zetaHistory[this.zetaHistory.length - 1];
-    const newZeta =
-      Math.exp(-resilience) * prevZeta +
-      (1.0 / Math.max(0.1, depth)) * Math.abs(action);
-
-    this.zetaHistory.push(newZeta);
-    return newZeta * Math.abs(action);
-  }
-}
+// Note: We use a single shared market spread (zeta) that both 
+// player and AI affect. No separate LinearSpread class needed.
 
 function executeTrade(action, price, frictionCost) {
+  // Direct price impact (no lot size scaling)
   const cashChange = -action * price - frictionCost;
   return { cashChange };
 }
 
 function calculateWealth(cash, inventory, price) {
+  // Direct wealth calculation (no lot size scaling)
   return cash + inventory * price;
 }
 
@@ -115,18 +198,26 @@ function validateTrade(currentCash, currentInventory, action, price, frictionCos
   const newInventory = currentInventory + action;
   const newWealth = calculateWealth(newCash, newInventory, price);
   
-  return newWealth >= 0;
+  // Allow negative wealth (loans) but set a floor
+  return newWealth >= CONFIG.scales.wealthMin;
 }
 
-function calculateAIAction(priceDeviation, depth, c0, depthExponent, threshold) {
-  const rawAction = -c0 * priceDeviation * Math.pow((1 - (1/depth)), depthExponent);
+function calculateContrarianAction(currentPrice, meanReversionLevel, threshold) {
+  // Contrarian strategy: buy when price is low, sell when price is high
+  // Calculate deviation from mean reversion level
+  const priceDeviation = currentPrice - meanReversionLevel;
   
-  if (Math.abs(rawAction) >= threshold) {
-    return Math.sign(rawAction);
+  // Only trade if deviation exceeds threshold
+  if (Math.abs(priceDeviation) < threshold) {
+    return 0;
   }
   
-  return 0;
+  // Contrarian: trade AGAINST the deviation
+  // If price > mean (high) → SELL (-1)
+  // If price < mean (low) → BUY (+1)
+  return priceDeviation > 0 ? -1 : +1;
 }
+
 
 function calculateLiquidationRate(inventory, liquidationPeriod) {
   if (liquidationPeriod <= 0) return 0;
@@ -238,8 +329,8 @@ function selectRandomTrajectory(trajectories) {
 function createGameState() {
   return {
     currentTime: 0,
-    currentZetaTime: 0,  // High-frequency time for zeta process
-    lastTradeZetaTime: -999,  // Last zeta time when trade occurred
+    currentZetaTime: 0,  // Zeta clock for decay
+    currentAITime: 0,    // AI clock for trading
     terminalTime: CONFIG.initialTerminalTime,
     
     assetPrice: [],
@@ -259,13 +350,13 @@ function createGameState() {
     inventory: CONFIG.initialInventory,
     pnl: 0,
     playerTrades: [],
-    linearSpread: new LinearSpread(),
     
     aiCash: CONFIG.commonCash,
     aiInventory: CONFIG.initialInventory,
     aiPnl: 0,
     aiTrades: [],
-    aiLinearSpread: new LinearSpread(),
+    
+    // Shared market spread tracked in zetaSeries (no separate object needed)
     
     liquidationStartTime: 0,
     isInLiquidationPhase: false,
@@ -284,21 +375,21 @@ function createGameState() {
 function resetGameState(state) {
   state.currentTime = 0;
   state.currentZetaTime = 0;
-  state.lastTradeZetaTime = -999;
+  state.currentAITime = 0;
   state.terminalTime = CONFIG.initialTerminalTime;
   
   state.cash = CONFIG.commonCash;
   state.inventory = CONFIG.initialInventory;
   state.pnl = 0;
   state.playerTrades = [];
-  state.linearSpread.reset();
   state.zetaSeries = [0.0];  // Reset zeta
   
   state.aiCash = CONFIG.commonCash;
   state.aiInventory = CONFIG.initialInventory;
   state.aiPnl = 0;
   state.aiTrades = [];
-  state.aiLinearSpread.reset();
+  
+  // Shared market spread is already reset via zetaSeries above
   
   state.liquidationStartTime = 0;
   state.isInLiquidationPhase = false;
@@ -376,37 +467,52 @@ function executePlayerTrade(state, action) {
     return false;
   }
   
-  // High-frequency rate limiting based on zeta time
-  const zetaStepsSinceLastTrade = state.currentZetaTime - state.lastTradeZetaTime;
-  if (zetaStepsSinceLastTrade < CONFIG.minZetaStepsBetweenTrades) {
-    console.log(`Cannot trade: Rate limit (need ${CONFIG.minZetaStepsBetweenTrades} zeta steps, only ${zetaStepsSinceLastTrade} elapsed)`);
-    return false;
-  }
+  // NO RATE LIMITING - Player can trade anytime!
   
   const currentCandleIndex = Math.floor(state.currentTime / CONFIG.pointsPerCandle);
   
+  // Market primitives are constant within one market time step
   const depth = state.currentDepth;
   const resilience = state.currentResilience;
-  const frictionCost = state.linearSpread.valueFor(action, depth, resilience);
+  
+  // ============================================================================
+  // SPREAD DYNAMICS (Equation 1 from Nagy & Rásonyi 2025)
+  // ============================================================================
+  // The spread (zeta) evolves as: ζ_{t+1} = e^{-r} * ζ_t + (1/δ) * |action|
+  //
+  // In our high-frequency implementation with substeps:
+  // - Market time steps slowly (primitives P, δ, r update once per step)
+  // - Zeta substeps tick faster (4 substeps per market step)
+  // - Within ONE substep: Multiple trades possible, each adds ONLY the jump
+  // - When substep advances: Apply exponential decay ONCE
+  //
+  // Structure:
+  //   Market step t=5: P, δ, r constant
+  //     Substep q1 (zetaTime=20):
+  //       - Trade 1: ζ += (1/δ) * |action|    [NO DECAY]
+  //       - Trade 2: ζ += (1/δ) * |action|    [NO DECAY]
+  //     Substep q2 (zetaTime=21):
+  //       - Clock ticks → Apply decay: ζ *= e^{-r/4}
+  //       - Trade 3: ζ += (1/δ) * |action|    [NO DECAY]
+  //
+  // This separates the two mechanisms:
+  // - DECAY: Time-based (happens when substep advances)
+  // - JUMP: Trade-based (happens when you click BUY/SELL)
+  // ============================================================================
+  
+  const prevZeta = state.zetaSeries[state.zetaSeries.length - 1];
+  
+  // FRICTION COST: We pay based on the CURRENT spread value
+  const frictionCost = prevZeta * Math.abs(action);
   
   if (!validateTrade(state.cash, state.inventory, action, state.currentPrice, frictionCost)) {
-    const currentWealth = calculateWealth(state.cash, state.inventory, state.currentPrice);
-    const { cashChange } = executeTrade(action, state.currentPrice, frictionCost);
-    const hypotheticalWealth = currentWealth + cashChange + action * state.currentPrice;
-    console.log(
-      `TRADE REJECTED: Would result in negative wealth. ` +
-      `Current wealth=${currentWealth.toFixed(2)}, ` +
-      `Hypothetical wealth=${hypotheticalWealth.toFixed(2)}`
-    );
     return false;
   }
   
+  // Execute the trade
   const { cashChange } = executeTrade(action, state.currentPrice, frictionCost);
   state.cash += cashChange;
   state.inventory += action;
-  
-  // Increment zeta time immediately on trade
-  state.currentZetaTime++;
   
   state.playerTrades.push({
     candleIndex: currentCandleIndex, 
@@ -415,63 +521,87 @@ function executePlayerTrade(state, action) {
     zetaTime: state.currentZetaTime
   });
   
-  // Update last trade time
-  state.lastTradeZetaTime = state.currentZetaTime;
+  // ============================================================================
+  // UPDATE SPREAD: Add ONLY the jump (no decay within substep)
+  // ============================================================================
+  // Within one zeta substep, trades only widen the spread
+  // NO decay is applied - decay happens when the substep clock advances
+  const spreadJump = (1.0 / Math.max(0.1, depth)) * Math.abs(action);
+  const newZeta = prevZeta + spreadJump;
   
-  // Update zeta immediately - it jumps up when trade occurs
-  const prevZeta = state.zetaSeries[state.zetaSeries.length - 1];
-  const newZeta = Math.exp(-resilience / CONFIG.zetaStepsPerMarketStep) * prevZeta + (1.0 / Math.max(0.1, depth)) * Math.abs(action);
   state.zetaSeries.push(newZeta);
+  // ============================================================================
   
   state.pnl = calculateWealth(state.cash, state.inventory, state.currentPrice);
   
-  if (state.pnl <= 0) {
-    state.isRunning = false;
-    state.isGameOver = true;
-    state.gameOverReason = 'broke';
-    console.log('Game Over: You are broke after this trade!');
-  }
-  
-  console.log(
-    `TRADE EXECUTED: action=${action}, candle=${currentCandleIndex}, t=${state.currentTime}, price=${state.currentPrice.toFixed(4)}, ` +
-    `depth=${depth.toFixed(2)}, res=${resilience.toFixed(2)}, friction=${frictionCost.toFixed(4)}, ` +
-    `cashChange=${cashChange.toFixed(4)}, wealth=${state.pnl.toFixed(2)}`
-  );
+  // Game continues even with negative wealth (loans allowed)
+  // Final liquidation will determine actual outcome
   
   return true;
 }
 
-function processAITrade(state) {
-  if (!CONFIG.aiAgent.enabled) return;
+function processRuleBasedAgentTrade(state) {
+  if (!CONFIG.ruleBasedAgent.enabled) return;
   
+  // Rule-based agent trades at its own clock frequency
+  // Called when agent clock ticks (in advanceTime)
+  
+  // STEP 1: Check market quality thresholds (high resilience and depth are GOOD)
+  if (state.currentResilience < CONFIG.ruleBasedAgent.thresholdResilience) {
+    return; // Resilience too low, market not good enough
+  }
+  
+  if (state.currentDepth < CONFIG.ruleBasedAgent.thresholdDepth) {
+    return; // Depth too low, market not liquid enough
+  }
+  
+  // STEP 2: Check if price deviation warrants a trade
   const currentCandleIndex = Math.floor(state.currentTime / CONFIG.pointsPerCandle);
+  const currentPrice = state.assetPrice[state.currentTime];
   
-  const alreadyTraded = state.aiTrades.some(trade => trade.candleIndex === currentCandleIndex);
-  if (alreadyTraded) return;
-  
-  const priceDeviation = state.assetPrice[state.currentTime];
-  const action = calculateAIAction(
-    priceDeviation,
-    state.currentDepth,
-    CONFIG.aiAgent.c0,
-    CONFIG.aiAgent.depthExponent,
-    CONFIG.aiAgent.actionThreshold
+  const action = calculateContrarianAction(
+    currentPrice,
+    CONFIG.ruleBasedAgent.meanReversionLevel,
+    CONFIG.ruleBasedAgent.actionThreshold
   );
   
-  if (action !== 0) {
-    executeAITradeAction(state, action, currentCandleIndex);
+  if (action === 0) {
+    return; // Price deviation not large enough
   }
+  
+  // STEP 3: Simple Bernoulli thinning (coinflip filter)
+  if (Math.random() > CONFIG.ruleBasedAgent.tradeProbability) {
+    return; // Coinflip failed, skip trade
+  }
+  
+  // All conditions satisfied, execute trade
+  executeRuleBasedAgentTradeAction(state, action, currentCandleIndex);
 }
 
-function executeAITradeAction(state, action, candleIndex) {
+function executeRuleBasedAgentTradeAction(state, action, candleIndex) {
+  // Market primitives are constant within one market time step
   const depth = state.currentDepth;
   const resilience = state.currentResilience;
-  const frictionCost = state.aiLinearSpread.valueFor(action, depth, resilience);
+  
+  // ============================================================================
+  // SPREAD DYNAMICS - Same as player, shared market spread
+  // ============================================================================
+  // AI faces the same spread dynamics as the player:
+  // - Pays friction based on current spread
+  // - Adds only the JUMP to spread (no decay within substep)
+  // - Both agents affect the same shared market spread
+  // ============================================================================
+  
+  const prevZeta = state.zetaSeries[state.zetaSeries.length - 1];
+  
+  // FRICTION COST: AI pays based on current spread
+  const frictionCost = prevZeta * Math.abs(action);
   
   if (!validateTrade(state.aiCash, state.aiInventory, action, state.currentPrice, frictionCost)) {
     return;
   }
   
+  // Execute AI trade
   const { cashChange } = executeTrade(action, state.currentPrice, frictionCost);
   state.aiCash += cashChange;
   state.aiInventory += action;
@@ -484,7 +614,14 @@ function executeAITradeAction(state, action, candleIndex) {
     zetaTime: state.currentZetaTime
   });
   
-  console.log(`AI TRADE: action=${action}, candle=${candleIndex}, price=${state.currentPrice.toFixed(2)}, wealth=${state.aiPnl.toFixed(2)}`);
+  // ============================================================================
+  // UPDATE SHARED SPREAD - Add only jump (no decay within substep)
+  // ============================================================================
+  const spreadJump = (1.0 / Math.max(0.1, depth)) * Math.abs(action);
+  const newZeta = prevZeta + spreadJump;
+  
+  state.zetaSeries.push(newZeta);
+  // ============================================================================
 }
 
 function checkLiquidationEntry(state) {
@@ -497,14 +634,30 @@ function checkLiquidationEntry(state) {
     const liquidationPeriod = state.terminalTime - state.liquidationStartTime;
     
     if (liquidationPeriod > 0) {
-      state.playerLiquidationRate = calculateLiquidationRate(state.playerInventoryAtLiquidationStart, liquidationPeriod);
-      state.aiLiquidationRate = calculateLiquidationRate(state.aiInventoryAtLiquidationStart, liquidationPeriod);
+      // Adjust liquidation period based on frequency
+      let effectivePeriod = liquidationPeriod;
+      
+      if (CONFIG.liquidationFrequency === 'zeta') {
+        effectivePeriod = liquidationPeriod * CONFIG.zetaClockFrequency;
+      } else if (CONFIG.liquidationFrequency === 'ai') {
+        effectivePeriod = liquidationPeriod * CONFIG.aiClockFrequency;
+      }
+      
+      state.playerLiquidationRate = calculateLiquidationRate(state.playerInventoryAtLiquidationStart, effectivePeriod);
+      state.aiLiquidationRate = calculateLiquidationRate(state.aiInventoryAtLiquidationStart, effectivePeriod);
     }
     
+    const frequencyDesc = CONFIG.liquidationFrequency === 'zeta' 
+      ? `zeta (${CONFIG.zetaClockFrequency}x per market step)` 
+      : CONFIG.liquidationFrequency === 'ai'
+      ? `ai (${CONFIG.aiClockFrequency}x per market step)`
+      : 'market (once per market step)';
+    
     console.log('LIQUIDATION PHASE: Force liquidation started');
+    console.log(`  Frequency: ${frequencyDesc}`);
     console.log(`  Player: inventory=${state.playerInventoryAtLiquidationStart.toFixed(2)}, rate=${state.playerLiquidationRate.toFixed(4)} shares/step`);
     console.log(`  AI: inventory=${state.aiInventoryAtLiquidationStart.toFixed(2)}, rate=${state.aiLiquidationRate.toFixed(4)} shares/step`);
-    console.log(`  Liquidation period: ${liquidationPeriod} steps`);
+    console.log(`  Liquidation period: ${liquidationPeriod} market steps`);
   }
 }
 
@@ -525,7 +678,7 @@ function processLiquidation(state) {
     }
   }
   
-  if (CONFIG.aiAgent.enabled && state.aiInventoryAtLiquidationStart !== 0 && state.aiInventory !== 0) {
+  if (CONFIG.ruleBasedAgent.enabled && state.aiInventoryAtLiquidationStart !== 0 && state.aiInventory !== 0) {
     const action = calculateLiquidationAction(
       state.aiInventoryAtLiquidationStart,
       state.aiInventory,
@@ -543,12 +696,16 @@ function executeLiquidationTrade(state, action, candleIndex, participant) {
   const depth = state.currentDepth;
   const resilience = state.currentResilience;
   
+  // Use shared market zeta for friction calculation
+  const prevZeta = state.zetaSeries[state.zetaSeries.length - 1];
+  const frictionCost = prevZeta * Math.abs(action);
+  
   if (participant === 'player') {
-    const frictionCost = state.linearSpread.valueFor(action, depth, resilience);
     const { cashChange } = executeTrade(action, state.currentPrice, frictionCost);
     
     state.cash += cashChange;
     state.inventory += action;
+    
     state.playerTrades.push({
       candleIndex: candleIndex, 
       action: action,
@@ -557,19 +714,17 @@ function executeLiquidationTrade(state, action, candleIndex, participant) {
     });
     state.pnl = calculateWealth(state.cash, state.inventory, state.currentPrice);
     
-    // Update zeta for liquidation trade
-    const prevZeta = state.zetaSeries[state.zetaSeries.length - 1];
-    const newZeta = Math.exp(-resilience) * prevZeta + (1.0 / Math.max(0.1, depth)) * Math.abs(action);
+    // Update shared market zeta - player liquidation widens spread
+    // NO decay during trade, only jump
+    const newZeta = prevZeta + (1.0 / Math.max(0.1, depth)) * Math.abs(action);
     state.zetaSeries.push(newZeta);
     
-    console.log(`PLAYER LIQUIDATION: action=${action}, t=${state.currentTime}, remaining=${state.inventory}`);
-    
   } else if (participant === 'ai') {
-    const frictionCost = state.aiLinearSpread.valueFor(action, depth, resilience);
     const { cashChange } = executeTrade(action, state.currentPrice, frictionCost);
     
     state.aiCash += cashChange;
     state.aiInventory += action;
+    
     state.aiTrades.push({
       candleIndex: candleIndex, 
       action: action,
@@ -578,7 +733,10 @@ function executeLiquidationTrade(state, action, candleIndex, participant) {
     });
     state.aiPnl = calculateWealth(state.aiCash, state.aiInventory, state.currentPrice);
     
-    console.log(`AI LIQUIDATION: action=${action}, t=${state.currentTime}, remaining=${state.aiInventory}`);
+    // Update shared market zeta - AI liquidation widens spread
+    // NO decay during trade, only jump
+    const newZeta = prevZeta + (1.0 / Math.max(0.1, depth)) * Math.abs(action);
+    state.zetaSeries.push(newZeta);
   }
 }
 
@@ -609,28 +767,49 @@ function advanceTime(state) {
     return;
   }
   
-  // Advance market time (slow clock)
+  // ============================================================================
+  // THREE-CLOCK MECHANISM
+  // ============================================================================
+  // 1. MARKET CLOCK: Advances once (updates P, δ, r)
+  // 2. ZETA CLOCK: Ticks multiple times (applies decay)
+  // 3. AI CLOCK: Ticks multiple times (AI trades)
+  // PLAYER: No clock (can trade anytime via button clicks)
+  // ============================================================================
+  
+  // 1. MARKET CLOCK: Advance once and update primitives
   state.currentTime++;
-  updateFromTime(state);
+  updateFromTime(state);  // Load new P, δ, r for this market step
   
-  // Process zeta decay steps between the last zeta time and where we should be now
-  const targetZetaTime = state.currentTime * CONFIG.zetaStepsPerMarketStep;
-  
-  while (state.currentZetaTime < targetZetaTime) {
+  // 2. ZETA CLOCK: Tick multiple times and apply decay
+  const zetaTicksThisStep = CONFIG.zetaClockFrequency;
+  const decayFactor = Math.exp(-state.currentResilience / CONFIG.zetaClockFrequency);
+  for (let i = 0; i < zetaTicksThisStep; i++) {
     state.currentZetaTime++;
     
-    // Zeta decays exponentially at each zeta step (only if no trade just happened)
+    // Apply exponential decay
     const prevZeta = state.zetaSeries[state.zetaSeries.length - 1];
-    const decayedZeta = prevZeta * Math.exp(-state.currentResilience / CONFIG.zetaStepsPerMarketStep);
+    const decayedZeta = prevZeta * decayFactor;
     state.zetaSeries.push(decayedZeta);
   }
   
+  // 3. AGENT CLOCK: Tick multiple times and consider trading
+  const agentTicksThisStep = CONFIG.aiClockFrequency;
+  for (let i = 0; i < agentTicksThisStep; i++) {
+    state.currentAITime++;
+    
+    if (!state.isInLiquidationPhase) {
+      processRuleBasedAgentTrade(state);
+    } else if (CONFIG.liquidationFrequency === 'ai') {
+      processLiquidation(state);
+    }
+  }
+  
+  // Check liquidation entry
   checkLiquidationEntry(state);
   
-  if (state.isInLiquidationPhase) {
+  // Market-frequency liquidation
+  if (CONFIG.liquidationFrequency === 'market' && state.isInLiquidationPhase) {
     processLiquidation(state);
-  } else {
-    processAITrade(state);
   }
   
   checkGameOver(state);
@@ -937,9 +1116,9 @@ function drawDepthResilienceChart(left, right, top, height, gameState, scales) {
     line(left, y, right, y);
   }
   
-  // Depth scale labels (left side)
+  // Depth scale labels (left side) - colored to match depth line
   noStroke();
-  fill(150);
+  fill(...CONFIG.chartStyles.depthColor);  // Blue color for depth
   textAlign(RIGHT, CENTER);
   textSize(9);
   for (let i = 0; i <= numScaleLines; i++) {
@@ -948,7 +1127,8 @@ function drawDepthResilienceChart(left, right, top, height, gameState, scales) {
     text(value.toFixed(2), left - 5, y);
   }
   
-  // Resilience scale labels (right side)
+  // Resilience scale labels (right side) - colored to match resilience line
+  fill(...CONFIG.chartStyles.resilienceColor);  // Pink color for resilience
   textAlign(LEFT, CENTER);
   for (let i = 0; i <= numScaleLines; i++) {
     const value = scales.resMax - (i / numScaleLines) * (scales.resMax - scales.resMin);
@@ -1000,7 +1180,7 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   if (nSteps <= 0) return;
 
   const xSpan = right - left;
-  const totalZetaSteps = nSteps * CONFIG.zetaStepsPerMarketStep;
+  const totalZetaSteps = nSteps * CONFIG.zetaClockFrequency;
   const currentZetaIndex = Math.min(gameState.currentZetaTime, gameState.zetaSeries.length - 1);
   const chartWidth = right - left;
 
@@ -1030,9 +1210,9 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
     line(left, y, right, y);
   }
   
-  // Scale labels
+  // Scale labels - colored to match zeta line
   noStroke();
-  fill(150);
+  fill(...CONFIG.chartStyles.zetaColor);  // Mustard yellow color for zeta
   textAlign(RIGHT, CENTER);
   textSize(9);
   for (let i = 0; i <= numScaleLines; i++) {
@@ -1041,23 +1221,21 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
     text(value.toFixed(2), left - 5, y);
   }
 
-  // Draw zeta series up to current zeta time
-  const zetaToDisplay = gameState.zetaSeries.slice(0, currentZetaIndex + 1);
-  
-  if (zetaToDisplay.length === 0) return;
+  // Draw zeta series up to current zeta time (iterate directly, no slice needed)
+  if (currentZetaIndex < 0) return;
   
   // Area
   noStroke();
   fill(...CONFIG.chartStyles.zetaColor, CONFIG.chartStyles.zetaAlpha);
   beginShape();
   vertex(left, top + height);
-  for (let t = 0; t < zetaToDisplay.length; t++) {
-    const val = zetaToDisplay[t];
+  for (let t = 0; t <= currentZetaIndex; t++) {
+    const val = gameState.zetaSeries[t];
     const x = left + (t / totalZetaSteps) * xSpan;
     const y = mapValueToY(val, scales.zetaMin, scales.zetaMax, top, height);
     vertex(x, y);
   }
-  vertex(left + ((zetaToDisplay.length - 1) / totalZetaSteps) * xSpan, top + height);
+  vertex(left + (currentZetaIndex / totalZetaSteps) * xSpan, top + height);
   endShape(CLOSE);
   
   // Line
@@ -1065,15 +1243,14 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   strokeWeight(CONFIG.chartStyles.zetaLineWeight);
   noFill();
   beginShape();
-  for (let t = 0; t < zetaToDisplay.length; t++) {
-    const val = zetaToDisplay[t];
+  for (let t = 0; t <= currentZetaIndex; t++) {
+    const val = gameState.zetaSeries[t];
     const x = left + (t / totalZetaSteps) * xSpan;
     const y = mapValueToY(val, scales.zetaMin, scales.zetaMax, top, height);
     vertex(x, y);
   }
   endShape();
 }
-
 
 function drawThermometerBars(startX, top, height, gameState, scales) {
   const barWidth = 40;
@@ -1087,7 +1264,7 @@ function drawThermometerBars(startX, top, height, gameState, scales) {
   drawThermometer(playerCashX, barTop, barWidth, barHeight, gameState.cash, scales.cashMin, scales.cashMax, 'P:Cash');
   drawThermometer(playerInvX, barTop, barWidth, barHeight, gameState.inventory, scales.inventoryMin, scales.inventoryMax, 'P:Inv');
   
-  if (CONFIG.aiAgent.enabled) {
+  if (CONFIG.ruleBasedAgent.enabled) {
     const aiCashX = startX + barSpacing * 2 + 15;
     const aiInvX = startX + barSpacing * 3 + 15;
     
@@ -1135,6 +1312,36 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
 function drawCashGridLines(x, top, width, height, minValue, maxValue, range) {
   stroke(220);
   strokeWeight(0.5);
+  
+  // Draw zero line (very prominent if scale allows negative)
+  if (minValue < 0 && maxValue > 0) {
+    const zeroNormalized = (0 - minValue) / range;
+    const zeroY = top + (1 - zeroNormalized) * height;
+    stroke(0);
+    strokeWeight(2);
+    line(x, zeroY, x + width, zeroY);
+    
+    noStroke();
+    fill(0);
+    textAlign(LEFT, CENTER);
+    textSize(9);
+    text('0', x + width + 2, zeroY);
+  }
+  
+  // Draw initial wealth line
+  if (CONFIG.commonCash >= minValue && CONFIG.commonCash <= maxValue) {
+    const initNormalized = (CONFIG.commonCash - minValue) / range;
+    const initY = top + (1 - initNormalized) * height;
+    stroke(0, 150, 0);  // Green for initial wealth
+    strokeWeight(1.5);
+    line(x, initY, x + width, initY);
+    
+    noStroke();
+    fill(0, 150, 0);
+    textAlign(LEFT, CENTER);
+    textSize(8);
+    text('Init', x + width + 2, initY);
+  }
   
   for (let pct = 0; pct <= 3; pct++) {
     const cashValue = CONFIG.commonCash * pct;
@@ -1197,10 +1404,24 @@ function drawThermometerFill(x, top, width, height, currentValue, minValue, maxV
   noStroke();
   
   if (isCashThermometer) {
-    const fillHeight = clampedValue * height;
-    fill(50, 200, 50, 180);
-    rect(x, top + height - fillHeight, width, fillHeight, 5);
+    // Cash thermometer now handles negative values (loans)
+    const zeroNormalized = (0 - minValue) / range;
+    const zeroY = top + (1 - zeroNormalized) * height;
+    
+    if (currentValue >= 0) {
+      // Positive: green fill from zero to current value
+      const fillTop = Math.min(valueY, zeroY);
+      const fillHeight = Math.abs(zeroY - valueY);
+      fill(50, 200, 50, 180);
+      rect(x, fillTop, width, fillHeight, 5);
+    } else {
+      // Negative: red fill from zero down to current value (loans)
+      const fillHeight = Math.abs(zeroY - valueY);
+      fill(200, 50, 50, 180);
+      rect(x, zeroY, width, fillHeight, 5);
+    }
   } else {
+    // Inventory thermometer (unchanged)
     const zeroNormalized = (0 - minValue) / range;
     const zeroY = top + (1 - zeroNormalized) * height;
     
@@ -1223,16 +1444,16 @@ function drawCharts(gameState, scales) {
   const priceTop = 20;
   const priceHeight = 250;
   const tradeMarkersHeight = 58;  // Increased from 44 to 58 for numeric display
-  const depthResTop = priceTop + priceHeight + tradeMarkersHeight + 5;
+  const depthResTop = priceTop + priceHeight + tradeMarkersHeight + 15;  // Increased spacing from 5 to 15
   const depthResHeight = CONFIG.chartStyles.depthResHeight;
-  const zetaTop = depthResTop + depthResHeight + 10;
+  const zetaTop = depthResTop + depthResHeight + 20;  // Increased spacing from 10 to 20
   const zetaHeight = CONFIG.chartStyles.zetaHeight;
 
   drawPriceChart(left, right, priceTop, priceHeight, gameState, scales);
   drawTradeMarkers(left, right, priceTop + priceHeight + 5, gameState);
   drawDepthResilienceChart(left, right, depthResTop, depthResHeight, gameState, scales);
   drawZetaChart(left, right, zetaTop, zetaHeight, gameState, scales);
-  drawThermometerBars(right + 30, priceTop, priceHeight + tradeMarkersHeight + 5 + depthResHeight + 10 + zetaHeight, gameState, scales);
+  drawThermometerBars(right + 30, priceTop, priceHeight + tradeMarkersHeight + 15 + depthResHeight + 20 + zetaHeight, gameState, scales);
 }
 
 // =====================================================
@@ -1261,7 +1482,7 @@ function drawButtons(buttons, gameState) {
         textColor = 150;
       }
     } else if (btn.label === 'BUY' || btn.label === 'SELL') {
-      // High-frequency trading enabled - only check if running and not in liquidation
+      // Player can trade anytime (no restrictions)
       isClickable = gameState.isRunning && !gameState.isInLiquidationPhase;
       if (!isClickable) {
         fillColor = 200;
@@ -1414,7 +1635,7 @@ function checkButtonClick(buttons, gameState) {
       } else if (btn.label === 'START') {
         isClickable = !gameState.isRunning;
       } else if (btn.label === 'BUY' || btn.label === 'SELL') {
-        // High-frequency trading enabled
+        // Player can trade anytime (no restrictions)
         isClickable = gameState.isRunning && !gameState.isInLiquidationPhase;
       }
       
@@ -1497,11 +1718,11 @@ window.draw = function() {
   if (gameState.isRunning && frameCount % CONFIG.stepFrames === 0 && !gameState.isGameOver) {
     advanceTime(gameState);
     
-    // Dynamically adjust zeta scale as data evolves
+    // Dynamically adjust zeta scale - only check last value for efficiency
     if (gameState.zetaSeries && gameState.zetaSeries.length > 1) {
-      const zetaMax = Math.max(...gameState.zetaSeries);
-      if (zetaMax > scales.zetaMax) {
-        scales.zetaMax = zetaMax * 1.1;  // Add 10% padding
+      const currentZeta = gameState.zetaSeries[gameState.zetaSeries.length - 1];
+      if (currentZeta > scales.zetaMax * 0.9) {
+        scales.zetaMax = currentZeta * 1.2;  // Expand scale
       }
     }
   }
@@ -1577,7 +1798,7 @@ function autoAdjustScales() {
   
   // Initialize zeta scale (will be dynamically adjusted as game runs)
   scales.zetaMin = 0;
-  scales.zetaMax = 1.0;  // Start with reasonable default
+  scales.zetaMax = scales.zetaMax;  // Start with reasonable default
   
   const priceRange = gameState.maxPrice - gameState.minPrice;
   scales.priceYMin = gameState.minPrice - 0.1 * priceRange;

@@ -1,212 +1,375 @@
 """
-Market Primitives Generator
-===========================
-Generate market microstructure primitives (asset price, depth, resilience).
+Market Primitives Generator - Modular Version
+==============================================
+Generate market microstructure primitives using VAR processes with flexible transforms.
 
 HOW TO USE:
 -----------
-1. Edit the CONFIG section below with your desired parameters
-2. Run: python generate_primitives.py
-3. Output CSV will be saved to assets/data/ directory
-
-That's it!
+1. Edit the CONFIG section below
+2. Run: python generator_modular.py
+3. Output CSV saved to specified directory
 """
 
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+from abc import ABC, abstractmethod
 
 
 # ============================================================================
-# CONFIGURATION - EDIT THESE VALUES
+# CONFIGURATION
 # ============================================================================
 
 # Generation settings
-N_TRAJECTORIES = 100         # Number of independent price paths to generate
-TERMINAL_TIME = 800          # Number of time steps per trajectory
-RANDOM_SEED = None           # Set to integer for reproducibility, None for random
+N_TRAJECTORIES = 100
+TERMINAL_TIME = 800
+RANDOM_SEED = 42  # Set to None for random
 
-# Noise scales (controls volatility for each primitive)
-NOISE_SCALE_AP = 0.3         # Asset price noise scale (default 1.0, lower = less volatile)
-NOISE_SCALE_DP = 0.2         # Depth noise scale
-NOISE_SCALE_RE = 0.2         # Resilience noise scale
-
-# Linear trend for asset price (drift)
-TREND_SLOPE = 0.005          # Slope per time step (very low, e.g., 0.005 means +/- 4 units over 800 steps)
-TREND_PROBABILITY = 0.5      # Probability of upward trend (0.5 = random sign)
-
-# Differencing flags (controls whether to cumsum the generated series)
-DIFF1_AP = False             # If True, asset price is generated as differences (cumsum to get levels)
-DIFF1_DP = False             # If True, depth is generated as differences (cumsum to get levels)
-DIFF1_RE = False             # If True, resilience is generated as differences (cumsum to get levels)
-
-# AR(1) process parameters
+# AR(1) parameters for each primitive: x[t+1] = alpha * x[t] + noise
 AR_PARAMS = {
-    'alpha_ap': 0.95,         # Asset price autocorrelation
-    'alpha_dp': 0.95,         # Depth autocorrelation  
-    'alpha_re': 0.8,          # Resilience autocorrelation
-    'offset_ap': 0.0,         # Asset price offset (added after simulation)
-    'offset_dp': 6.0,         # Depth mean level (added after simulation)
-    'offset_re': 0.5          # Resilience mean level (added after simulation)
+    'asset_price': {
+        'alpha': 0.96,
+        'noise_scale': 1.0,  # Innovation standard deviation
+    },
+    'depth': {
+        'alpha': 0.92,
+        'noise_scale': 0.387,  # sqrt(0.15) for variance 0.15
+    },
+    'resilience': {
+        'alpha': 0.93,
+        'noise_scale': 0.1,  # sqrt(0.10) for variance 0.10
+    }
+}
+
+# Transform configurations for each primitive
+TRANSFORM_CONFIG = {
+    'asset_price': {
+        'pre_offset': 0.0,
+        'pre_scale': 1.0,
+        'transform': None,  # No transform (linear)
+        'post_offset': 50.0,  # Center at 50
+        'post_scale': 1.0,
+    },
+    'depth': {
+        'pre_offset': 0.0,
+        'pre_scale': 1.0,
+        'transform': {
+            'type': 'bounded_sigmoid',
+            'params': {
+                'lower': 0.2,   # Minimum depth
+                'upper': 2.0,    # Maximum depth
+                'steepness': 1.0,
+            }
+        },
+        'post_offset': 0.0,
+        'post_scale': 1.0,
+    },
+    'resilience': {
+        'pre_offset': 0.0,
+        'pre_scale': 1.0,
+        'transform': {
+            'type': 'bounded_sigmoid',
+            'params': {
+                'lower': 0.3,    # Minimum resilience
+                'upper': 1.4,    # Maximum resilience
+                'steepness': 1.0,
+            }
+        },
+        'post_offset': 0.0,
+        'post_scale': 1.0,
+    }
 }
 
 # Output settings
 OUTPUT_DIR = Path("assets/data")
-OUTPUT_FILENAME = "primitives_{timestamp}.csv"
+OUTPUT_FILENAME = "market_primitives.csv"
 
 
 # ============================================================================
-# AR(1) ZERO-MEAN GENERATOR
+# AR(1) GENERATOR
 # ============================================================================
 
-def generate_ar1_zero_mean(params):
+def generate_ar1(alpha, noise_scale, n_trajectories, terminal_time):
     """
-    AR(1) generator with zero-mean simulation and offset added afterwards.
-    
-    This matches the JavaScript implementation:
-    - Simulates zero-mean AR(1) processes
-    - Adds offsets after simulation to shift mean levels
-    - Ensures depth and resilience stay positive
+    Generate AR(1) process: x[t+1] = alpha * x[t] + noise
     
     Args:
-        params: Dictionary with keys 'alpha_ap', 'alpha_dp', 'alpha_re', 
-                'offset_ap', 'offset_dp', 'offset_re'
+        alpha: AR(1) coefficient
+        noise_scale: Standard deviation of innovation
+        n_trajectories: Number of independent trajectories
+        terminal_time: Number of time steps per trajectory
     
     Returns:
-        dict: {'asset_price': array, 'depth': array, 'resilience': array}
-              Each array has shape (n_trajectories, terminal_time + 1)
+        Array of shape (n_trajectories, terminal_time + 1)
     """
-    print("\n" + "="*60)
-    print("GENERATING AR(1) ZERO-MEAN PROCESSES")
-    print("="*60)
-    print(f"Parameters:")
-    print(f"  alpha_ap = {params['alpha_ap']}")
-    print(f"  alpha_dp = {params['alpha_dp']}")
-    print(f"  alpha_re = {params['alpha_re']}")
-    print(f"  offset_ap = {params['offset_ap']}")
-    print(f"  offset_dp = {params['offset_dp']}")
-    print(f"  offset_re = {params['offset_re']}")
-    print()
+    series = np.zeros((n_trajectories, terminal_time + 1))
     
-    n_traj = N_TRAJECTORIES
-    T = TERMINAL_TIME
+    for t in range(terminal_time):
+        noise = noise_scale * np.random.randn(n_trajectories)
+        series[:, t + 1] = alpha * series[:, t] + noise
     
-    # Initialize arrays
-    asset_price = np.zeros((n_traj, T + 1))
-    depth = np.zeros((n_traj, T + 1))
-    resilience = np.zeros((n_traj, T + 1))
+    return series
+
+
+# ============================================================================
+# TRANSFORM CLASSES
+# ============================================================================
+
+class Transform(ABC):
+    """Abstract base class for transforms"""
     
-    # Generate random trend directions for each trajectory
-    # +1 for upward trend, -1 for downward trend
-    trend_signs = np.where(np.random.rand(n_traj) < TREND_PROBABILITY, 1.0, -1.0)
+    @abstractmethod
+    def __call__(self, x):
+        """Apply transform to input"""
+        pass
     
-    print(f"Trend configuration:")
-    print(f"  Slope magnitude: {TREND_SLOPE} per time step")
-    print(f"  Upward trends: {np.sum(trend_signs == 1)} / {n_traj}")
-    print(f"  Downward trends: {np.sum(trend_signs == -1)} / {n_traj}")
-    print()
+    @abstractmethod
+    def __repr__(self):
+        """String representation"""
+        pass
+
+
+class IdentityTransform(Transform):
+    """Identity transform (no transformation)"""
     
-    print("Generating time series...")
+    def __call__(self, x):
+        return x
     
-    # Generate AR(1) processes with zero mean
-    for t in range(T):
-        # Generate innovations (standard normal scaled by respective NOISE_SCALE)
-        noise_ap = NOISE_SCALE_AP * np.random.randn(n_traj)
-        noise_dp = NOISE_SCALE_DP * np.random.randn(n_traj)
-        noise_re = NOISE_SCALE_RE * np.random.randn(n_traj)
+    def __repr__(self):
+        return "Identity"
+
+
+class SigmoidTransform(Transform):
+    """Scaled sigmoid transform: scale * sigmoid(x)"""
+    
+    def __init__(self, scale=1.0):
+        self.scale = scale
+    
+    def __call__(self, x):
+        return self.scale / (1.0 + np.exp(-x))
+    
+    def __repr__(self):
+        return f"Sigmoid(scale={self.scale})"
+
+
+class BoundedSigmoidTransform(Transform):
+    """Bounded sigmoid: maps R to [lower, upper]"""
+    
+    def __init__(self, lower=0.0, upper=1.0, steepness=1.0):
+        """
+        Args:
+            lower: Lower bound
+            upper: Upper bound
+            steepness: Controls steepness of sigmoid (default 1.0)
+        """
+        self.lower = lower
+        self.upper = upper
+        self.steepness = steepness
+        self.range = upper - lower
+    
+    def __call__(self, x):
+        """Maps x ∈ R to [lower, upper]"""
+        sigmoid = 1.0 / (1.0 + np.exp(-self.steepness * x))
+        return self.lower + self.range * sigmoid
+    
+    def __repr__(self):
+        return f"BoundedSigmoid(lower={self.lower}, upper={self.upper}, k={self.steepness})"
+
+
+class TanhTransform(Transform):
+    """Scaled tanh transform: lower + (upper-lower) * (tanh(x) + 1) / 2"""
+    
+    def __init__(self, lower=-1.0, upper=1.0):
+        self.lower = lower
+        self.upper = upper
+        self.range = upper - lower
+    
+    def __call__(self, x):
+        """Maps x ∈ R to [lower, upper]"""
+        return self.lower + self.range * (np.tanh(x) + 1.0) / 2.0
+    
+    def __repr__(self):
+        return f"Tanh(lower={self.lower}, upper={self.upper})"
+
+
+# ============================================================================
+# TRANSFORM FACTORY
+# ============================================================================
+
+def create_transform(config):
+    """Create transform from configuration dictionary"""
+    if config is None:
+        return IdentityTransform()
+    
+    transform_type = config.get('type', 'identity')
+    params = config.get('params', {})
+    
+    if transform_type == 'identity':
+        return IdentityTransform()
+    elif transform_type == 'sigmoid':
+        return SigmoidTransform(**params)
+    elif transform_type == 'bounded_sigmoid':
+        return BoundedSigmoidTransform(**params)
+    elif transform_type == 'tanh':
+        return TanhTransform(**params)
+    else:
+        raise ValueError(f"Unknown transform type: {transform_type}")
+
+
+# ============================================================================
+# PRIMITIVES GENERATOR
+# ============================================================================
+
+class PrimitivesGenerator:
+    """Generate market primitives using independent AR(1) processes with transforms"""
+    
+    def __init__(self, ar_params, transform_config):
+        """
+        Args:
+            ar_params: Dictionary with AR(1) parameters for each primitive
+            transform_config: Dictionary with transform specs for each primitive
+        """
+        self.ar_params = ar_params
+        self.transform_config = transform_config
         
-        # AR(1) recursion (zero mean) + linear trend for asset price
-        # trend_signs * TREND_SLOPE gives +TREND_SLOPE or -TREND_SLOPE per step
-        asset_price[:, t + 1] = params['alpha_ap'] * asset_price[:, t] + noise_ap + trend_signs * TREND_SLOPE
-        depth[:, t + 1] = params['alpha_dp'] * depth[:, t] + noise_dp
-        resilience[:, t + 1] = params['alpha_re'] * resilience[:, t] + noise_re
+        # Create transforms for each primitive
+        self.transforms = {
+            'asset_price': self._build_transform_pipeline('asset_price'),
+            'depth': self._build_transform_pipeline('depth'),
+            'resilience': self._build_transform_pipeline('resilience'),
+        }
         
-        # Progress indicator
-        if (t + 1) % 200 == 0 or t == T - 1:
-            print(f"  Progress: {t + 1}/{T} time steps")
+        # Print AR parameters
+        self.print_ar_params()
     
-    print("✓ Time series generation complete")
-    print(f"  Noise scales: AP={NOISE_SCALE_AP}, DP={NOISE_SCALE_DP}, RE={NOISE_SCALE_RE}")
-    print()
+    def _build_transform_pipeline(self, name):
+        """Build transform pipeline for a primitive"""
+        config = self.transform_config[name]
+        
+        return {
+            'pre_offset': config.get('pre_offset', 0.0),
+            'pre_scale': config.get('pre_scale', 1.0),
+            'transform': create_transform(config.get('transform')),
+            'post_offset': config.get('post_offset', 0.0),
+            'post_scale': config.get('post_scale', 1.0),
+        }
     
-    # Apply cumulative sum if series were generated as differences
-    print("Checking differencing flags...")
-    if DIFF1_AP:
-        print("  Asset price: applying cumsum (was generated as differences)")
-        asset_price = np.cumsum(asset_price, axis=1)
-    else:
-        print("  Asset price: no cumsum (already in levels)")
+    def _apply_transform(self, x, pipeline):
+        """Apply full transform pipeline to data"""
+        # Pre-processing
+        x = x + pipeline['pre_offset']
+        x = x * pipeline['pre_scale']
+        
+        # Core transform
+        x = pipeline['transform'](x)
+        
+        # Post-processing
+        x = x + pipeline['post_offset']
+        x = x * pipeline['post_scale']
+        
+        return x
     
-    if DIFF1_DP:
-        print("  Depth: applying cumsum (was generated as differences)")
-        depth = np.cumsum(depth, axis=1)
-    else:
-        print("  Depth: no cumsum (already in levels)")
+    def print_ar_params(self):
+        """Print AR(1) parameters"""
+        print("\n" + "="*60)
+        print("AR(1) PARAMETERS")
+        print("="*60)
+        
+        for name in ['asset_price', 'depth', 'resilience']:
+            params = self.ar_params[name]
+            print(f"\n{name.upper()}:")
+            print(f"  Alpha (AR coefficient): {params['alpha']}")
+            print(f"  Noise scale (σ):        {params['noise_scale']}")
+            print(f"  Stable: {'✓ Yes' if params['alpha'] < 1.0 else '✗ No'}")
+        
+        print()
     
-    if DIFF1_RE:
-        print("  Resilience: applying cumsum (was generated as differences)")
-        resilience = np.cumsum(resilience, axis=1)
-    else:
-        print("  Resilience: no cumsum (already in levels)")
+    def generate(self, n_trajectories, terminal_time):
+        """Generate primitives for multiple trajectories"""
+        
+        print("\n" + "="*60)
+        print("GENERATING MARKET PRIMITIVES")
+        print("="*60)
+        print(f"Trajectories: {n_trajectories}")
+        print(f"Time steps: {terminal_time}")
+        print()
+        
+        # Generate independent AR(1) processes
+        print("Generating AR(1) processes...")
+        asset_price_raw = generate_ar1(
+            alpha=self.ar_params['asset_price']['alpha'],
+            noise_scale=self.ar_params['asset_price']['noise_scale'],
+            n_trajectories=n_trajectories,
+            terminal_time=terminal_time
+        )
+        
+        depth_raw = generate_ar1(
+            alpha=self.ar_params['depth']['alpha'],
+            noise_scale=self.ar_params['depth']['noise_scale'],
+            n_trajectories=n_trajectories,
+            terminal_time=terminal_time
+        )
+        
+        resilience_raw = generate_ar1(
+            alpha=self.ar_params['resilience']['alpha'],
+            noise_scale=self.ar_params['resilience']['noise_scale'],
+            n_trajectories=n_trajectories,
+            terminal_time=terminal_time
+        )
+        
+        print("✓ AR(1) processes generated")
+        print()
+        
+        # Apply transforms
+        print("Applying transforms...")
+        asset_price = self._apply_transform(asset_price_raw, self.transforms['asset_price'])
+        depth = self._apply_transform(depth_raw, self.transforms['depth'])
+        resilience = self._apply_transform(resilience_raw, self.transforms['resilience'])
+        
+        print("✓ Transforms applied")
+        print()
+        
+        primitives = {
+            'asset_price': asset_price,
+            'depth': depth,
+            'resilience': resilience
+        }
+        
+        return primitives
     
-    print()
-    print("Applying offsets and constraints...")
-    
-    # Add offsets after simulation (shift to desired mean levels)
-    asset_price += params['offset_ap']
-    depth += params['offset_dp']
-    resilience += params['offset_re']
-    
-    # Ensure depth and resilience stay positive (floor at 0.1)
-    depth = np.maximum(0.1, depth)
-    resilience = np.maximum(0.1, resilience)
-    
-    print("✓ Offsets applied")
-    print(f"  Asset price offset: {params['offset_ap']}")
-    print(f"  Depth offset: {params['offset_dp']}")
-    print(f"  Resilience offset: {params['offset_re']}")
-    
-    return {
-        'asset_price': asset_price,
-        'depth': depth,
-        'resilience': resilience
-    }
+    def print_config(self):
+        """Print configuration summary"""
+        print("\n" + "="*60)
+        print("TRANSFORM CONFIGURATION")
+        print("="*60)
+        
+        for name in ['asset_price', 'depth', 'resilience']:
+            pipeline = self.transforms[name]
+            print(f"\n{name.upper()}:")
+            print(f"  Pre-offset:  {pipeline['pre_offset']}")
+            print(f"  Pre-scale:   {pipeline['pre_scale']}")
+            print(f"  Transform:   {pipeline['transform']}")
+            print(f"  Post-offset: {pipeline['post_offset']}")
+            print(f"  Post-scale:  {pipeline['post_scale']}")
+        
+        print()
 
 
 # ============================================================================
 # DATA EXPORT
 # ============================================================================
 
-def primitives_to_dataframe(primitives):
-    """
-    Convert primitives dictionary to pandas DataFrame in long format.
-    
-    Format:
-    - trajectory_id: which trajectory (0 to n_trajectories-1)
-    - time: time step (0 to terminal_time)
-    - asset_price: price deviation from baseline
-    - depth: market depth
-    - resilience: market resilience
-    
-    Args:
-        primitives: dict with arrays of shape (n_trajectories, terminal_time + 1)
-        
-    Returns:
-        pd.DataFrame: Long-format dataframe with all trajectories
-    """
-    n_traj = N_TRAJECTORIES
-    T = TERMINAL_TIME
+def primitives_to_dataframe(primitives, n_trajectories, terminal_time):
+    """Convert primitives to long-format DataFrame"""
     
     print("\n" + "="*60)
     print("CONVERTING TO DATAFRAME")
     print("="*60)
     
-    # Create indices for trajectory and time
-    trajectory_ids = np.repeat(np.arange(n_traj), T + 1)
-    time_steps = np.tile(np.arange(T + 1), n_traj)
+    trajectory_ids = np.repeat(np.arange(n_trajectories), terminal_time + 1)
+    time_steps = np.tile(np.arange(terminal_time + 1), n_trajectories)
     
-    # Flatten the arrays
     df = pd.DataFrame({
         'trajectory_id': trajectory_ids,
         'time': time_steps,
@@ -216,72 +379,64 @@ def primitives_to_dataframe(primitives):
     })
     
     print(f"✓ Created dataframe with {len(df):,} rows")
+    print()
     
     return df
 
 
-def save_primitives(primitives, params):
-    """
-    Save primitives to CSV file with metadata.
+def save_primitives(df, ar_params, transform_config):
+    """Save primitives to CSV with metadata"""
     
-    Args:
-        primitives: dict with generated data
-        params: dict with generator parameters
-        
-    Returns:
-        Path: path to saved file
-    """
     print("\n" + "="*60)
     print("SAVING TO FILE")
     print("="*60)
     
-    # Create output directory
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    filepath = OUTPUT_DIR / OUTPUT_FILENAME
     
-    # Generate filename with timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = OUTPUT_FILENAME.format(timestamp=timestamp)
-    filepath = OUTPUT_DIR / filename
-    
-    # Convert to dataframe
-    df = primitives_to_dataframe(primitives)
-    
-    # Create metadata header
+    # Build metadata
     metadata = [
         f"# Market Primitives Dataset",
         f"# Generated: {datetime.now().isoformat()}",
-        f"# Generator: AR(1) zero-mean with linear trend",
+        f"# Generator: Independent AR(1) processes with transforms",
         f"#",
         f"# Parameters:",
         f"# n_trajectories: {N_TRAJECTORIES}",
         f"# terminal_time: {TERMINAL_TIME}",
-        f"# noise_scale_ap: {NOISE_SCALE_AP}",
-        f"# noise_scale_dp: {NOISE_SCALE_DP}",
-        f"# noise_scale_re: {NOISE_SCALE_RE}",
-        f"# trend_slope: {TREND_SLOPE}",
-        f"# trend_probability: {TREND_PROBABILITY}",
-        f"# diff1_ap: {DIFF1_AP}",
-        f"# diff1_dp: {DIFF1_DP}",
-        f"# diff1_re: {DIFF1_RE}",
+        f"# random_seed: {RANDOM_SEED}",
+        f"#",
+        f"# AR(1) Parameters:",
     ]
     
-    # Add generator-specific parameters
-    for key, value in params.items():
-        metadata.append(f"# {key}: {value}")
+    for name in ['asset_price', 'depth', 'resilience']:
+        params = ar_params[name]
+        metadata.append(f"# {name}:")
+        metadata.append(f"#   alpha: {params['alpha']}")
+        metadata.append(f"#   noise_scale: {params['noise_scale']}")
     
     metadata.append(f"#")
+    metadata.append(f"# Transforms:")
+    for name, config in transform_config.items():
+        transform_info = config.get('transform')
+        if transform_info is None:
+            transform_type = 'identity'
+        else:
+            transform_type = transform_info.get('type', 'identity')
+        metadata.append(f"#   {name}: {transform_type}")
     
-    # Write metadata
+    metadata.append("#")
+    
+    # Write metadata and data
     with open(filepath, 'w') as f:
         f.write('\n'.join(metadata) + '\n')
     
-    # Append data
     df.to_csv(filepath, mode='a', index=False)
     
     print(f"✓ Saved to: {filepath}")
     print(f"  - {N_TRAJECTORIES} trajectories")
     print(f"  - {TERMINAL_TIME + 1} time steps each")
-    print(f"  - Total data points: {len(df):,}")
+    print(f"  - Total rows: {len(df):,}")
+    print()
     
     return filepath
 
@@ -291,7 +446,7 @@ def save_primitives(primitives, params):
 # ============================================================================
 
 def print_statistics(primitives):
-    """Print summary statistics of generated primitives"""
+    """Print summary statistics"""
     
     print("\n" + "="*60)
     print("SUMMARY STATISTICS")
@@ -305,44 +460,55 @@ def print_statistics(primitives):
         print(f"  Min:      {data.min():>8.4f}")
         print(f"  Max:      {data.max():>8.4f}")
         
-        # Check for issues
         if np.any(np.isnan(data)):
             print(f"  ⚠ WARNING: Contains NaN values!")
         if np.any(np.isinf(data)):
             print(f"  ⚠ WARNING: Contains infinite values!")
+    
+    print()
 
 
 # ============================================================================
-# MAIN EXECUTION
+# MAIN
 # ============================================================================
 
 def main():
-    """Main execution function"""
+    """Main execution"""
     
     print("\n" + "="*70)
-    print(" "*20 + "MARKET PRIMITIVES GENERATOR")
+    print(" "*15 + "MARKET PRIMITIVES GENERATOR")
     print("="*70)
     print()
     print(f"Configuration:")
-    print(f"  Generator:        AR(1) zero-mean")
-    print(f"  Trajectories:     {N_TRAJECTORIES}")
-    print(f"  Time steps:       {TERMINAL_TIME}")
-    print(f"  Random seed:      {RANDOM_SEED if RANDOM_SEED is not None else 'None (random)'}")
+    print(f"  Generator:     Independent AR(1) processes")
+    print(f"  Trajectories:  {N_TRAJECTORIES}")
+    print(f"  Time steps:    {TERMINAL_TIME}")
+    print(f"  Random seed:   {RANDOM_SEED if RANDOM_SEED is not None else 'None (random)'}")
     
-    # Set random seed if provided
     if RANDOM_SEED is not None:
         np.random.seed(RANDOM_SEED)
         print(f"\n✓ Random seed set to: {RANDOM_SEED}")
     
+    # Initialize generator
+    generator = PrimitivesGenerator(
+        ar_params=AR_PARAMS,
+        transform_config=TRANSFORM_CONFIG
+    )
+    
+    # Print configuration
+    generator.print_config()
+    
     # Generate primitives
-    params = AR_PARAMS
-    primitives = generate_ar1_zero_mean(params)
+    primitives = generator.generate(N_TRAJECTORIES, TERMINAL_TIME)
     
     # Print statistics
     print_statistics(primitives)
     
+    # Convert to dataframe
+    df = primitives_to_dataframe(primitives, N_TRAJECTORIES, TERMINAL_TIME)
+    
     # Save to file
-    filepath = save_primitives(primitives, params)
+    filepath = save_primitives(df, AR_PARAMS, TRANSFORM_CONFIG)
     
     print("\n" + "="*70)
     print(" "*30 + "✓ COMPLETE")
