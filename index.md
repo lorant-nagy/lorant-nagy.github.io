@@ -81,7 +81,7 @@ classes: wide
   background-attachment: fixed;
   background-position: center;
   background-size: cover;
-  min-height: 15vh;
+  min-height: 30vh;
   display: flex;
   align-items: center;
   justify-content: center;
