@@ -166,7 +166,7 @@ const CONFIG = {
   
   // Canvas
   canvasWidth: 900,
-  canvasHeight: 605,  // Increased for more airy spacing (was 580)
+  canvasHeight: 605,
   
   // Animation
   stepFrames: 15
@@ -1253,8 +1253,8 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
 }
 
 function drawThermometerBars(startX, top, height, gameState, scales) {
-  const barWidth = 28;  // Reduced from 40 to fit in narrower space
-  const barSpacing = 35;  // Reduced from 50
+  const barWidth = 40;
+  const barSpacing = 50;
   const barHeight = height - 20;
   const barTop = top + 10;
   
@@ -1265,8 +1265,8 @@ function drawThermometerBars(startX, top, height, gameState, scales) {
   drawThermometer(playerInvX, barTop, barWidth, barHeight, gameState.inventory, scales.inventoryMin, scales.inventoryMax, 'P:Inv');
   
   if (CONFIG.ruleBasedAgent.enabled) {
-    const aiCashX = startX + barSpacing * 2 + 10;  // Reduced gap from 15 to 10
-    const aiInvX = startX + barSpacing * 3 + 10;
+    const aiCashX = startX + barSpacing * 2 + 15;
+    const aiInvX = startX + barSpacing * 3 + 15;
     
     drawThermometer(aiCashX, barTop, barWidth, barHeight, gameState.aiCash, scales.cashMin, scales.cashMax, 'AI:Cash');
     drawThermometer(aiInvX, barTop, barWidth, barHeight, gameState.aiInventory, scales.inventoryMin, scales.inventoryMax, 'AI:Inv');
@@ -1292,10 +1292,10 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
   
   fill(0);
   textAlign(CENTER, TOP);
-  textSize(7);  // Reduced from 9
+  textSize(9);
   text(label, x + width / 2, top - 15);
   
-  textSize(7);  // Reduced from 8
+  textSize(8);
   function formatValue(value) {
     if (Math.abs(value) < 1) {
       return value.toFixed(4);
@@ -1440,21 +1440,20 @@ function drawThermometerFill(x, top, width, height, currentValue, minValue, maxV
 
 function drawCharts(gameState, scales) {
   const left = 40;
-  const priceRight = 418;  // 70% of original width (378 pixels instead of 540)
-  const fullRight = 580;   // Keep full width for depth/resilience and zeta charts
+  const right = 580;
   const priceTop = 20;
   const priceHeight = 250;
-  const tradeMarkersHeight = 58;  // Increased from 44 to 58 for numeric display
-  const depthResTop = priceTop + priceHeight + tradeMarkersHeight + 15;  // Increased spacing from 5 to 15
+  const tradeMarkersHeight = 58;
+  const depthResTop = priceTop + priceHeight + tradeMarkersHeight + 15;
   const depthResHeight = CONFIG.chartStyles.depthResHeight;
-  const zetaTop = depthResTop + depthResHeight + 20;  // Increased spacing from 10 to 20
+  const zetaTop = depthResTop + depthResHeight + 20;
   const zetaHeight = CONFIG.chartStyles.zetaHeight;
 
-  drawPriceChart(left, priceRight, priceTop, priceHeight, gameState, scales);
-  drawTradeMarkers(left, priceRight, priceTop + priceHeight + 5, gameState);
-  drawThermometerBars(priceRight + 20, priceTop, priceHeight + tradeMarkersHeight, gameState, scales);  // Moved next to price chart
-  drawDepthResilienceChart(left, fullRight, depthResTop, depthResHeight, gameState, scales);
-  drawZetaChart(left, fullRight, zetaTop, zetaHeight, gameState, scales);
+  drawPriceChart(left, right, priceTop, priceHeight, gameState, scales);
+  drawTradeMarkers(left, right, priceTop + priceHeight + 5, gameState);
+  drawDepthResilienceChart(left, right, depthResTop, depthResHeight, gameState, scales);
+  drawZetaChart(left, right, zetaTop, zetaHeight, gameState, scales);
+  drawThermometerBars(right + 30, priceTop, priceHeight + tradeMarkersHeight + 15 + depthResHeight + 20 + zetaHeight, gameState, scales);
 }
 
 // =====================================================
@@ -1502,7 +1501,7 @@ function drawButtons(buttons, gameState) {
     stroke(0);
     strokeWeight(isClickable ? 1 : 0.5);
     fill(fillColor);
-    rect(btn.x, btn.y, btn.w, btn.h, 5);
+    rect(btn.x, btn.y, btn.w, btn.h);
 
     noStroke();
     fill(textColor);
@@ -1612,15 +1611,17 @@ function drawLiquidationPhase(gameState) {
 }
 
 function initButtons(canvasHeight) {
-  const y = canvasHeight - 60;
-  const w = 100;
-  const h = 40;
+  const x = 820;  // Right side, after thermometers
+  const w = 70;
+  const h = 90;   // Tall buttons
+  const gap = 8;
+  const startY = 20;  // Align with chart top
 
   return [
-    { label: 'START', x: 30,  y, w, h },
-    { label: 'RESET', x: 150, y, w, h },
-    { label: 'BUY',   x: 270, y, w, h },
-    { label: 'SELL',  x: 390, y, w, h },
+    { label: 'START', x, y: startY,                w, h },
+    { label: 'RESET', x, y: startY + h + gap,      w, h },
+    { label: 'BUY',   x, y: startY + (h + gap) * 2, w, h },
+    { label: 'SELL',  x, y: startY + (h + gap) * 3, w, h },
   ];
 }
 
@@ -1728,9 +1729,7 @@ window.draw = function() {
     }
   }
 
-  drawGrid(width, height, cellW, cellH);
   drawCharts(gameState, scales);
-  drawControlBar(width, height);
   drawButtons(buttons, gameState);
   
   if (gameState.isGameOver) {
