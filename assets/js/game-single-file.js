@@ -977,7 +977,7 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   const candleSpacing = 2;
   const candleWidth = Math.max(2, (chartWidth - (totalCandles - 1) * candleSpacing) / totalCandles);
   
-  const stripeHeight = 28;  // Increased for text
+  const stripeHeight = 28;
   const stripeSpacing = 2;
   
   const aiStripeY = yPosition;
@@ -986,15 +986,26 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   const playerStripeY = aiStripeY + stripeHeight + stripeSpacing;
   const playerMarkerY = playerStripeY + stripeHeight / 2;
   
-  // Background stripes
-  noStroke();
-  fill(240, 240, 245);
+  // Background stripes - Blade Runner style
+  stroke(255, 140, 50);  // Orange border
+  strokeWeight(1);
+  fill(25, 25, 35, 240);  // Dark background
   rect(left, aiStripeY, chartWidth, stripeHeight);
-  fill(245, 240, 240);
   rect(left, playerStripeY, chartWidth, stripeHeight);
   
+  // Draw vertical dividers between candles
+  stroke(0, 100, 120);  // Dark cyan dividers
+  strokeWeight(1);
+  for (let i = 1; i < totalCandles; i++) {
+    const dividerX = left + i * (candleWidth + candleSpacing) - candleSpacing / 2;
+    // Short dividers, not full height
+    line(dividerX, aiStripeY + 5, dividerX, aiStripeY + stripeHeight - 5);
+    line(dividerX, playerStripeY + 5, dividerX, playerStripeY + stripeHeight - 5);
+  }
+  
   // Labels
-  fill(0);
+  noStroke();
+  fill(255, 140, 50);  // Orange text
   textAlign(LEFT, CENTER);
   textSize(10);
   text('AI Agent', left + 5, aiMarkerY);
@@ -1034,15 +1045,15 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
     const candleX = left + idx * (candleWidth + candleSpacing) + candleWidth / 2;
     const counts = aiTradesPerCandle[candleIndex];
     
-    // Green for buys (left side)
+    // Cyan for buys (left side)
     if (counts.buys > 0) {
-      fill(50, 200, 50);
+      fill(0, 220, 180);
       text(counts.buys, candleX - 5, aiMarkerY);
     }
     
-    // Red for sells (right side)
+    // Orange for sells (right side)
     if (counts.sells > 0) {
-      fill(200, 50, 50);
+      fill(255, 100, 30);
       text(counts.sells, candleX + 5, aiMarkerY);
     }
   });
@@ -1053,15 +1064,15 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
     const candleX = left + idx * (candleWidth + candleSpacing) + candleWidth / 2;
     const counts = playerTradesPerCandle[candleIndex];
     
-    // Green for buys (left side)
+    // Cyan for buys (left side)
     if (counts.buys > 0) {
-      fill(50, 200, 50);
+      fill(0, 220, 180);
       text(counts.buys, candleX - 5, playerMarkerY);
     }
     
-    // Red for sells (right side)
+    // Orange for sells (right side)
     if (counts.sells > 0) {
-      fill(200, 50, 50);
+      fill(255, 100, 30);
       text(counts.sells, candleX + 5, playerMarkerY);
     }
   });
@@ -1258,8 +1269,8 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
 function drawThermometerBars(startX, top, height, gameState, scales) {
   const barWidth = 40;
   const barSpacing = 50;
-  const barHeight = height - 20;
-  const barTop = top + 10;
+  const barHeight = height;  // Use full height, no margins
+  const barTop = top;         // Align to top exactly
   
   const playerCashX = startX;
   const playerInvX = startX + barSpacing;
@@ -1451,12 +1462,16 @@ function drawCharts(gameState, scales) {
   const depthResHeight = CONFIG.chartStyles.depthResHeight;
   const zetaTop = depthResTop + depthResHeight + 20;
   const zetaHeight = CONFIG.chartStyles.zetaHeight;
+  const zetaBottom = zetaTop + zetaHeight;  // 483
 
   drawPriceChart(left, right, priceTop, priceHeight, gameState, scales);
   drawTradeMarkers(left, right, priceTop + priceHeight + 5, gameState);
   drawDepthResilienceChart(left, right, depthResTop, depthResHeight, gameState, scales);
   drawZetaChart(left, right, zetaTop, zetaHeight, gameState, scales);
-  drawThermometerBars(right + 30, priceTop, priceHeight + tradeMarkersHeight + 15 + depthResHeight + 20 + zetaHeight, gameState, scales);
+  
+  // Thermometers span from priceTop (20) to zetaBottom (483)
+  const thermometerHeight = zetaBottom - priceTop;  // 463
+  drawThermometerBars(right + 30, priceTop, thermometerHeight, gameState, scales);
 }
 
 // =====================================================
