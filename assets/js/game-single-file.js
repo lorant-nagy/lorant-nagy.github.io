@@ -166,7 +166,7 @@ const CONFIG = {
   
   // Canvas
   canvasWidth: 900,
-  canvasHeight: 605,
+  canvasHeight: 510,  // Reduced from 605 to fit content (container ends at 488)
   
   // Animation
   stepFrames: 15
@@ -1163,12 +1163,27 @@ function drawSeriesArea(left, top, height, xSpan, nSteps, endIndex, series, minV
   fill(...colorRGB, alpha);
   beginShape();
   vertex(left, top + height);
-  for (let t = 0; t <= endIndex; t++) {
+  
+  // Downsample: only draw points that would be visible
+  // Maximum useful points = width in pixels (no need to draw more than 1 point per pixel)
+  const maxPoints = Math.min(xSpan, 500);  // Cap at 500 points max
+  const step = Math.max(1, Math.floor(endIndex / maxPoints));
+  
+  for (let t = 0; t <= endIndex; t += step) {
     const val = series[t];
     const x = left + (t / nSteps) * xSpan;
     const y = mapValueToY(val, minVal, maxVal, top, height);
     vertex(x, y);
   }
+  
+  // Always draw the last point to ensure we reach the current time
+  if (endIndex % step !== 0) {
+    const val = series[endIndex];
+    const x = left + (endIndex / nSteps) * xSpan;
+    const y = mapValueToY(val, minVal, maxVal, top, height);
+    vertex(x, y);
+  }
+  
   vertex(left + (endIndex / nSteps) * xSpan, top + height);
   endShape(CLOSE);
 }
@@ -1178,12 +1193,26 @@ function drawSeriesLine(left, top, height, xSpan, nSteps, endIndex, series, minV
   strokeWeight(lineWeight);
   noFill();
   beginShape();
-  for (let t = 0; t <= endIndex; t++) {
+  
+  // Downsample: only draw points that would be visible
+  const maxPoints = Math.min(xSpan, 500);  // Cap at 500 points max
+  const step = Math.max(1, Math.floor(endIndex / maxPoints));
+  
+  for (let t = 0; t <= endIndex; t += step) {
     const val = series[t];
     const x = left + (t / nSteps) * xSpan;
     const y = mapValueToY(val, minVal, maxVal, top, height);
     vertex(x, y);
   }
+  
+  // Always draw the last point
+  if (endIndex % step !== 0) {
+    const val = series[endIndex];
+    const x = left + (endIndex / nSteps) * xSpan;
+    const y = mapValueToY(val, minVal, maxVal, top, height);
+    vertex(x, y);
+  }
+  
   endShape();
 }
 
@@ -1240,31 +1269,55 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   // Draw zeta series up to current zeta time (iterate directly, no slice needed)
   if (currentZetaIndex < 0) return;
   
-  // Area
+  // Downsample for performance
+  const maxPoints = Math.min(xSpan, 500);
+  const step = Math.max(1, Math.floor(currentZetaIndex / maxPoints));
+  
+  // Area with downsampling
   noStroke();
   fill(...CONFIG.chartStyles.zetaColor, CONFIG.chartStyles.zetaAlpha);
   beginShape();
   vertex(left, top + height);
-  for (let t = 0; t <= currentZetaIndex; t++) {
+  
+  for (let t = 0; t <= currentZetaIndex; t += step) {
     const val = gameState.zetaSeries[t];
     const x = left + (t / totalZetaSteps) * xSpan;
     const y = mapValueToY(val, scales.zetaMin, scales.zetaMax, top, height);
     vertex(x, y);
   }
+  
+  // Always draw the last point
+  if (currentZetaIndex % step !== 0) {
+    const val = gameState.zetaSeries[currentZetaIndex];
+    const x = left + (currentZetaIndex / totalZetaSteps) * xSpan;
+    const y = mapValueToY(val, scales.zetaMin, scales.zetaMax, top, height);
+    vertex(x, y);
+  }
+  
   vertex(left + (currentZetaIndex / totalZetaSteps) * xSpan, top + height);
   endShape(CLOSE);
   
-  // Line
+  // Line with downsampling
   stroke(...CONFIG.chartStyles.zetaColor);
   strokeWeight(CONFIG.chartStyles.zetaLineWeight);
   noFill();
   beginShape();
-  for (let t = 0; t <= currentZetaIndex; t++) {
+  
+  for (let t = 0; t <= currentZetaIndex; t += step) {
     const val = gameState.zetaSeries[t];
     const x = left + (t / totalZetaSteps) * xSpan;
     const y = mapValueToY(val, scales.zetaMin, scales.zetaMax, top, height);
     vertex(x, y);
   }
+  
+  // Always draw the last point
+  if (currentZetaIndex % step !== 0) {
+    const val = gameState.zetaSeries[currentZetaIndex];
+    const x = left + (currentZetaIndex / totalZetaSteps) * xSpan;
+    const y = mapValueToY(val, scales.zetaMin, scales.zetaMax, top, height);
+    vertex(x, y);
+  }
+  
   endShape();
 }
 
