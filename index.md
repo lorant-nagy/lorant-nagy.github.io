@@ -100,18 +100,18 @@ classes: wide
   margin-left: calc(-50vw + 50%);
 }
 
-/* Split container for game section */
+/* Split container for game section - 30% info, 70% game */
 .split-container {
   display: flex;
   gap: 2em;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 2em auto;
   align-items: flex-start;
 }
 
 .publication-info {
-  flex: 0 0 48%;
-  padding: 2em;
+  flex: 0 0 28%;
+  padding: 1.5em;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -120,7 +120,7 @@ classes: wide
 .publication-info h3 {
   margin-top: 0;
   color: #333;
-  font-size: 1.5em;
+  font-size: 1.3em;
   margin-bottom: 0.5em;
 }
 
@@ -128,11 +128,18 @@ classes: wide
   color: #555;
   line-height: 1.6;
   margin-bottom: 1em;
+  font-size: 0.95em;
 }
 
 .publication-info ul {
   color: #555;
   line-height: 1.8;
+  font-size: 0.9em;
+  padding-left: 1.2em;
+}
+
+.publication-info li {
+  margin-bottom: 0.5em;
 }
 
 .publication-info .paper-link {
@@ -144,6 +151,7 @@ classes: wide
   text-decoration: none;
   border-radius: 4px;
   transition: background-color 0.3s;
+  font-size: 0.9em;
 }
 
 .publication-info .paper-link:hover {
@@ -151,21 +159,25 @@ classes: wide
 }
 
 .comic-placeholder {
-  margin-top: 2em;
-  padding: 2em;
+  margin-top: 1.5em;
+  padding: 1.5em;
   background-color: #e8e8e8;
   border: 2px dashed #999;
   border-radius: 8px;
   text-align: center;
   color: #666;
-  min-height: 200px;
+  min-height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.9em;
 }
 
 .game-wrapper {
-  flex: 0 0 48%;
+  flex: 0 0 68%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .game-wrapper h3 {
@@ -174,6 +186,19 @@ classes: wide
   color: #333;
   font-size: 1.5em;
   text-align: center;
+}
+
+#game-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+
+#game-container canvas {
+  max-width: 100%;
+  height: auto !important;
 }
 
 /* Responsive design */
@@ -231,7 +256,7 @@ classes: wide
       
       <div class="game-wrapper">
         <h3>Try the Game</h3>
-        <div id="game-container" style="display:flex; justify-content:center;">
+        <div id="game-container">
           <!-- p5 canvas will be inserted here -->
         </div>
       </div>
