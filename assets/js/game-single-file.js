@@ -865,7 +865,7 @@ function drawPriceChart(left, right, top, height, gameState, scales) {
   fill(255, 140, 50);  // Orange text
   textAlign(LEFT, TOP);
   textSize(12);
-  text('Price', left - 5, top - 18);
+  text('Price', left - 5, top);  // Inside, at the top edge
 
   const totalCandles = Math.ceil(nSteps / CONFIG.pointsPerCandle);
   const candleSpacing = 2;
@@ -986,12 +986,12 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   const playerStripeY = aiStripeY + stripeHeight + stripeSpacing;
   const playerMarkerY = playerStripeY + stripeHeight / 2;
   
-  // Background stripes - Blade Runner style
+  // Background stripes - Blade Runner style, full width like charts
   stroke(255, 140, 50);  // Orange border
   strokeWeight(1);
   fill(25, 25, 35, 240);  // Dark background
-  rect(left, aiStripeY, chartWidth, stripeHeight);
-  rect(left, playerStripeY, chartWidth, stripeHeight);
+  rect(left - 10, aiStripeY, chartWidth + 20, stripeHeight);  // Extended width
+  rect(left - 10, playerStripeY, chartWidth + 20, stripeHeight);  // Extended width
   
   // Draw vertical dividers between candles
   stroke(0, 100, 120);  // Dark cyan dividers
@@ -1008,8 +1008,8 @@ function drawTradeMarkers(left, right, yPosition, gameState) {
   fill(255, 140, 50);  // Orange text
   textAlign(LEFT, CENTER);
   textSize(10);
-  text('AI Agent', left + 5, aiMarkerY);
-  text('Player', left + 5, playerMarkerY);
+  text('AI Agent', left - 5, aiMarkerY);  // Adjusted for new width
+  text('Player', left - 5, playerMarkerY);  // Adjusted for new width
   
   // Count AI trades per candle
   const aiTradesPerCandle = {};
@@ -1460,15 +1460,21 @@ function drawCharts(gameState, scales) {
   const right = 580;
   const priceTop = 20;
   const priceHeight = 250;
+  const spacing = 10;  // Equal spacing between sections
   const tradeMarkersHeight = 58;
-  const depthResTop = priceTop + priceHeight + tradeMarkersHeight + 15;
+  
+  // Calculate positions with equal spacing
+  const priceBottom = priceTop + priceHeight;  // 270
+  const tradeMarkersTop = priceBottom + spacing;  // 280
+  const tradeMarkersBottom = tradeMarkersTop + tradeMarkersHeight;  // 338
+  const depthResTop = tradeMarkersBottom + spacing;  // 348
   const depthResHeight = CONFIG.chartStyles.depthResHeight;
   const zetaTop = depthResTop + depthResHeight + 20;
   const zetaHeight = CONFIG.chartStyles.zetaHeight;
   const zetaBottom = zetaTop + zetaHeight;  // 483
 
   drawPriceChart(left, right, priceTop, priceHeight, gameState, scales);
-  drawTradeMarkers(left, right, priceTop + priceHeight + 5, gameState);
+  drawTradeMarkers(left, right, tradeMarkersTop, gameState);  // Now using calculated position
   drawDepthResilienceChart(left, right, depthResTop, depthResHeight, gameState, scales);
   drawZetaChart(left, right, zetaTop, zetaHeight, gameState, scales);
   
