@@ -44,17 +44,11 @@ classes: wide
   margin-left: auto;
 }
 
-
 .masthead {
   background-color: #fff;
   background-image: none !important;
   border-bottom: none !important;
   min-height: auto;
-}
-
-.masthead-contact {
-  text-align: right;
-  padding: 0.5em 1em;
 }
 
 .masthead__inner-wrap {
@@ -105,6 +99,95 @@ classes: wide
   width: 100vw;
   margin-left: calc(-50vw + 50%);
 }
+
+/* Split container for game section */
+.split-container {
+  display: flex;
+  gap: 2em;
+  max-width: 1400px;
+  margin: 2em auto;
+  align-items: flex-start;
+}
+
+.publication-info {
+  flex: 0 0 48%;
+  padding: 2em;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.publication-info h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.publication-info p {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+.publication-info ul {
+  color: #555;
+  line-height: 1.8;
+}
+
+.publication-info .paper-link {
+  display: inline-block;
+  margin-top: 1em;
+  padding: 0.5em 1em;
+  background-color: #007acc;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.publication-info .paper-link:hover {
+  background-color: #005a9c;
+}
+
+.comic-placeholder {
+  margin-top: 2em;
+  padding: 2em;
+  background-color: #e8e8e8;
+  border: 2px dashed #999;
+  border-radius: 8px;
+  text-align: center;
+  color: #666;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-wrapper {
+  flex: 0 0 48%;
+}
+
+.game-wrapper h3 {
+  margin-top: 0;
+  margin-bottom: 1em;
+  color: #333;
+  font-size: 1.5em;
+  text-align: center;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .split-container {
+    flex-direction: column;
+  }
+  
+  .publication-info,
+  .game-wrapper {
+    flex: 0 0 100%;
+  }
+}
+
 </style>
 
 <div class="welcome-section">
@@ -118,13 +201,44 @@ classes: wide
   <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 1em;">UNDER CONSTRUCTION</h2>
   
   <div class="game-section">
-    <h2 style="text-align:center;">Trajectory Forecast Game</h2>
-    <p style="text-align:center;">Interactive experiment coming here...</p>
-    <div id="game-container" style="display:flex; justify-content:center; padding:1em;">
-      <!-- p5 canvas will live here -->
+    <h2 style="text-align:center;">Trading Game</h2>
+    
+    <div class="split-container">
+      
+      <div class="publication-info">
+        <h3>Based on Research</h3>
+        <p>
+          <strong>Paper:</strong> Nagy, L. & Rásonyi, M. (2025)<br>
+          <em>"On the utility problem in a market where price impact is transient"</em><br>
+          arXiv:2511.12093v1
+        </p>
+        <p>
+          This interactive game demonstrates the mathematical model of market microstructure 
+          where traders face transient price impact. The model captures:
+        </p>
+        <ul>
+          <li><strong>Dynamic spreads:</strong> Bid-ask spreads widen with trades and recover over time</li>
+          <li><strong>Market primitives:</strong> Price evolution, depth (liquidity), and resilience</li>
+          <li><strong>High-frequency trading:</strong> Multiple trades between market updates</li>
+          <li><strong>Strategic competition:</strong> You trade against a rule-based agent</li>
+        </ul>
+        <a href="https://arxiv.org/abs/2511.12093" class="paper-link" target="_blank">Read the Paper →</a>
+        
+        <div class="comic-placeholder">
+          <p><em>Comic illustration coming soon...<br>Explaining model features visually</em></p>
+        </div>
+      </div>
+      
+      <div class="game-wrapper">
+        <h3>Try the Game</h3>
+        <div id="game-container" style="display:flex; justify-content:center;">
+          <!-- p5 canvas will be inserted here -->
+        </div>
+      </div>
+      
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
-<script src="{{ '/assets/js/trajectory-game.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/game-single-file.js' | relative_url }}"></script>
