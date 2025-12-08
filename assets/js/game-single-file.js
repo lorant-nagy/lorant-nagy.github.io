@@ -1253,8 +1253,8 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
 }
 
 function drawThermometerBars(startX, top, height, gameState, scales) {
-  const barWidth = 40;
-  const barSpacing = 50;
+  const barWidth = 28;  // Reduced from 40 to fit in narrower space
+  const barSpacing = 35;  // Reduced from 50
   const barHeight = height - 20;
   const barTop = top + 10;
   
@@ -1265,8 +1265,8 @@ function drawThermometerBars(startX, top, height, gameState, scales) {
   drawThermometer(playerInvX, barTop, barWidth, barHeight, gameState.inventory, scales.inventoryMin, scales.inventoryMax, 'P:Inv');
   
   if (CONFIG.ruleBasedAgent.enabled) {
-    const aiCashX = startX + barSpacing * 2 + 15;
-    const aiInvX = startX + barSpacing * 3 + 15;
+    const aiCashX = startX + barSpacing * 2 + 10;  // Reduced gap from 15 to 10
+    const aiInvX = startX + barSpacing * 3 + 10;
     
     drawThermometer(aiCashX, barTop, barWidth, barHeight, gameState.aiCash, scales.cashMin, scales.cashMax, 'AI:Cash');
     drawThermometer(aiInvX, barTop, barWidth, barHeight, gameState.aiInventory, scales.inventoryMin, scales.inventoryMax, 'AI:Inv');
@@ -1292,10 +1292,10 @@ function drawThermometer(x, top, width, height, currentValue, minValue, maxValue
   
   fill(0);
   textAlign(CENTER, TOP);
-  textSize(9);
+  textSize(7);  // Reduced from 9
   text(label, x + width / 2, top - 15);
   
-  textSize(8);
+  textSize(7);  // Reduced from 8
   function formatValue(value) {
     if (Math.abs(value) < 1) {
       return value.toFixed(4);
@@ -1440,7 +1440,8 @@ function drawThermometerFill(x, top, width, height, currentValue, minValue, maxV
 
 function drawCharts(gameState, scales) {
   const left = 40;
-  const right = 580;
+  const priceRight = 418;  // 70% of original width (378 pixels instead of 540)
+  const fullRight = 580;   // Keep full width for depth/resilience and zeta charts
   const priceTop = 20;
   const priceHeight = 250;
   const tradeMarkersHeight = 58;  // Increased from 44 to 58 for numeric display
@@ -1449,11 +1450,11 @@ function drawCharts(gameState, scales) {
   const zetaTop = depthResTop + depthResHeight + 20;  // Increased spacing from 10 to 20
   const zetaHeight = CONFIG.chartStyles.zetaHeight;
 
-  drawPriceChart(left, right, priceTop, priceHeight, gameState, scales);
-  drawTradeMarkers(left, right, priceTop + priceHeight + 5, gameState);
-  drawDepthResilienceChart(left, right, depthResTop, depthResHeight, gameState, scales);
-  drawZetaChart(left, right, zetaTop, zetaHeight, gameState, scales);
-  drawThermometerBars(right + 30, priceTop, priceHeight + tradeMarkersHeight + 15 + depthResHeight + 20 + zetaHeight, gameState, scales);
+  drawPriceChart(left, priceRight, priceTop, priceHeight, gameState, scales);
+  drawTradeMarkers(left, priceRight, priceTop + priceHeight + 5, gameState);
+  drawThermometerBars(priceRight + 20, priceTop, priceHeight + tradeMarkersHeight, gameState, scales);  // Moved next to price chart
+  drawDepthResilienceChart(left, fullRight, depthResTop, depthResHeight, gameState, scales);
+  drawZetaChart(left, fullRight, zetaTop, zetaHeight, gameState, scales);
 }
 
 // =====================================================
