@@ -6,74 +6,6 @@ classes: wide
 
 <style>
 
-.game-section {
-  background-color: #ffffff;
-  padding: 4em 2em;
-  min-height: 50vh;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-}
-
-/* Push header content to edges */
-.masthead__inner-wrap {
-  padding-left: 1em;
-  padding-right: 1em;
-  max-width: 100% !important;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.masthead__menu {
-  width: 100%;
-}
-
-.greedy-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.site-title {
-  margin-right: auto;
-}
-
-.masthead-contact {
-  text-align: right;
-  padding: 0.5em 1em;
-  margin-left: auto;
-}
-
-.masthead {
-  background-color: #fff;
-  background-image: none !-important;
-  border-bottom: none !important;
-  min-height: auto;
-}
-
-.masthead__inner-wrap {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Hide background in footer */
-.page__footer {
-  background-color: #ffffff !important;
-  background-image: none !important;
-  padding: 0.5em 0 !important;
-  margin-top: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* In case the theme wraps footer content and pads that */
-.page__footer .page__footer-follow {
-  max-width: 100% !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
 /* Remove container padding to make sections full width */
 .page__content {
   margin: 0 !important;
@@ -84,6 +16,31 @@ classes: wide
 .page {
   width: 100% !important;
   padding: 0 !important;
+}
+
+/* Custom header section */
+.custom-header {
+  background-color: #fff;
+  padding: 1em 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.site-title-custom {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+.header-contact {
+  text-align: right;
+  font-size: 0.75em;
+  line-height: 1.4;
+  color: #555;
 }
 
 /* Welcome section - transparent with parallax effect */
@@ -106,6 +63,14 @@ classes: wide
 .works-section {
   background-color: #f5f5f5;
   padding: 1em 2em;
+  min-height: 50vh;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.game-section {
+  background-color: #ffffff;
+  padding: 4em 2em;
   min-height: 50vh;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
@@ -166,9 +131,9 @@ classes: wide
 
 /* Modal for enlarged comic */
 .comic-modal {
-  display: none;               /* hidden by default */
+  display: none;
   position: fixed;
-  inset: 0;                    /* top/right/bottom/left: 0 */
+  inset: 0;
   z-index: 99999999 !important;
   background-color: rgba(0,0,0,0.85);
   cursor: pointer;
@@ -189,16 +154,8 @@ classes: wide
   flex: 0 0 66%;
   display: flex;
   flex-direction: column;
-  align-items: center;      /* centers the game horizontally */
-  justify-content: center;  /* centers the game vertically */
-}
-
-.game-wrapper h3 {
-  margin-top: 0;
-  margin-bottom: 1em;
-  color: #333;
-  font-size: 1.5em;
-  text-align: center;
+  align-items: center;
+  justify-content: center;
 }
 
 #game-container {
@@ -214,6 +171,42 @@ classes: wide
   height: auto !important;
 }
 
+/* Custom footer section */
+.custom-footer {
+  background-color: #fff;
+  padding: 2em;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.footer-title {
+  font-size: 1.5em;
+  margin: 0 0 0.5em 0;
+  text-align: center;
+}
+
+.social-icons {
+  text-align: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.social-icons li {
+  display: inline-block;
+  margin: 0 15px;
+  vertical-align: middle;
+}
+
+.social-icons a {
+  color: #333;
+  transition: color 0.3s;
+}
+
+.social-icons a:hover {
+  color: #007acc;
+}
+
 /* Responsive design */
 @media (max-width: 1024px) {
   .split-container {
@@ -224,9 +217,30 @@ classes: wide
   .game-wrapper {
     flex: 0 0 100%;
   }
+  
+  .custom-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-contact {
+    text-align: left;
+    margin-top: 1em;
+  }
 }
 
 </style>
+
+<!-- Custom Header -->
+<div class="custom-header">
+  <a class="site-title-custom" href="/">Lóránt Nagy</a>
+  <div class="header-contact">
+    HUN-REN Rényi Institute of Mathematics<br>
+    Budapest, Reáltanoda utca 13-15, 1053<br>
+    <br>
+    lorantnagy at renyi hu
+  </div>
+</div>
 
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em; line-height: 1.2;">
@@ -265,6 +279,17 @@ classes: wide
   </div>
 </div>
 
+<!-- Custom Footer -->
+<div class="custom-footer">
+  <p class="footer-title">c o n n e c t</p>
+  <ul class="social-icons">
+    <li><a href="https://github.com/lorant-nagy" target="_blank" title="GitHub"><i class="fab fa-fw fa-github" aria-hidden="true" style="font-size: 4em;"></i></a></li>
+    <li><a href="https://instagram.com/lowcy_me_is" target="_blank" title="Instagram"><i class="fab fa-fw fa-instagram" aria-hidden="true" style="font-size: 4em;"></i></a></li>
+    <li><a href="https://linkedin.com/in/lóránt-nagy-87b5a0101" target="_blank" title="LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true" style="font-size: 4em;"></i></a></li>
+    <li><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=10076737" target="_blank" title="MTMT"><img src="/assets/images/mtmt_logo.png" alt="MTMT" style="width: 4em; height: 4em; display: inline-block;"></a></li>
+  </ul>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 <script src="{{ '/assets/js/game-single-file.js' | relative_url }}"></script>
 
@@ -279,7 +304,7 @@ function openModal() {
   const modalImg = document.getElementById('modalImg');
   const comicImg = document.getElementById('comicImg');
   
-  modal.style.display = 'flex';        // show modal as flexbox
+  modal.style.display = 'flex';
   modalImg.src = comicImg.src;
 }
 
