@@ -61,6 +61,8 @@ classes: wide
 .page__footer {
   background-color: #ffffffb6;
   background-image: none !important;
+  padding: 1em 0 !important;
+  margin-top: 2em !important;
 }
 
 /* Remove container padding to make sections full width */
