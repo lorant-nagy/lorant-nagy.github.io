@@ -368,7 +368,8 @@ function createGameState() {
     
     isRunning: false,
     isGameOver: false,
-    gameOverReason: ''
+    gameOverReason: '',
+    showInfoScreen: true  // Show info screen on first load
   };
 }
 
@@ -1723,6 +1724,81 @@ function drawLiquidationPhase(gameState) {
   text(`Auto-liquidating to zero position (${stepsRemaining} steps remaining)`, width / 2, bannerHeight / 2 + 20);
 }
 
+function drawInfoScreen() {
+  // Semi-transparent dark overlay
+  fill(0, 0, 0, 200);
+  rect(0, 0, width, height);
+  
+  // Info box - 80% of canvas size
+  const boxW = width * 0.8;
+  const boxH = height * 0.8;
+  const boxX = (width - boxW) / 2;
+  const boxY = (height - boxH) / 2;
+  
+  // Box background
+  stroke(255, 140, 50);  // Orange border (same as game)
+  strokeWeight(3);
+  fill(25, 25, 35, 240);  // Same dark background as game panels
+  rect(boxX, boxY, boxW, boxH);
+  
+  // Title
+  noStroke();
+  fill(255, 140, 50);  // Orange text
+  textAlign(CENTER, TOP);
+  textSize(32);
+  textStyle(BOLD);
+  text('INFO', width / 2, boxY + 30);
+  textStyle(NORMAL);
+  
+  // Description text
+  fill(200, 200, 200);  // Light gray text
+  textAlign(LEFT, TOP);
+  textSize(16);
+  const textX = boxX + 40;
+  const textY = boxY + 100;
+  const textW = boxW - 80;
+  
+  // Use text() with WORD wrapping for justified-like appearance
+  const description = "The game is built on a transient price impact microstructure where a single risky asset has a midprice and a time varying bid ask spread driven by an impact variable. Each trade you make moves this impact variable according to the market depth, so low depth means even one unit of trading makes the spread jump a lot, while high depth makes the spread react only mildly. Between trades, resilience slowly pulls the spread back toward its normal level, so the extra cost you created by trading gradually decays instead of staying forever. An automated opponent trades in the same market and its orders move the same spread process as yours, so its activity can also widen the spread and make your trades more expensive. Your task is to time and size your trades so that, after eventual liquidation of your position, your wealth is as high as possible given this depth and resilience driven friction.";
+  text(description, textX, textY, textW);
+  
+  // OK Button
+  const btnW = 140;
+  const btnH = 50;
+  const btnX = (width - btnW) / 2;
+  const btnY = boxY + boxH - 80;
+  
+  const isHovered = mouseX >= btnX && mouseX <= btnX + btnW &&
+                    mouseY >= btnY && mouseY <= btnY + btnH;
+  
+  stroke(255, 140, 50);  // Orange border
+  strokeWeight(2);
+  fill(isHovered ? color(60, 60, 70) : color(40, 40, 50));  // Slightly lighter on hover
+  rect(btnX, btnY, btnW, btnH);
+  
+  noStroke();
+  fill(255, 140, 50);  // Orange text
+  textSize(20);
+  textAlign(CENTER, CENTER);
+  text('OK', btnX + btnW / 2, btnY + btnH / 2);
+  
+  return { btnX, btnY, btnW, btnH };
+}
+
+function checkInfoScreenOKClick() {
+  const boxW = width * 0.8;
+  const boxH = height * 0.8;
+  const boxX = (width - boxW) / 2;
+  const boxY = (height - boxH) / 2;
+  const btnW = 140;
+  const btnH = 50;
+  const btnX = (width - btnW) / 2;
+  const btnY = boxY + boxH - 80;
+  
+  return mouseX >= btnX && mouseX <= btnX + btnW &&
+         mouseY >= btnY && mouseY <= btnY + btnH;
+}
+
 function initButtons(canvasHeight) {
   const x = 820;
   const w = 70;
@@ -1832,6 +1908,12 @@ window.draw = function() {
     return;
   }
 
+  // Show info screen on first load
+  if (gameState.showInfoScreen) {
+    drawInfoScreen();
+    return;
+  }
+
   if (gameState.isRunning && frameCount % CONFIG.stepFrames === 0 && !gameState.isGameOver) {
     advanceTime(gameState);
     
@@ -1857,6 +1939,14 @@ window.draw = function() {
 };
 
 window.mousePressed = function() {
+  // Handle info screen OK button
+  if (gameState.showInfoScreen) {
+    if (checkInfoScreenOKClick()) {
+      gameState.showInfoScreen = false;
+    }
+    return;
+  }
+  
   if (gameState.isGameOver) {
     if (checkGameOverResetClick()) {
       handleReset();
