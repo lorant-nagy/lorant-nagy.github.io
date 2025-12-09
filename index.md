@@ -181,15 +181,16 @@ classes: wide
   flex: 0 0 66%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center;      /* centers the game horizontally */
+  justify-content: center;  /* centers the game vertically */
 }
 
-.game-wrapper {
-  flex: 0 0 66%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;      /* horizontal centering */
-  justify-content: center;  /* vertical centering */
+.game-wrapper h3 {
+  margin-top: 0;
+  margin-bottom: 1em;
+  color: #333;
+  font-size: 1.5em;
+  text-align: center;
 }
 
 #game-container {
