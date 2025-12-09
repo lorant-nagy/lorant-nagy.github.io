@@ -160,7 +160,7 @@ classes: wide
   display: none;               /* hidden by default */
   position: fixed;
   inset: 0;                    /* top/right/bottom/left: 0 */
-  z-index: 9999;
+  z-index: 999999;
   background-color: rgba(0,0,0,0.85);
   cursor: pointer;
   justify-content: center;
