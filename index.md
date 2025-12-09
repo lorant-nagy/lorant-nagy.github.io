@@ -106,7 +106,7 @@ classes: wide
   gap: 2em;
   max-width: 1600px;
   margin: 2em auto;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .publication-info {
@@ -184,12 +184,12 @@ classes: wide
   align-items: center;
 }
 
-.game-wrapper h3 {
-  margin-top: 0;
-  margin-bottom: 1em;
-  color: #333;
-  font-size: 1.5em;
-  text-align: center;
+.game-wrapper {
+  flex: 0 0 66%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* horizontal centering */
+  justify-content: center;  /* vertical centering */
 }
 
 #game-container {
