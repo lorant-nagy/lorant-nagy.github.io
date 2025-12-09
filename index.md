@@ -162,7 +162,7 @@ classes: wide
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255,255,255,0.98);
+  background-color: transparent;
   cursor: pointer;
 }
 
@@ -175,21 +175,6 @@ classes: wide
   left: 50%;
   transform: translate(-50%, -50%);
   object-fit: contain;
-}
-
-.modal-close {
-  position: absolute;
-  top: 20px;
-  right: 35px;
-  color: #333;
-  font-size: 40px;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-.modal-close:hover,
-.modal-close:focus {
-  color: #666;
 }
 
 .game-wrapper {
@@ -275,7 +260,6 @@ classes: wide
 
 <!-- Modal for enlarged comic -->
 <div id="comicModal" class="modal" onclick="closeModal()">
-  <span class="modal-close" onclick="closeModal()">&times;</span>
   <img class="modal-content" id="modalImg">
 </div>
 
