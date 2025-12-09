@@ -59,19 +59,12 @@ classes: wide
 
 /* Hide background in footer */
 .page__footer {
-  background-color: #ffffffb6;
+  background-color: #ffffff !important;
   background-image: none !important;
   padding: 0.5em 0 !important;
-  margin-top: 0em !important;
-}
-
-.page__footer {
-  background-color: #ffffffb6;
-  background-image: none !important;
-  padding: 0.5em 0 !important;    /* top/bottom only */
-  margin-top: 0 !important;       /* remove gap above footer */
-  border: none !important;        /* kill any border */
-  box-shadow: none !important;    /* just in case */
+  margin-top: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* In case the theme wraps footer content and pads that */
@@ -111,7 +104,7 @@ classes: wide
 
 /* Works section - solid background */
 .works-section {
-  background-color: #f5f5f5ba;
+  background-color: #f5f5f5;
   padding: 1em 2em;
   min-height: 50vh;
   width: 100vw;
@@ -176,7 +169,7 @@ classes: wide
   display: none;               /* hidden by default */
   position: fixed;
   inset: 0;                    /* top/right/bottom/left: 0 */
-  z-index: 999999;
+  z-index: 99999999 !important;
   background-color: rgba(0,0,0,0.85);
   cursor: pointer;
   justify-content: center;
