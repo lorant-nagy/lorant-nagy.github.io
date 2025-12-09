@@ -230,7 +230,6 @@ classes: wide
   <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 1em;">UNDER CONSTRUCTION</h2>
   
   <div class="game-section">
-    <h2 style="text-align:center;">Trading Game</h2>
     
     <div class="split-container">
       
@@ -245,7 +244,6 @@ classes: wide
       </div>
       
       <div class="game-wrapper">
-        <h3>Try the Game</h3>
         <div id="game-container">
           <!-- p5 canvas will be inserted here -->
         </div>
