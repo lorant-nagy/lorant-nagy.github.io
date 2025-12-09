@@ -162,7 +162,7 @@ classes: wide
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.9);
+  background-color: rgba(255,255,255,0.98);
   cursor: pointer;
 }
 
@@ -181,7 +181,7 @@ classes: wide
   position: absolute;
   top: 20px;
   right: 35px;
-  color: #f1f1f1;
+  color: #333;
   font-size: 40px;
   font-weight: bold;
   transition: 0.3s;
@@ -189,7 +189,7 @@ classes: wide
 
 .modal-close:hover,
 .modal-close:focus {
-  color: #bbb;
+  color: #666;
 }
 
 .game-wrapper {
