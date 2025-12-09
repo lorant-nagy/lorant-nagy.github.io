@@ -94,7 +94,7 @@ classes: wide
 /* Works section - solid background */
 .works-section {
   background-color: #f5f5f5ba;
-  padding: 3em 2em;
+  padding: 1em 2em;
   min-height: 50vh;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
@@ -105,7 +105,7 @@ classes: wide
   display: flex;
   gap: 2em;
   max-width: 1600px;
-  margin: 2em auto;
+  margin: 0.5em auto;
   align-items: center;
 }
 
