@@ -59,7 +59,7 @@ classes: wide
 
 /* Hide background in footer */
 .page__footer {
-  background-color: #fff;
+  background-color: #ffffffb6;
   background-image: none !important;
 }
 
@@ -93,8 +93,8 @@ classes: wide
 
 /* Works section - solid background */
 .works-section {
-  background-color: #f5f5f5;
-  padding: 4em 2em;
+  background-color: #f5f5f5ba;
+  padding: 3em 2em;
   min-height: 50vh;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
