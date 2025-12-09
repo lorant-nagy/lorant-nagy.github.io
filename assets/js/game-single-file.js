@@ -1244,7 +1244,7 @@ function drawZetaChart(left, right, top, height, gameState, scales) {
   fill(255, 100, 30);  // Deep orange text
   textAlign(LEFT, CENTER);
   textSize(10);
-  text('Zeta', legendX + 8, legendY);
+  text('spread', legendX + 8, legendY);
 
   // Scale lines
   stroke(230);
