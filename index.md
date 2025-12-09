@@ -272,12 +272,10 @@ function openModal() {
   
   modal.style.display = 'flex';        // show modal as flexbox
   modalImg.src = comicImg.src;
-  document.body.style.overflow = 'hidden';  // Prevent background scrolling
 }
 
 function closeModal() {
   const modal = document.getElementById('comicModal');
   modal.style.display = 'none';
-  document.body.style.overflow = '';   // Restore scrolling
 }
 </script>
