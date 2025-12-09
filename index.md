@@ -164,7 +164,7 @@ classes: wide
   top: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: transparent;
   cursor: pointer;
 }
 
@@ -179,6 +179,7 @@ classes: wide
   object-fit: contain;
   border: none;
   outline: none;
+  box-shadow: none;
 }
 
 .game-wrapper {
