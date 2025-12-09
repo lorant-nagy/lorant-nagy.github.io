@@ -235,7 +235,7 @@ classes: wide
       
       <div class="publication-info">
         <div class="citation">
-          Nagy, L. & Rásonyi, M. (2025). <em>On the utility problem in a market where price impact is transient</em>. arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank">link</a>]
+          Nagy, L. & Rásonyi, M. (2025). <em>On the utility problem in a market where price impact is transient</em>. arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank">arxiv</a>]
         </div>
         
         <div class="comic-container" onclick="openModal()">
