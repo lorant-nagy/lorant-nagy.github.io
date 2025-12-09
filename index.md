@@ -177,6 +177,8 @@ classes: wide
   left: 50%;
   transform: translate(-50%, -50%);
   object-fit: contain;
+  border: none;
+  outline: none;
 }
 
 .game-wrapper {
