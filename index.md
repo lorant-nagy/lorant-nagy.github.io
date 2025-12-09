@@ -46,7 +46,7 @@ classes: wide
 
 .masthead {
   background-color: #fff;
-  background-image: none !important;
+  background-image: none !-important;
   border-bottom: none !important;
   min-height: auto;
 }
@@ -156,26 +156,20 @@ classes: wide
 }
 
 /* Modal for enlarged comic */
-.modal {
-  display: none;
+.comic-modal {
+  display: none;               /* hidden by default */
   position: fixed;
+  inset: 0;                    /* top/right/bottom/left: 0 */
   z-index: 9999;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: transparent;
+  background-color: rgba(0,0,0,0.85);
   cursor: pointer;
+  justify-content: center;
+  align-items: center;
 }
 
-.modal-content {
-  display: block;
-  max-width: 90%;
+.comic-modal img {
+  max-width: 90vw;
   max-height: 90vh;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   object-fit: contain;
   border: none;
   outline: none;
@@ -227,20 +221,24 @@ classes: wide
 
 <div class="welcome-section">
   <div style="text-align: center; max-width: 800px; padding: 2em; line-height: 1.2;">
-    <div style="font-size: 3em;"><span style="font-size: 0.5em;">some &nbsp;</span> OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML</div>
-    <div style="font-size: 2em; letter-spacing: 0.2em;">&#8202;F&thinsp; i n - M a t &thinsp;h</div>
+    <div style="font-size: 3em;">
+      <span style="font-size: 0.5em;">some &nbsp;</span> OR &nbsp;&nbsp;&nbsp; AI &nbsp;&nbsp;&nbsp; ML
+    </div>
+    <div style="font-size: 2em; letter-spacing: 0.2em;">
+      &#8202;F&thinsp; i n - M a t &thinsp;h
+    </div>
   </div>
 </div>
 
 <div class="works-section">
-  
   <div class="game-section">
-    
     <div class="split-container">
       
       <div class="publication-info">
         <div class="citation">
-          Nagy, L. & Rásonyi, M. (2025). <em>On the utility problem in a market where price impact is transient</em>. arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank">arxiv</a>]
+          Nagy, L. &amp; Rásonyi, M. (2025).
+          <em>On the utility problem in a market where price impact is transient</em>.
+          arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank" rel="noopener">arxiv</a>]
         </div>
         
         <div class="comic-container" onclick="openModal()">
@@ -262,8 +260,8 @@ classes: wide
 <script src="{{ '/assets/js/game-single-file.js' | relative_url }}"></script>
 
 <!-- Modal for enlarged comic -->
-<div id="comicModal" class="modal" onclick="closeModal()">
-  <img class="modal-content" id="modalImg">
+<div id="comicModal" class="comic-modal" onclick="closeModal()">
+  <img id="modalImg" alt="Enlarged comic">
 </div>
 
 <script>
@@ -272,13 +270,14 @@ function openModal() {
   const modalImg = document.getElementById('modalImg');
   const comicImg = document.getElementById('comicImg');
   
-  modal.style.display = 'block';
+  modal.style.display = 'flex';        // show modal as flexbox
   modalImg.src = comicImg.src;
-  document.body.style.overflow = 'hidden';  // Prevent scrolling
+  document.body.style.overflow = 'hidden';  // Prevent background scrolling
 }
 
 function closeModal() {
-  document.getElementById('comicModal').style.display = 'none';
-  document.body.style.overflow = '';  // Restore scrolling
+  const modal = document.getElementById('comicModal');
+  modal.style.display = 'none';
+  document.body.style.overflow = '';   // Restore scrolling
 }
 </script>
