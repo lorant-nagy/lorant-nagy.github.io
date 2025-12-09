@@ -168,13 +168,13 @@ classes: wide
 
 .modal-content {
   display: block;
-  margin: auto;
-  max-width: 95%;
-  max-height: 95%;
-  position: absolute;
+  max-width: 90%;
+  max-height: 90vh;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  object-fit: contain;
 }
 
 .modal-close {
