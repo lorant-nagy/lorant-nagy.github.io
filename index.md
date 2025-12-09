@@ -62,7 +62,7 @@ classes: wide
   background-color: #ffffffb6;
   background-image: none !important;
   padding: 0.5em 0 !important;
-  margin-top: 1em !important;
+  margin-top: 0em !important;
 }
 
 /* Remove container padding to make sections full width */
