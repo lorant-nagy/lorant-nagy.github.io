@@ -100,7 +100,7 @@ classes: wide
   margin-left: calc(-50vw + 50%);
 }
 
-/* Split container for game section - 30% info, 70% game */
+/* Split container for game section - 30% comic, 70% game */
 .split-container {
   display: flex;
   gap: 2em;
@@ -110,71 +110,90 @@ classes: wide
 }
 
 .publication-info {
-  flex: 0 0 28%;
-  padding: 1.5em;
+  flex: 0 0 30%;
+  display: flex;
+  flex-direction: column;
+}
+
+.citation {
+  padding: 1em;
   background-color: #f9f9f9;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.publication-info h3 {
-  margin-top: 0;
-  color: #333;
-  font-size: 1.3em;
-  margin-bottom: 0.5em;
-}
-
-.publication-info p {
-  color: #555;
-  line-height: 1.6;
   margin-bottom: 1em;
-  font-size: 0.95em;
-}
-
-.publication-info ul {
-  color: #555;
-  line-height: 1.8;
   font-size: 0.9em;
-  padding-left: 1.2em;
+  color: #333;
+  line-height: 1.6;
 }
 
-.publication-info li {
-  margin-bottom: 0.5em;
-}
-
-.publication-info .paper-link {
-  display: inline-block;
-  margin-top: 1em;
-  padding: 0.5em 1em;
-  background-color: #007acc;
-  color: white;
+.citation a {
+  color: #007acc;
   text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  font-size: 0.9em;
 }
 
-.publication-info .paper-link:hover {
-  background-color: #005a9c;
+.citation a:hover {
+  text-decoration: underline;
 }
 
-.comic-placeholder {
-  margin-top: 1.5em;
-  padding: 1.5em;
-  background-color: #e8e8e8;
-  border: 2px dashed #999;
-  border-radius: 8px;
-  text-align: center;
-  color: #666;
-  min-height: 150px;
+.comic-container {
+  flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9em;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.comic-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+
+.comic-container img:hover {
+  transform: scale(1.02);
+}
+
+/* Modal for enlarged comic */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.9);
+  cursor: pointer;
+}
+
+.modal-content {
+  display: block;
+  margin: auto;
+  max-width: 95%;
+  max-height: 95%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: #bbb;
 }
 
 .game-wrapper {
-  flex: 0 0 68%;
+  flex: 0 0 66%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -231,26 +250,12 @@ classes: wide
     <div class="split-container">
       
       <div class="publication-info">
-        <h3>Based on Research</h3>
-        <p>
-          <strong>Paper:</strong> Nagy, L. & Rásonyi, M. (2025)<br>
-          <em>"On the utility problem in a market where price impact is transient"</em><br>
-          arXiv:2511.12093v1
-        </p>
-        <p>
-          This interactive game demonstrates the mathematical model of market microstructure 
-          where traders face transient price impact. The model captures:
-        </p>
-        <ul>
-          <li><strong>Dynamic spreads:</strong> Bid-ask spreads widen with trades and recover over time</li>
-          <li><strong>Market primitives:</strong> Price evolution, depth (liquidity), and resilience</li>
-          <li><strong>High-frequency trading:</strong> Multiple trades between market updates</li>
-          <li><strong>Strategic competition:</strong> You trade against a rule-based agent</li>
-        </ul>
-        <a href="https://arxiv.org/abs/2511.12093" class="paper-link" target="_blank">Read the Paper →</a>
+        <div class="citation">
+          Nagy, L. & Rásonyi, M. (2025). <em>On the utility problem in a market where price impact is transient</em>. arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank">link</a>]
+        </div>
         
-        <div class="comic-placeholder">
-          <p><em>Comic illustration coming soon...<br>Explaining model features visually</em></p>
+        <div class="comic-container" onclick="openModal()">
+          <img src="/assets/images/comic0.png" alt="Trading Game Comic" id="comicImg">
         </div>
       </div>
       
@@ -267,3 +272,24 @@ classes: wide
 
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 <script src="{{ '/assets/js/game-single-file.js' | relative_url }}"></script>
+
+<!-- Modal for enlarged comic -->
+<div id="comicModal" class="modal" onclick="closeModal()">
+  <span class="modal-close" onclick="closeModal()">&times;</span>
+  <img class="modal-content" id="modalImg">
+</div>
+
+<script>
+function openModal() {
+  const modal = document.getElementById('comicModal');
+  const modalImg = document.getElementById('modalImg');
+  const comicImg = document.getElementById('comicImg');
+  
+  modal.style.display = 'block';
+  modalImg.src = comicImg.src;
+}
+
+function closeModal() {
+  document.getElementById('comicModal').style.display = 'none';
+}
+</script>
