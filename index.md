@@ -61,8 +61,8 @@ classes: wide
 .page__footer {
   background-color: #ffffffb6;
   background-image: none !important;
-  padding: 1em 0 !important;
-  margin-top: 2em !important;
+  padding: 0.5em 0 !important;
+  margin-top: 1em !important;
 }
 
 /* Remove container padding to make sections full width */
@@ -96,7 +96,7 @@ classes: wide
 /* Works section - solid background */
 .works-section {
   background-color: #f5f5f5ba;
-  padding: 0.7em 2em;
+  padding: 0.9em 2em;
   min-height: 50vh;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
