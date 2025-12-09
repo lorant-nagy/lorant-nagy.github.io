@@ -96,7 +96,7 @@ classes: wide
 /* Works section - solid background */
 .works-section {
   background-color: #f5f5f5ba;
-  padding: 0.5em 2em;
+  padding: 0.7em 2em;
   min-height: 50vh;
   width: 100vw;
   margin-left: calc(-50vw + 50%);
