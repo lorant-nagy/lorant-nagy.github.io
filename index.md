@@ -65,6 +65,22 @@ classes: wide
   margin-top: 0em !important;
 }
 
+.page__footer {
+  background-color: #ffffffb6;
+  background-image: none !important;
+  padding: 0.5em 0 !important;    /* top/bottom only */
+  margin-top: 0 !important;       /* remove gap above footer */
+  border: none !important;        /* kill any border */
+  box-shadow: none !important;    /* just in case */
+}
+
+/* In case the theme wraps footer content and pads that */
+.page__footer .page__footer-follow {
+  max-width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 /* Remove container padding to make sections full width */
 .page__content {
   margin: 0 !important;
