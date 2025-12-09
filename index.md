@@ -162,11 +162,10 @@ classes: wide
   z-index: 9999;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.95);
   cursor: pointer;
-  overflow: hidden;
 }
 
 .modal-content {
@@ -274,9 +273,11 @@ function openModal() {
   
   modal.style.display = 'block';
   modalImg.src = comicImg.src;
+  document.body.style.overflow = 'hidden';  // Prevent scrolling
 }
 
 function closeModal() {
   document.getElementById('comicModal').style.display = 'none';
+  document.body.style.overflow = '';  // Restore scrolling
 }
 </script>
