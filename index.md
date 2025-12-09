@@ -227,7 +227,6 @@ classes: wide
 </div>
 
 <div class="works-section">
-  <h2 style="text-align: center; font-size: 2.5em; margin-bottom: 1em;">UNDER CONSTRUCTION</h2>
   
   <div class="game-section">
     
