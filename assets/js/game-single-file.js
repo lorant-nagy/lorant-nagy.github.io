@@ -137,7 +137,8 @@ const CONFIG = {
     actionThreshold: 2.7,         // Minimum price deviation to trigger trade
     
     // Market quality thresholds (must be ABOVE these to trade - high is good!)
-    thresholdResilience: 0.6,     // Only trade if resilience > 0.6
+    // thresholdResilience: 0.6,     // Only trade if resilience > 0.6
+    thresholdResilience: 1.3,     // Only trade if resilience > 1.3
     thresholdDepth: 0.8,          // Only trade if depth > 0.8
     
     // Simple Bernoulli thinning

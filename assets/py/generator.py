@@ -76,7 +76,7 @@ TRANSFORM_CONFIG = {
                 'steepness': 1.0,
             }
         },
-        'post_offset': 0.5,
+        'post_offset': 1.0,
         'post_scale': 1.0,
     }
 }
