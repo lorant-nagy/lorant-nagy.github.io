@@ -151,7 +151,7 @@ const CONFIG = {
     resMin: 0,
     resMax: 15,
     zetaMin: 0,
-    zetaMax: 0.6,
+    zetaMax: 1.1,
     inventoryMin: -50,
     inventoryMax: 50,
     cashMin: -100,  // Allow negative (loans)
@@ -1780,7 +1780,7 @@ function drawInfoScreen() {
   fill(255, 140, 50);  // Orange text
   textSize(20);
   textAlign(CENTER, CENTER);
-  text('OK', btnX + btnW / 2, btnY + btnH / 2);
+  text('PLAY', btnX + btnW / 2, btnY + btnH / 2);
   
   return { btnX, btnY, btnW, btnH };
 }
