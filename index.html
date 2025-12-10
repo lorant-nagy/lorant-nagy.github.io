@@ -19,6 +19,13 @@
       color: #333;
     }
 
+
+    .visitor-counter {
+      margin-top: 1em;
+      text-align: right;
+      font-size: 0.85em;
+      color: #555;
+    }
     /* Custom header section */
     .custom-header {
       background-color: #fff;
@@ -272,6 +279,7 @@
 </div>
 
 <!-- Custom Footer -->
+<!-- Custom Footer -->
 <div class="custom-footer">
   <p class="footer-title">c o n n e c t</p>
   <ul class="social-icons">
@@ -280,6 +288,11 @@
     <li><a href="https://linkedin.com/in/lóránt-nagy-87b5a0101" target="_blank" title="LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true" style="font-size: 4em;"></i></a></li>
     <li><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=10076737" target="_blank" title="MTMT"><img src="/assets/images/mtmt_logo.png" alt="MTMT" style="width: 4em; height: 4em; display: inline-block;"></a></li>
   </ul>
+
+  <!-- Visitor counter, right side -->
+  <p class="visitor-counter">
+    visitor count <span id="visitorCount">0</span>
+  </p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
@@ -304,6 +317,50 @@ function closeModal() {
   const modal = document.getElementById('comicModal');
   modal.style.display = 'none';
 }
+</script>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnQb_ZkAAWw8bGouuSt5wimjeNKRSsnKg",
+    authDomain: "github-page-edfd8.firebaseapp.com",
+    databaseURL: "https://github-page-edfd8-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "github-page-edfd8",
+    storageBucket: "github-page-edfd8.firebasestorage.app",
+    messagingSenderId: "290132840280",
+    appId: "1:290132840280:web:1cebccaf83429ef8ac9f2d",
+    measurementId: "G-T156EDMCBF"
+  };
+
+  // Initialize Firebase in the browser
+  firebase.initializeApp(firebaseConfig);
+
+  // Realtime Database: visitors/count
+  const db = firebase.database();
+  const visitorCountRef = db.ref('visitors/count');
+  const visitorCountElement = document.getElementById('visitorCount');
+
+  // Show live value
+  visitorCountRef.on('value', (snapshot) => {
+    const count = snapshot.val();
+    visitorCountElement.textContent =
+      (typeof count === 'number') ? count : 0;
+  });
+
+  // Increment once per page load
+  function incrementCounter() {
+    visitorCountRef.transaction((currentCount) => {
+      if (typeof currentCount !== 'number') {
+        return 1; // first visitor
+      }
+      return currentCount + 1;
+    });
+  }
+
+  incrementCounter();
 </script>
 
 </body>
