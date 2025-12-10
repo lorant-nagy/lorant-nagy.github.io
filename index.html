@@ -279,7 +279,6 @@
 </div>
 
 <!-- Custom Footer -->
-<!-- Custom Footer -->
 <div class="custom-footer">
   <p class="footer-title">c o n n e c t</p>
   <ul class="social-icons">
@@ -289,11 +288,13 @@
     <li><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=10076737" target="_blank" title="MTMT"><img src="/assets/images/mtmt_logo.png" alt="MTMT" style="width: 4em; height: 4em; display: inline-block;"></a></li>
   </ul>
 
-  <!-- Visitor counter, right side -->
+  <!-- visitors total + today -->
   <p class="visitor-counter">
-    visitor count <span id="visitorCount">0</span>
+    visitors total <span id="visitorsTotal">0</span><br>
+    visitors today <span id="visitorsToday">0</span>
   </p>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 <script src="/assets/js/game-single-file.js"></script>
@@ -335,32 +336,55 @@ function closeModal() {
     measurementId: "G-T156EDMCBF"
   };
 
-  // Initialize Firebase in the browser
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
-
-  // Realtime Database: visitors/count
   const db = firebase.database();
-  const visitorCountRef = db.ref('visitors/count');
-  const visitorCountElement = document.getElementById('visitorCount');
 
-  // Show live value
-  visitorCountRef.on('value', (snapshot) => {
-    const count = snapshot.val();
-    visitorCountElement.textContent =
-      (typeof count === 'number') ? count : 0;
+  // --- Budapest date helper ---
+  function getBudapestDateKey() {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Budapest',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    // e.g. "2025-12-10"
+    return formatter.format(now);
+  }
+
+  // --- DB references ---
+  const totalRef = db.ref('visitors/count');
+  const todayKey = getBudapestDateKey();                  // Budapest local date
+  const todayRef = db.ref('visitors/daily/' + todayKey);
+
+  // --- DOM elements ---
+  const visitorsTotalEl = document.getElementById('visitorsTotal');
+  const visitorsTodayEl = document.getElementById('visitorsToday');
+
+  // --- Live listeners ---
+  totalRef.on('value', (snapshot) => {
+    const val = snapshot.val();
+    visitorsTotalEl.textContent = (typeof val === 'number') ? val : 0;
   });
 
-  // Increment once per page load
-  function incrementCounter() {
-    visitorCountRef.transaction((currentCount) => {
-      if (typeof currentCount !== 'number') {
-        return 1; // first visitor
-      }
-      return currentCount + 1;
+  todayRef.on('value', (snapshot) => {
+    const val = snapshot.val();
+    visitorsTodayEl.textContent = (typeof val === 'number') ? val : 0;
+  });
+
+  // --- Increment both counters once per page load ---
+  function incrementCounters() {
+    totalRef.transaction((current) => {
+      return (typeof current === 'number') ? current + 1 : 1;
+    });
+
+    todayRef.transaction((current) => {
+      return (typeof current === 'number') ? current + 1 : 1;
     });
   }
 
-  incrementCounter();
+  incrementCounters();
 </script>
 
 </body>
