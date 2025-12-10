@@ -341,8 +341,7 @@ function closeModal() {
   const db = firebase.database();
 
   // --- Budapest date helper ---
-  function getBudapestDateKey() {
-    const now = new Date();
+  function formatBudapestDateKey(date) {
     const formatter = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Europe/Budapest',
       year: 'numeric',
@@ -350,28 +349,17 @@ function closeModal() {
       day: '2-digit',
     });
     // e.g. "2025-12-10"
-    return formatter.format(now);
+    return formatter.format(date);
   }
 
-  // --- DB references ---
+  function getTodayBudapestKey() {
+    return formatBudapestDateKey(new Date());
+  }
+
+  // --- DB references for counters ---
   const totalRef = db.ref('visitors/count');
-  const todayKey = getBudapestDateKey();                  // Budapest local date
+  const todayKey = getTodayBudapestKey();
   const todayRef = db.ref('visitors/daily/' + todayKey);
-
-  // --- DOM elements ---
-  const visitorsTotalEl = document.getElementById('visitorsTotal');
-  const visitorsTodayEl = document.getElementById('visitorsToday');
-
-  // --- Live listeners ---
-  totalRef.on('value', (snapshot) => {
-    const val = snapshot.val();
-    visitorsTotalEl.textContent = (typeof val === 'number') ? val : 0;
-  });
-
-  todayRef.on('value', (snapshot) => {
-    const val = snapshot.val();
-    visitorsTodayEl.textContent = (typeof val === 'number') ? val : 0;
-  });
 
   // --- Increment both counters once per page load ---
   function incrementCounters() {
@@ -385,7 +373,43 @@ function closeModal() {
   }
 
   incrementCounters();
+
+  // --- Build 7-day analytics table from visitors/daily ---
+  const analyticsEl = document.getElementById('analyticsTable');
+  const dailyRef = db.ref('visitors/daily');
+
+  dailyRef.on('value', (snapshot) => {
+    const dailyData = snapshot.val() || {};
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    const now = new Date();
+
+    // We want days: -6, -5, -4, -3, -2, -1, 0
+    const offsets = [-6, -5, -4, -3, -2, -1, 0];
+
+    // Format columns
+    const dayCells = offsets.map(offset =>
+      String(offset).padStart(3, ' ')
+    );
+
+    const visitorCells = offsets.map(offset => {
+      const date = new Date(now.getTime() + offset * MS_PER_DAY);
+      const key = formatBudapestDateKey(date);
+      const val = (typeof dailyData[key] === 'number') ? dailyData[key] : 0;
+      return String(val).padStart(3, ' ');
+    });
+
+    const lines = [];
+    lines.push('site analytics');
+    lines.push('______________________________________________________________');
+    lines.push('| day      |' + dayCells.map(c => ' ' + c + ' ').join('|') + ' |');
+    lines.push('|----------|' + offsets.map(() => '-----').join('|') + '|');
+    lines.push('| visitors |' + visitorCells.map(c => ' ' + c + ' ').join('|') + ' |');
+    lines.push('--------------------------------------------------------------');
+
+    analyticsEl.textContent = lines.join('\n');
+  });
 </script>
+
 
 </body>
 </html>
