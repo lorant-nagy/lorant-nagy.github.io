@@ -26,6 +26,11 @@
       font-size: 0.85em;
       color: #aa701e;
     }
+
+    .visitor-counter pre {
+      overflow-x: auto;
+      max-width: 100%;
+    }
     /* Custom header section */
     .custom-header {
       background-color: #fff;
@@ -425,11 +430,11 @@ function closeModal() {
 
     const lines = [];
     lines.push('site analytics for the last 7 days');
-    lines.push('______________________________________________________________');
+    lines.push('_________________________________________');
     lines.push('| day      |' + dayCells.map(c => ' ' + c + ' ').join('|') + ' |');
     lines.push('|----------|' + offsets.map(() => '-----').join('|') + '|');
     lines.push('| visitors |' + visitorCells.map(c => ' ' + c + ' ').join('|') + ' |');
-    lines.push('--------------------------------------------------------------');
+    lines.push('-----------------------------------------');
 
     analyticsEl.textContent = lines.join('\n');
   });
