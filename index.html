@@ -109,7 +109,7 @@
       padding: 4em 2em;
       min-height: 50vh;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
     }
 
@@ -124,19 +124,34 @@
       text-decoration: underline;
     }
 
+    .section-header {
+      max-width: 1600px;
+      margin: 0 auto 2em auto;
+      font-size: 0.95em;
+      color: #333;
+      line-height: 1.7;
+    }
+
+    .section-header h2 {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 0.4em;
+    }
+
     /* Split container for game section - 30% comic, 70% game */
     .split-container {
       display: flex;
       gap: 2em;
       max-width: 1600px;
       margin: 0.5em auto;
-      align-items: center;
+      align-items: flex-start;
     }
 
     .publication-info {
       flex: 0 0 30%;
       display: flex;
       flex-direction: column;
+      max-height: 500px;
     }
 
     .citation {
@@ -147,6 +162,7 @@
       font-size: 0.9em;
       color: #333;
       line-height: 1.6;
+      flex-shrink: 0;
     }
 
     .citation a {
@@ -163,11 +179,15 @@
       display: flex;
       flex-direction: column;
       cursor: pointer;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .comic-container img {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       transition: transform 0.3s ease;
@@ -302,6 +322,10 @@
 
 <div class="works-section">
   <div class="game-section">
+    <div class="section-header">
+      <h2>Section title goes here</h2>
+      A short description of this section. You can use <strong>bold text like this</strong> to emphasize key ideas, and the rest is plain prose that you can edit freely.
+    </div>
     <div class="split-container">
       
       <div class="publication-info">
@@ -326,7 +350,13 @@
   </div>
 
   <div class="next-section">
-    <a href="/read-on.html" class="read-on-link">read on →</a>
+    <div style="max-width: 1600px; width: 100%;">
+      <div class="section-header">
+        <h2>Another section title</h2>
+        A short description here too. <strong>Bold text works the same way</strong> — just wrap words in &lt;strong&gt; tags.
+      </div>
+      <a href="/read-on.html" class="read-on-link">read on →</a>
+    </div>
   </div>
 </div>
 
