@@ -135,6 +135,10 @@
       text-align: left;
     }
 
+    .section-header p {
+      margin-top: 1em;
+    }
+
     .split-container {
       display: flex;
       gap: 2em;
@@ -340,12 +344,45 @@
   </div>
 
   <div class="next-section">
-    <div style="max-width: 1600px; width: 100%;">
-      <div class="section-header">
-        <h2>When autocorrelation sees only noise: from a coin paradox to stochastic volatility</h2>
-        A time series may look like pure noise through the lens of autocorrelation, while its hidden structure lives elsewhere. A simple coin paradox already shows how this can happen: take two fair coins, and an oracle that tells whether they landed on the same face or on different faces. Any two of these three objects look unrelated, yet any two completely determine the third. A similar effect can appear in time series evolution: changing signs may hide persistent structure that only becomes visible in local variance, squared values, or volatility. Read on.
+    <div style="max-width: 1600px; width: 100%; display: flex; gap: 2em;">
+
+      <div style="flex: 1;">
+        <div class="section-header">
+          <h2>
+            
+          Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
+          <p>
+          Take two fair coins, and add a third character: an oracle that reports only one thing 
+          — whether the two coins landed on the same face or on different faces. 
+          At first sight, the three objects seem perfectly unrelated: whichever pair we pick, 
+          one does not reveal anything about the other. 
+          But this is deceptive: independence holds at the level of pairs, yet the moment any two are known, 
+          the third is fixed with certainty.
+          This somewhat paradoxical example is often cited to show that full independence 
+          in a probabilistic structure is a subtle property. 
+          </p>
+          <p>One may then naturally ask whether 
+          a similar hiding of dependence can emerge in more complex and evolving structures such as time series.
+          </p>
+          <p>
+           The answer is yes: 
+           in finance, one important example appears in stochastic-volatility models, 
+           beginning with Hull and White (1987) and continuing, in a long-memory direction, 
+           with the work of Comte and Renault (1998).
+          When volatility is governed by a long-memory driver, the alternating signs of returns 
+          can mask the underlying persistence. 
+          Ordinary autocorrelation may then suggest a world of independent shocks, 
+          while the same persistence quietly survives in return magnitudes, 
+          local energy, or squared values. In this sense, what looks like noise 
+          at the level of returns may still carry memory through volatility clustering.
+          </p>
+        </div>
+        <a href="/read-on.html" class="read-on-link">read on →</a>
       </div>
-      <a href="/read-on.html" class="read-on-link">read on →</a>
+
+      <div id="coin-oracle-container" style="width: 200px; background: #eee;">
+      </div>
+
     </div>
   </div>
 </div>
@@ -372,6 +409,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 <script src="/assets/js/game-single-file.js"></script>
+
+<script src="/assets/js/coin-oracle.js"></script>
+<script>
+  CoinOracle.init('coin-oracle-container');
+</script>
 
 <!-- Modal for enlarged comic -->
 <div id="comicModal" class="comic-modal" onclick="closeModal()">
