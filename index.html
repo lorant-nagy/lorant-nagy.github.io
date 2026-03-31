@@ -19,7 +19,6 @@
       color: #333333;
     }
 
-
     .visitor-counter {
       margin-top: 1em;
       text-align: right;
@@ -31,7 +30,7 @@
       overflow-x: auto;
       max-width: 100%;
     }
-    /* Custom header section */
+
     .custom-header {
       background-color: #fff;
       padding: 1em 2em;
@@ -54,7 +53,6 @@
       color: #555;
     }
 
-    /* Welcome section - transparent with parallax effect */
     .welcome-section {
       background-image: url('/assets/images/background.png');
       background-attachment: fixed;
@@ -69,13 +67,11 @@
       position: relative;
     }
 
-
-
     .cv-link {
       position: absolute;
-      top: 50%;              /* center vertically */
-      left: 50%;             /* center horizontally */
-      transform: translate(-50%, -50%);  /* perfect center */
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       font-size: 2.2rem;
       font-weight: 600;
       color: #aa701e;
@@ -90,16 +86,15 @@
       background-color: rgba(255, 255, 255, 0.15);
     }
 
-    /* Works section - solid background */
     .works-section {
       background-color: #f5f5f5;
-      padding: 1em 0;  /* Keep top/bottom padding for grey stripes, remove left/right */
+      padding: 1em 0;
       min-height: 50vh;
     }
 
     .game-section {
       background-color: #ffffff;
-      padding: 4em 2em;  /* Keep padding for content inside */
+      padding: 4em 2em;
       min-height: 50vh;
       margin-bottom: 1em;
     }
@@ -130,15 +125,16 @@
       font-size: 0.95em;
       color: #333;
       line-height: 1.7;
+      text-align: justify;
     }
 
     .section-header h2 {
       font-size: 1.2em;
       font-weight: bold;
       margin-bottom: 0.4em;
+      text-align: left;
     }
 
-    /* Split container for game section - 30% comic, 70% game */
     .split-container {
       display: flex;
       gap: 2em;
@@ -197,7 +193,6 @@
       transform: scale(1.02);
     }
 
-    /* Modal for enlarged comic */
     .comic-modal {
       display: none;
       position: fixed;
@@ -239,7 +234,6 @@
       height: auto !important;
     }
 
-    /* Custom footer section */
     .custom-footer {
       background-color: #fff;
       padding: 2em;
@@ -273,7 +267,6 @@
       color: #007acc;
     }
 
-    /* Responsive design */
     @media (max-width: 1024px) {
       .split-container {
         flex-direction: column;
@@ -311,27 +304,17 @@
 
 <!-- Welcome Section -->
 <div class="welcome-section">
-  <!-- Big clickable CV link on top of the background -->
   <a href="/assets/pdf/CV.pdf" class="cv-link" target="_blank" rel="noopener">
     CV
   </a>
-
-  
 </div>
 
 
 <div class="works-section">
   <div class="game-section">
-    <div class="section-header" style="text-align: justify;">
+    <div class="section-header">
       <h2>A note on transient price impact.</h2>
-      Trading moves the market against the trader,
-      but what is the temporal nature of this effect?
-      In models of price impact, large trades are often associated with permanent price impact,
-      while smaller trades are typically modeled as having only instantaneous effects.
-      In reality, however, the truth likely lies somewhere in between.
-      Price impact is often better described as transient:
-      trades move prices, but this effect then gradually decays,
-      with prices partially reverting toward their pre-trade level over time.
+      Trading moves the market against the trader, but what is the temporal nature of this effect? In price impact models, large traders are often modeled as generating permanent impact, whereas small traders are typically modeled as having only instantaneous impact. In reality, however, the truth likely lies somewhere in between. Price impact may be better described as transient: after a trade moves the price, the effect gradually decays, with the price reverting toward its original level over time.
     </div>
     <div class="split-container">
       
@@ -358,9 +341,9 @@
 
   <div class="next-section">
     <div style="max-width: 1600px; width: 100%;">
-      <div class="section-header", style="text-align: justify;">
+      <div class="section-header">
         <h2>A note on auto-correlation, and latent independence.</h2>
-        A short description here too. <strong>Bold text works the same way</strong> — just wrap words in &lt;strong&gt; tags.
+        Stochastic volatility models can hide persistent memory when viewing dependence through the lens of first order statistics.
       </div>
       <a href="/read-on.html" class="read-on-link">read on →</a>
     </div>
@@ -377,7 +360,6 @@
     <li><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=10076737" target="_blank" title="MTMT"><img src="/assets/images/mtmt_logo.png" alt="MTMT" style="width: 4em; height: 4em; display: inline-block;"></a></li>
   </ul>
 
-  <!-- visitors total + today -->
   <div class="visitor-counter">
     <pre id="analyticsTable">loading site analytics...
 
@@ -401,7 +383,6 @@ function openModal() {
   const modal = document.getElementById('comicModal');
   const modalImg = document.getElementById('modalImg');
   const comicImg = document.getElementById('comicImg');
-  
   modal.style.display = 'flex';
   modalImg.src = comicImg.src;
 }
@@ -428,11 +409,9 @@ function closeModal() {
     measurementId: "G-T156EDMCBF"
   };
 
-  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
-  // --- Budapest date helper ---
   function formatBudapestDateKey(date) {
     const formatter = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Europe/Budapest',
@@ -440,7 +419,6 @@ function closeModal() {
       month: '2-digit',
       day: '2-digit',
     });
-    // e.g. "2025-12-10"
     return formatter.format(date);
   }
 
@@ -448,17 +426,14 @@ function closeModal() {
     return formatBudapestDateKey(new Date());
   }
 
-  // --- DB references for counters ---
   const totalRef = db.ref('visitors/count');
   const todayKey = getTodayBudapestKey();
   const todayRef = db.ref('visitors/daily/' + todayKey);
 
-  // --- Increment both counters once per page load ---
   function incrementCounters() {
     totalRef.transaction((current) => {
       return (typeof current === 'number') ? current + 1 : 1;
     });
-
     todayRef.transaction((current) => {
       return (typeof current === 'number') ? current + 1 : 1;
     });
@@ -466,7 +441,6 @@ function closeModal() {
 
   incrementCounters();
 
-  // --- Build 7-day analytics table from visitors/daily ---
   const analyticsEl = document.getElementById('analyticsTable');
   const dailyRef = db.ref('visitors/daily');
 
@@ -474,15 +448,9 @@ function closeModal() {
     const dailyData = snapshot.val() || {};
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
     const now = new Date();
-
-    // We want days: -6, -5, -4, -3, -2, -1, 0
     const offsets = [-6, -5, -4, -3, -2, -1, 0];
 
-    // Format columns
-    const dayCells = offsets.map(offset =>
-      String(offset).padStart(3, ' ')
-    );
-
+    const dayCells = offsets.map(offset => String(offset).padStart(3, ' '));
     const visitorCells = offsets.map(offset => {
       const date = new Date(now.getTime() + offset * MS_PER_DAY);
       const key = formatBudapestDateKey(date);
@@ -501,7 +469,6 @@ function closeModal() {
     analyticsEl.textContent = lines.join('\n');
   });
 </script>
-
 
 </body>
 </html>
