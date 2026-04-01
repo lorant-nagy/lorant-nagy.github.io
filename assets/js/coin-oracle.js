@@ -109,7 +109,7 @@ void main(){
 
     // --- flip button on top ---
     const btn = document.createElement('button');
-    btn.textContent = 'flip coins';
+    btn.textContent = 'click to flip coins';
     btn.style.cssText = [
       'background:none', 'border:none', 'padding:0',
       'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
@@ -169,7 +169,7 @@ void main(){
         'text-align:center',
         'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
         'font-size:9px', 'letter-spacing:0.1em',
-        'color:rgba(80,50,10,0.5)', 'pointer-events:none'
+        'color:rgba(224, 211, 193, 0.61)', 'pointer-events:none'
       ].join(';');
       tag.textContent = c.label;
       cell.appendChild(tag);

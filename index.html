@@ -54,10 +54,6 @@
     }
 
     .welcome-section {
-      background-image: url('/assets/images/background.png');
-      background-attachment: fixed;
-      background-position: center 23%;
-      background-size: cover;
       min-height: 65vh;
       display: flex;
       align-items: center;
@@ -322,7 +318,7 @@
 </div>
 
 <!-- Welcome Section -->
-<div class="welcome-section">
+<div class="welcome-section" id="welcome-section">
   <a href="/assets/pdf/CV.pdf" class="cv-link" target="_blank" rel="noopener">
     CV
   </a>
@@ -420,6 +416,9 @@
   </div>
 </div>
 
+
+<script src="/assets/js/background-shader.js"></script>
+<script>BackgroundShader.init('welcome-section');</script>
 
 <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 <script src="/assets/js/game-single-file.js"></script>
