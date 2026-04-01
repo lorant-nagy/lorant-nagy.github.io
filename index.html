@@ -271,6 +271,13 @@
       color: #007acc;
     }
 
+    .next-section-inner {
+      max-width: 1600px;
+      width: 100%;
+      display: flex;
+      gap: 2em;
+    }
+
     @media (max-width: 1024px) {
       .split-container {
         flex-direction: column;
@@ -289,6 +296,14 @@
       .header-contact {
         text-align: left;
         margin-top: 1em;
+      }
+
+      .next-section-inner {
+        flex-direction: column;
+      }
+
+      #coin-oracle-container {
+        align-self: center;
       }
     }
   </style>
@@ -344,7 +359,7 @@
   </div>
 
   <div class="next-section">
-    <div style="max-width: 1600px; width: 100%; display: flex; gap: 2em;">
+    <div class="next-section-inner">
 
       <div style="flex: 1;">
         <div class="section-header">
