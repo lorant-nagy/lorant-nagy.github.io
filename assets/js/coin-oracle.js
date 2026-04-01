@@ -1,13 +1,12 @@
 /* coin-oracle.js
-   Self-contained WebGL widget for the stochastic volatility section.
-   Renders three vertically stacked interference-pattern cells:
-     cell 0 — coin 1  (vertical stripes = heads, horizontal = tails)
-     cell 1 — coin 2  (same encoding)
-     cell 2 — oracle  (product when same, sum when different)
-   Call CoinOracle.init(containerId) to mount.
+   Layout: two square coin cells stacked on the left, one 2x square oracle on the right.
+   Overall dimensions: 3*UNIT wide, 2*UNIT tall.
+   Change UNIT to resize everything.
 */
 
 const CoinOracle = (() => {
+
+  const UNIT = 190; // px — one coin cell is UNIT x UNIT
 
   const VERT = `attribute vec2 p; void main(){ gl_Position=vec4(p,0,1); }`;
 
@@ -102,77 +101,80 @@ void main(){
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // --- build DOM ---
     container.innerHTML = '';
-    container.style.cssText = 'display:flex; flex-direction:column; align-items:flex-start; gap:10px;';
+    container.style.display = 'inline-flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'flex-start';
+    container.style.gap = '6px';
 
-    const wrap = document.createElement('div');
-    wrap.style.cssText = [
-      'display:flex', 'flex-direction:column',
-      'width:120px', 'height:360px',
-      'border-radius:6px', 'overflow:hidden',
-      'border:0.5px solid rgba(0,0,0,0.12)'
-    ].join(';');
-
-    const canvases = [];
-    const labels = ['coin 1', 'coin 2', 'oracle'];
-
-    labels.forEach((lbl, i) => {
-      const cell = document.createElement('div');
-      cell.style.cssText = 'position:relative; flex:1; overflow:hidden;';
-      if (i > 0) cell.style.borderTop = '0.5px solid rgba(0,0,0,0.08)';
-
-      const cv = document.createElement('canvas');
-      cv.style.cssText = 'width:100%; height:100%; display:block; filter:brightness(0.52);';
-      cell.appendChild(cv);
-      canvases.push(cv);
-
-      const tag = document.createElement('div');
-      tag.id = containerId + '-lbl-' + i;
-      tag.style.cssText = [
-        'position:absolute', 'bottom:6px', 'left:0', 'right:0',
-        'text-align:center',
-        'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
-        'font-size:9px', 'letter-spacing:0.12em',
-        'color:rgba(174, 131, 78, 0.82)', 'pointer-events:none',
-        'text-transform:lowercase', 'transition:color 0.1s'
-      ].join(';');
-      tag.textContent = lbl;
-      cell.appendChild(tag);
-
-      wrap.appendChild(cell);
-    });
-
-    
-
-    // flip button — discrete, matches site link style
+    // --- flip button on top ---
     const btn = document.createElement('button');
     btn.textContent = 'flip coins';
     btn.style.cssText = [
       'background:none', 'border:none', 'padding:0',
       'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
       'font-size:0.85em', 'color:#aa701e', 'cursor:pointer',
-      'letter-spacing:0.04em', 'text-decoration:none',
-      'opacity:0.8'
+      'letter-spacing:0.04em', 'opacity:0.8'
     ].join(';');
     btn.onmouseenter = () => btn.style.opacity = '1';
     btn.onmouseleave = () => btn.style.opacity = '0.8';
     container.appendChild(btn);
+
+    // --- outer wrap: exactly 3*UNIT wide, 2*UNIT tall ---
+    const wrap = document.createElement('div');
+    wrap.style.cssText = [
+      'position:relative',
+      `width:${3 * UNIT}px`,
+      `height:${2 * UNIT}px`,
+      'border-radius:4px',
+      'overflow:hidden',
+      'border:0.5px solid rgba(0,0,0,0.15)'
+    ].join(';');
     container.appendChild(wrap);
 
-    // --- size canvases once layout is settled ---
-    function sizeCanvases() {
-      canvases.forEach(cv => {
-        const r = cv.parentElement.getBoundingClientRect();
-        cv.width  = Math.max(Math.floor(r.width),  1);
-        cv.height = Math.max(Math.floor(r.height), 1);
-      });
-    }
+    // cell definitions: [left, top, width, height] all in UNIT multiples
+    const cells = [
+      { x: 0,    y: 0,    w: 1, h: 1, label: 'coin 1' },
+      { x: 0,    y: 1,    w: 1, h: 1, label: 'coin 2' },
+      { x: 1,    y: 0,    w: 2, h: 2, label: 'oracle'  },
+    ];
 
-    // defer so layout has resolved
-    requestAnimationFrame(() => {
-      sizeCanvases();
-      window.addEventListener('resize', sizeCanvases);
+    const canvases = [];
+
+    cells.forEach((c, i) => {
+      const cell = document.createElement('div');
+      cell.style.cssText = [
+        'position:absolute',
+        `left:${c.x * UNIT}px`,
+        `top:${c.y * UNIT}px`,
+        `width:${c.w * UNIT}px`,
+        `height:${c.h * UNIT}px`,
+        'overflow:hidden'
+      ].join(';');
+
+      // borders between cells
+      if (i === 0) cell.style.borderBottom = '0.5px solid rgba(0,0,0,0.1)';
+      if (i === 0 || i === 1) cell.style.borderRight = '0.5px solid rgba(0,0,0,0.1)';
+
+      const cv = document.createElement('canvas');
+      cv.width  = c.w * UNIT;
+      cv.height = c.h * UNIT;
+      cv.style.cssText = 'width:100%; height:100%; display:block; filter:brightness(0.52);';
+      cell.appendChild(cv);
+      canvases.push(cv);
+
+      const tag = document.createElement('div');
+      tag.style.cssText = [
+        'position:absolute', 'bottom:4px', 'left:0', 'right:0',
+        'text-align:center',
+        'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
+        'font-size:9px', 'letter-spacing:0.1em',
+        'color:rgba(80,50,10,0.5)', 'pointer-events:none'
+      ].join(';');
+      tag.textContent = c.label;
+      cell.appendChild(tag);
+
+      wrap.appendChild(cell);
     });
 
     // --- compile shaders ---
@@ -185,21 +187,15 @@ void main(){
     // --- state ---
     const S = { coins: [0, 0], reveal: 0, phase: 'idle' };
 
-    function showLabel(i) {}
-
-    function runFlip(onDone) {
+    function runFlip() {
       S.phase = 'flipping';
       S.reveal = 0;
       S.coins[0] = Math.random() < 0.5 ? 0 : 1;
-      showLabel(0);
       setTimeout(() => {
         S.coins[1] = Math.random() < 0.5 ? 0 : 1;
-        showLabel(1);
         setTimeout(() => {
           S.reveal = 1;
-          showLabel(2);
           S.phase = 'done';
-          setTimeout(() => { showLabel(-1); if (onDone) onDone(); }, 2000);
         }, 350);
       }, 350);
     }
@@ -239,8 +235,7 @@ void main(){
 
     requestAnimationFrame(draw);
 
-    // --- auto-run on load ---
-    // small delay so canvas sizes are computed before first flip
+    // auto-run on load
     setTimeout(() => runFlip(), 120);
   }
 
