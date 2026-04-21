@@ -35,7 +35,7 @@ WEEKLY_2Y      = 110   # ~2 years of weekly data (crude stocks, gas storage)
 # ---------------------------------------------------------------------------
 
 def eia_fetch(route: str, series_id: str, frequency: str, length: int) -> list[dict]:
-    """Fetch via APIv2 route + facets[series] (works for most series)."""
+    """Fetch via APIv2 route + facets[series]."""
     params = urllib.parse.urlencode({
         "api_key":            EIA_API_KEY,
         "frequency":          frequency,
@@ -47,27 +47,6 @@ def eia_fetch(route: str, series_id: str, frequency: str, length: int) -> list[d
     })
     url = f"https://api.eia.gov/v2/{route}/data/?{params}"
     print(f"  GET {route} [{series_id}] ...")
-    with urllib.request.urlopen(url, timeout=30) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-    rows = data.get("response", {}).get("data", [])
-    print(f"    -> {len(rows)} rows")
-    return rows
-
-
-def eia_fetch_v1(v1_id: str, length: int) -> list[dict]:
-    """Fetch via APIv2 /seriesid/ translation route using a full v1 series ID.
-    Use this when the v2 route+facet approach returns 0 rows or 400.
-    v1_id format: 'PET.EMD_EPD2D_PTE_NUS_DPG.W'
-    """
-    params = urllib.parse.urlencode({
-        "api_key":            EIA_API_KEY,
-        "data[0]":            "value",
-        "sort[0][column]":    "period",
-        "sort[0][direction]": "desc",
-        "length":             length,
-    })
-    url = f"https://api.eia.gov/v2/seriesid/{v1_id}/data/?{params}"
-    print(f"  GET seriesid/{v1_id} ...")
     with urllib.request.urlopen(url, timeout=30) as resp:
         data = json.loads(resp.read().decode("utf-8"))
     rows = data.get("response", {}).get("data", [])
@@ -96,18 +75,20 @@ def to_series(rows: list[dict]) -> list[dict]:
 def build_and_write():
 
     # Daily spot prices
-    brent_rows = eia_fetch("petroleum/pri/spt",  "RBRTE",   "daily", DAILY_LENGTH)
-    gas_rows   = eia_fetch("natural-gas/pri/fut", "RNGWHHD", "daily", DAILY_LENGTH)
+    brent_rows = eia_fetch("petroleum/pri/spt",   "RBRTE",                  "daily",  DAILY_LENGTH)
+    gas_rows   = eia_fetch("natural-gas/pri/fut",  "RNGWHHD",               "daily",  DAILY_LENGTH)
 
-    # Weekly retail fuel prices — use v1 translation route (more reliable for gnd series)
-    gasoline_rows = eia_fetch_v1("PET.EMM_EPMR_PTE_NUS_DPG.W", WEEKLY_1Y)
-    diesel_rows   = eia_fetch_v1("PET.EMD_EPD2D_PTE_NUS_DPG.W",  WEEKLY_1Y)
+    # Weekly retail fuel prices (USD/gallon, US national average)
+    # Gasoline: regular grade all formulations
+    # Diesel: No.2 ultra-low sulfur on-highway
+    gasoline_rows = eia_fetch("petroleum/pri/gnd", "EMM_EPMR_PTE_NUS_DPG",    "weekly", WEEKLY_1Y)
+    diesel_rows   = eia_fetch("petroleum/pri/gnd", "EMD_EPD2DXL0_PTE_NUS_DPG","weekly", WEEKLY_1Y)
 
     # Weekly crude oil stocks excl. SPR (thousand barrels)
-    crude_stocks_rows = eia_fetch("petroleum/sum/sndw", "WCESTUS1", "weekly", WEEKLY_2Y)
+    crude_stocks_rows = eia_fetch("petroleum/sum/sndw", "WCESTUS1",            "weekly", WEEKLY_2Y)
 
-    # Weekly natural gas working storage, Lower 48 (Bcf) — use v1 route
-    gas_storage_rows = eia_fetch_v1("NG.NW2_EPG0_SWO_R48_BCF.W", WEEKLY_2Y)
+    # Weekly natural gas working storage, Lower 48 (Bcf)
+    gas_storage_rows  = eia_fetch("natural-gas/sum/sndw", "NW2_EPG0_SWO_R48_BCF", "weekly", WEEKLY_2Y)
 
     payload = {
         "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
@@ -145,7 +126,7 @@ def build_and_write():
     }
 
     firebase_db.reference("energy/prices").set(payload)
-    print(f"Written to Firebase: energy/prices")
+    print("Written to Firebase: energy/prices")
 
 
 # ---------------------------------------------------------------------------
