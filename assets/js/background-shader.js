@@ -11,7 +11,7 @@ const SHADER_CONFIG = {
   octaves:    5,
   warp:       1.4,
   zoom:       1.3,
-  parallax:   0.40,
+  parallax:   0.33,
   brightness: 1.5,   // ← add this (0.5 = darker, 1.5 = brighter)
 
   c1: [0.01, 0.04, 0.10],
