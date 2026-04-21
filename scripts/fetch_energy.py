@@ -49,17 +49,19 @@ def fetch_brent(length: int = FETCH_DAYS) -> list[dict]:
 
 
 def fetch_henry_hub(length: int = FETCH_DAYS) -> list[dict]:
-    """Fetch daily Henry Hub natural gas spot price (USD/MMBtu)."""
+    """Fetch daily Henry Hub natural gas spot price (USD/MMBtu).
+    Series RNGWHHD = Henry Hub Natural Gas Spot Price, Daily.
+    """
     params = urllib.parse.urlencode({
         "api_key": EIA_API_KEY,
         "frequency": "daily",
         "data[0]": "value",
-        "facets[process][]": "PG4",
+        "facets[series][]": "RNGWHHD",
         "sort[0][column]": "period",
         "sort[0][direction]": "desc",
         "length": length,
     })
-    url = f"https://api.eia.gov/v2/natural-gas/pri/sum/data/?{params}"
+    url = f"https://api.eia.gov/v2/natural-gas/pri/fut/data/?{params}"
     with urllib.request.urlopen(url, timeout=30) as resp:
         data = json.loads(resp.read().decode("utf-8"))
     return data.get("response", {}).get("data", [])
