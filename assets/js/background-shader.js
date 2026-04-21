@@ -38,6 +38,7 @@ uniform float u_warp;
 uniform float u_zoom;
 uniform float u_scroll;
 uniform vec3  u_c1, u_c2, u_c3, u_c4;
+uniform float u_brightness;
 
 vec2 hash2(vec2 p) {
   p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
@@ -138,6 +139,7 @@ void main() {
     const uOct    = U('u_octaves'), uWarp = U('u_warp'),  uZoom   = U('u_zoom');
     const uScroll = U('u_scroll');
     const uC1 = U('u_c1'), uC2 = U('u_c2'), uC3 = U('u_c3'), uC4 = U('u_c4');
+    const uBrightness = U('u_brightness');
 
     const C = SHADER_CONFIG;
     gl.uniform3fv(uC1, C.c1); gl.uniform3fv(uC2, C.c2);
@@ -190,6 +192,7 @@ void main() {
       gl.uniform1f(uWarp,   warpSlider.value  / 100);
       gl.uniform1f(uZoom,   C.zoom);
       gl.uniform1f(uScroll, scrollOffset);
+      gl.uniform1f(uBrightness, C.brightness);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       requestAnimationFrame(render);
     }
