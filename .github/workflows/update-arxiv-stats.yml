@@ -1,0 +1,39 @@
+name: Update arXiv stats
+
+on:
+  schedule:
+    - cron: '15 5 * * 1-5'   # 05:15 UTC, Monday–Friday only (arXiv weekdays)
+  workflow_dispatch:           # allows manual trigger from GitHub Actions tab
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install firebase-admin
+
+      # - name: Run daily fetch
+      #   env:
+      #     FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      #   run: python scripts/fetch_arxiv.py
+
+      - name: Run daily fetch (backfil)
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: BACKFILL=1 python scripts/fetch_arxiv.py
+
+      # ── BACKFILL STEP ────────────────────────────────────────────────────
+      # To run the backfill: go to Actions tab → "Update arXiv stats" →
+      # "Run workflow", then temporarily change the step above to use
+      # BACKFILL=1, or just run the script locally with BACKFILL=1.
+      # Delete this comment block once backfill is done.
+      # ── END BACKFILL STEP ────────────────────────────────────────────────
