@@ -7,17 +7,17 @@
  * ── Tunable initial parameters ────────────────────────────────────────────
  */
 const SHADER_CONFIG = {
-  speed:    0.055,  // travel speed through noise field  (0 = frozen, 0.2 = fast)
-  octaves:  5,      // fBm octaves  (1–8),  more = finer cloud detail
-  warp:     1.4,    // domain warp strength  (0 = plain fBm,  2+ = very twisted)
-  zoom:     1.3,    // zoom  (larger = more zoomed-out / bigger blobs)
-  parallax: 0.30,   // scroll parallax strength  (0 = none,  0.3 = strong)
+  speed:      0.055,
+  octaves:    5,
+  warp:       1.4,
+  zoom:       1.3,
+  parallax:   0.30,
+  brightness: 1.0,   // ← add this (0.5 = darker, 1.5 = brighter)
 
-  // Colour palette — four stops mapped 0→1 over the noise value
-  c1: [0.01, 0.04, 0.10],   // near-black / deep navy
-  c2: [0.03, 0.22, 0.32],   // dark teal
-  c3: [0.55, 0.32, 0.06],   // amber-brown
-  c4: [0.88, 0.82, 0.70],   // warm off-white highlight
+  c1: [0.01, 0.04, 0.10],
+  c2: [0.03, 0.22, 0.32],
+  c3: [0.55, 0.32, 0.06],
+  c4: [0.88, 0.82, 0.70],
 };
 /* ─────────────────────────────────────────────────────────────────────────*/
 
@@ -89,6 +89,7 @@ void main() {
   col      = mix(col,  u_c3, smoothstep(0.35, 0.70, n));
   col      = mix(col,  u_c4, smoothstep(0.70, 1.00, n));
 
+  col *= u_brightness; // Apply brightness adjustment
   gl_FragColor = vec4(col, 1.0);
 }
 `;
