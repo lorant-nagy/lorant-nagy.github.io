@@ -274,6 +274,16 @@
       gap: 2em;
     }
 
+    .energy-section {
+      background-color: #ffffff;
+      padding: 4em 2em;
+    }
+
+    .energy-section-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
     .arxiv-section {
       background-color: #f5f5f5;
       padding: 4em 2em;
@@ -414,6 +424,13 @@
   </div>
 </div>
 
+<!-- Energy Prices Section -->
+<div class="energy-section">
+  <div class="energy-section-inner">
+    <div id="energy-prices-container"></div>
+  </div>
+</div>
+
 <!-- Custom Footer -->
 <div class="custom-footer">
   <p class="footer-title">c o n n e c t</p>
@@ -448,6 +465,11 @@
 <script src="/assets/js/arxiv-stats.js"></script>
 <script>
   ArxivStats.init('arxiv-stats-container');
+</script>
+
+<script src="/assets/js/energy-prices.js"></script>
+<script>
+  EnergyPrices.init('energy-prices-container');
 </script>
 
 <!-- Modal for enlarged comic -->
