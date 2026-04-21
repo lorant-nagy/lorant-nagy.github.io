@@ -8,7 +8,7 @@ from firebase_admin import credentials, db as firebase_db
 
 
 # ---------------------------------------------------------------------------
-# Firebase init (reuse existing app if already initialized)
+# Firebase init
 # ---------------------------------------------------------------------------
 
 SERVICE_ACCOUNT = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
@@ -24,100 +24,108 @@ if not firebase_admin._apps:
 # ---------------------------------------------------------------------------
 
 EIA_API_KEY = os.environ["EIA_API_KEY"]
-FETCH_DAYS  = 60   # how many days of history to fetch from EIA
+
+# How many data points to fetch per series
+DAILY_LENGTH   = 90    # ~3 months for daily series (Brent, Henry Hub)
+WEEKLY_1Y      = 56    # ~1 year of weekly data (gasoline, diesel)
+WEEKLY_2Y      = 110   # ~2 years of weekly data (crude stocks, gas storage)
 
 
 # ---------------------------------------------------------------------------
-# EIA fetch helpers
+# Generic EIA fetch
 # ---------------------------------------------------------------------------
 
-def fetch_brent(length: int = FETCH_DAYS) -> list[dict]:
-    """Fetch daily Brent crude spot price (USD/barrel)."""
+def eia_fetch(route: str, series_id: str, frequency: str, length: int) -> list[dict]:
+    """Fetch a single EIA series by legacy series ID via APIv2."""
     params = urllib.parse.urlencode({
-        "api_key": EIA_API_KEY,
-        "frequency": "daily",
-        "data[0]": "value",
-        "facets[product][]": "EPCBRENT",
-        "sort[0][column]": "period",
-        "sort[0][direction]": "desc",
-        "length": length,
+        "api_key":              EIA_API_KEY,
+        "frequency":            frequency,
+        "data[0]":              "value",
+        "facets[series][]":     series_id,
+        "sort[0][column]":      "period",
+        "sort[0][direction]":   "desc",
+        "length":               length,
     })
-    url = f"https://api.eia.gov/v2/petroleum/pri/spt/data/?{params}"
+    url = f"https://api.eia.gov/v2/{route}/data/?{params}"
+    print(f"  GET {route} [{series_id}] ...")
     with urllib.request.urlopen(url, timeout=30) as resp:
         data = json.loads(resp.read().decode("utf-8"))
-    return data.get("response", {}).get("data", [])
+    rows = data.get("response", {}).get("data", [])
+    print(f"    → {len(rows)} rows")
+    return rows
 
 
-def fetch_henry_hub(length: int = FETCH_DAYS) -> list[dict]:
-    """Fetch daily Henry Hub natural gas spot price (USD/MMBtu).
-    Series RNGWHHD = Henry Hub Natural Gas Spot Price, Daily.
-    """
-    params = urllib.parse.urlencode({
-        "api_key": EIA_API_KEY,
-        "frequency": "daily",
-        "data[0]": "value",
-        "facets[series][]": "RNGWHHD",
-        "sort[0][column]": "period",
-        "sort[0][direction]": "desc",
-        "length": length,
-    })
-    url = f"https://api.eia.gov/v2/natural-gas/pri/fut/data/?{params}"
-    with urllib.request.urlopen(url, timeout=30) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-    return data.get("response", {}).get("data", [])
-
-
-def normalize_series(raw: list[dict]) -> dict[str, float]:
-    """Convert list of {period, value} records to {date_str: float} dict."""
-    result = {}
-    for row in raw:
+def to_series(rows: list[dict]) -> list[dict]:
+    """Convert raw EIA rows to [{date, value}] sorted ascending."""
+    result = []
+    for row in rows:
         period = row.get("period", "")
         value  = row.get("value")
         if period and value is not None:
             try:
-                result[period] = float(value)
+                result.append({"date": period, "value": float(value)})
             except (ValueError, TypeError):
                 pass
-    return result
+    return sorted(result, key=lambda x: x["date"])
 
 
 # ---------------------------------------------------------------------------
-# Build combined payload and write to Firebase
+# Build payload and write to Firebase
 # ---------------------------------------------------------------------------
 
 def build_and_write():
-    print("Fetching Brent crude from EIA...")
-    brent_raw = fetch_brent()
-    print(f"  Got {len(brent_raw)} Brent records")
 
-    print("Fetching Henry Hub natural gas from EIA...")
-    gas_raw = fetch_henry_hub()
-    print(f"  Got {len(gas_raw)} Henry Hub records")
+    # ── Daily spot prices ───────────────────────────────────────────────────
+    brent_rows  = eia_fetch("petroleum/pri/spt",  "RBRTE",   "daily",  DAILY_LENGTH)
+    gas_rows    = eia_fetch("natural-gas/pri/fut", "RNGWHHD", "daily",  DAILY_LENGTH)
 
-    brent = normalize_series(brent_raw)
-    gas   = normalize_series(gas_raw)
+    # ── Weekly retail fuel prices (USD/gallon, US national average) ─────────
+    gasoline_rows = eia_fetch("petroleum/pri/gnd", "EMM_EPMR_PTE_NUS_DPG", "weekly", WEEKLY_1Y)
+    diesel_rows   = eia_fetch("petroleum/pri/gnd", "EMM_EPD2D_PTE_NUS_DPG", "weekly", WEEKLY_1Y)
 
-    # Build unified date-keyed series for the frontend
-    all_dates = sorted(set(list(brent.keys()) + list(gas.keys())))
+    # ── Weekly crude oil stocks excl. SPR (thousand barrels) ────────────────
+    crude_stocks_rows = eia_fetch("petroleum/sum/sndw", "WCESTUS1", "weekly", WEEKLY_2Y)
 
-    series = []
-    for date in all_dates:
-        series.append({
-            "date":   date,
-            "brent":  brent.get(date),   # None if missing for that date
-            "gas":    gas.get(date),
-        })
+    # ── Weekly natural gas working storage, Lower 48 (Bcf) ──────────────────
+    gas_storage_rows  = eia_fetch("natural-gas/sum/sndw", "NW2_EPG0_SWO_R48_BCF", "weekly", WEEKLY_2Y)
 
     payload = {
-        "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
-        "brent_unit":   "USD/barrel",
-        "gas_unit":     "USD/MMBtu",
-        "source":       "U.S. Energy Information Administration (EIA)",
-        "series":       series,
+        "generated_at":  datetime.datetime.utcnow().isoformat() + "Z",
+        "source":        "U.S. Energy Information Administration (EIA)",
+        "brent": {
+            "label": "Brent crude spot price",
+            "unit":  "USD/barrel",
+            "series": to_series(brent_rows),
+        },
+        "henry_hub": {
+            "label": "Henry Hub natural gas spot price",
+            "unit":  "USD/MMBtu",
+            "series": to_series(gas_rows),
+        },
+        "gasoline": {
+            "label": "US retail gasoline (regular)",
+            "unit":  "USD/gallon",
+            "series": to_series(gasoline_rows),
+        },
+        "diesel": {
+            "label": "US retail diesel",
+            "unit":  "USD/gallon",
+            "series": to_series(diesel_rows),
+        },
+        "crude_stocks": {
+            "label": "US crude oil stocks (excl. SPR)",
+            "unit":  "thousand barrels",
+            "series": to_series(crude_stocks_rows),
+        },
+        "gas_storage": {
+            "label": "US natural gas working storage (L48)",
+            "unit":  "Bcf",
+            "series": to_series(gas_storage_rows),
+        },
     }
 
     firebase_db.reference("energy/prices").set(payload)
-    print(f"Written to Firebase: energy/prices ({len(series)} data points)")
+    print(f"Written to Firebase: energy/prices")
 
 
 # ---------------------------------------------------------------------------
