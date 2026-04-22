@@ -96,7 +96,7 @@
     <div style="font-size:0.8em;font-weight:normal;color:#888;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5em;">neural network architectures — an interactive guide</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.5rem;">
 
-      <a href="/networks/feedforward.html" style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.2s,transform 0.2s;">
+      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
           <rect width="220" height="130" fill="#0d0f14"/>
           <g class="ff-edge" stroke="rgba(255,255,255,1)" stroke-width="0.6" fill="none">
@@ -110,75 +110,63 @@
           <circle class="ff-h2" cx="110" cy="65" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
           <circle class="ff-h3" cx="110" cy="98" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
           <circle class="ff-o"  cx="168" cy="65" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <text x="110" y="120" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">feedforward</text>
         </svg>
-        <div style="padding:0.75rem 0.9rem 0.85rem;border-top:0.5px solid rgba(255,255,255,0.06);">
-          <div style="font-size:0.95rem;color:#e8e4dc;margin-bottom:0.25rem;">feedforward</div>
-          <div style="font-size:0.72rem;color:#565c6e;line-height:1.5;margin-bottom:0.6rem;">how does activation flow from input to output?</div>
-          <div style="font-size:0.72rem;color:#aa701e;">explore →</div>
-        </div>
-      </a>
+      </div>
 
-      <a href="/networks/rnn.html" style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.2s,transform 0.2s;">
+      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
           <rect width="220" height="130" fill="#0d0f14"/>
           <defs><marker id="arr-idx" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="rgba(255,255,255,0.2)"/></marker></defs>
-          <g font-family="monospace" font-size="7" fill="rgba(255,255,255,0.25)" text-anchor="middle">
-            <text x="30" y="122">x₁</text><text x="48" y="122">x₂</text><text x="66" y="122">x₃</text>
-            <text x="84" y="122">x₄</text><text x="102" y="122">x₅</text><text x="120" y="122">x₆</text><text x="138" y="122">x₇</text>
+          <g font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)" text-anchor="middle">
+            <text x="30" y="116">x₁</text><text x="48" y="116">x₂</text><text x="66" y="116">x₃</text>
+            <text x="84" y="116">x₄</text><text x="102" y="116">x₅</text><text x="120" y="116">x₆</text><text x="138" y="116">x₇</text>
           </g>
-          <circle class="rnn-seq-dot" cx="30" cy="112" r="4" fill="#aa701e" opacity="0.7"/>
-          <line x1="110" y1="110" x2="110" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arr-idx)"/>
-          <circle class="rnn-x" cx="110" cy="76" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <line x1="97" y1="70" x2="68" y2="46" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-          <line x1="97" y1="82" x2="68" y2="100" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-          <circle class="rnn-h1" cx="54" cy="38"  r="15" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="rnn-h2" cx="54" cy="100" r="15" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <path class="rnn-arc" d="M 46 23 C 20 8, 20 8, 46 23" fill="none" stroke="#378ADD" stroke-width="1.5"/>
-          <path class="rnn-arc" d="M 46 115 C 20 130, 20 130, 46 115" fill="none" stroke="#e8824a" stroke-width="1.5"/>
-          <path d="M 54 53 Q 30 69 54 85" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="70" y1="69" x2="175" y2="69" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-          <circle cx="185" cy="69" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
+          <circle class="rnn-seq-dot" cx="30" cy="106" r="4" fill="#aa701e" opacity="0.7"/>
+          <line x1="110" y1="104" x2="110" y2="86" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arr-idx)"/>
+          <circle class="rnn-x" cx="110" cy="72" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="97" y1="66" x2="68" y2="42" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+          <line x1="97" y1="78" x2="68" y2="96" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+          <circle class="rnn-h1" cx="54" cy="34"  r="15" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <circle class="rnn-h2" cx="54" cy="96" r="15" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <path class="rnn-arc" d="M 46 19 C 20 4, 20 4, 46 19" fill="none" stroke="#378ADD" stroke-width="1.5"/>
+          <path class="rnn-arc" d="M 46 111 C 20 126, 20 126, 46 111" fill="none" stroke="#e8824a" stroke-width="1.5"/>
+          <path d="M 54 49 Q 30 65 54 81" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="70" y1="65" x2="175" y2="65" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <circle cx="185" cy="65" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">vanilla RNN</text>
         </svg>
-        <div style="padding:0.75rem 0.9rem 0.85rem;border-top:0.5px solid rgba(255,255,255,0.06);">
-          <div style="font-size:0.95rem;color:#e8e4dc;margin-bottom:0.25rem;">vanilla RNN</div>
-          <div style="font-size:0.72rem;color:#565c6e;line-height:1.5;margin-bottom:0.6rem;">can a network remember what happened steps ago?</div>
-          <div style="font-size:0.72rem;color:#aa701e;">explore →</div>
-        </div>
-      </a>
+      </div>
 
-      <a href="/networks/lstm.html" style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;text-decoration:none;display:block;transition:border-color 0.2s,transform 0.2s;">
+      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
           <rect width="220" height="130" fill="#0d0f14"/>
-          <rect class="lstm-cell" x="10" y="22" width="200" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
-          <line class="lstm-hw" x1="15" y1="27" x2="205" y2="27" stroke="white" stroke-width="2"/>
-          <rect class="lstm-gate-f" x="22"  y="48" width="28" height="28" rx="4" stroke="#378ADD" stroke-width="1"/>
-          <rect class="lstm-gate-i" x="62"  y="48" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
-          <rect class="lstm-gate-g" x="102" y="48" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
-          <rect class="lstm-gate-o" x="142" y="48" width="28" height="28" rx="4" stroke="#e8824a" stroke-width="1"/>
-          <text x="36"  y="63" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">f</text>
-          <text x="76"  y="63" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
-          <text x="116" y="63" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
-          <text x="156" y="63" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
-          <line x1="36"  y1="48" x2="36"  y2="27" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="76"  y1="48" x2="76"  y2="27" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="116" y1="48" x2="116" y2="27" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="156" y1="48" x2="156" y2="27" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="20"  y1="118" x2="20"  y2="100" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="195" y1="118" x2="195" y2="100" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="20"  y1="100" x2="195" y2="100" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <rect class="lstm-cell" x="10" y="20" width="200" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
+          <line class="lstm-hw" x1="15" y1="25" x2="205" y2="25" stroke="white" stroke-width="2"/>
+          <text x="110" y="16" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)">cell state</text>
+          <rect class="lstm-gate-f" x="22"  y="44" width="28" height="28" rx="4" stroke="#378ADD" stroke-width="1"/>
+          <rect class="lstm-gate-i" x="62"  y="44" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
+          <rect class="lstm-gate-g" x="102" y="44" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
+          <rect class="lstm-gate-o" x="142" y="44" width="28" height="28" rx="4" stroke="#e8824a" stroke-width="1"/>
+          <text x="36"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">f</text>
+          <text x="76"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
+          <text x="116" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
+          <text x="156" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
+          <line x1="36"  y1="44" x2="36"  y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="76"  y1="44" x2="76"  y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="116" y1="44" x2="116" y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="156" y1="44" x2="156" y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="20"  y1="114" x2="20"  y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="195" y1="114" x2="195" y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="20"  y1="96" x2="195" y2="96" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">LSTM</text>
         </svg>
-        <div style="padding:0.75rem 0.9rem 0.85rem;border-top:0.5px solid rgba(255,255,255,0.06);">
-          <div style="font-size:0.95rem;color:#e8e4dc;margin-bottom:0.25rem;">LSTM</div>
-          <div style="font-size:0.72rem;color:#565c6e;line-height:1.5;margin-bottom:0.6rem;">how do four gates control long-term memory?</div>
-          <div style="font-size:0.72rem;color:#aa701e;">explore →</div>
-        </div>
-      </a>
+      </div>
 
     </div>
-    <a href="/networks/" style="font-size:0.85em;color:#aa701e;text-decoration:none;letter-spacing:0.05em;">see all architectures →</a>
+    <a href="/networks/" style="font-size:0.85em;color:#aa701e;text-decoration:none;letter-spacing:0.05em;">explore →</a>
   </div>
 </div>
-
 
 <div class="arxiv-section">
   <div class="arxiv-section-inner">
