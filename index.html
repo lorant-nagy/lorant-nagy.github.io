@@ -5,328 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lóránt Nagy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      line-height: 1.6;
-      color: #333333;
-    }
-
-    .visitor-counter {
-      margin-top: 1em;
-      text-align: right;
-      font-size: 0.85em;
-      color: #aa701e;
-    }
-
-    .visitor-counter pre {
-      overflow-x: auto;
-      max-width: 100%;
-    }
-
-    .custom-header {
-      background-color: #fff;
-      padding: 1em 2em;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .site-title-custom {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #333;
-      text-decoration: none;
-    }
-
-    .header-contact {
-      text-align: right;
-      font-size: 0.75em;
-      line-height: 1.4;
-      color: #555;
-    }
-
-    .welcome-section {
-      min-height: 65vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-      position: relative;
-    }
-
-    .cv-link {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2.2rem;
-      font-weight: 600;
-      color: #aa701e;
-      text-decoration: none;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-      padding: 0.3em 0.8em;
-      border-radius: 0.5em;
-      background-color: rgba(255, 255, 255, 0.08);
-    }
-
-    .cv-link:hover {
-      background-color: rgba(255, 255, 255, 0.15);
-    }
-
-    .works-section {
-      background-color: #f5f5f5;
-      padding: 1em 0;
-      min-height: 50vh;
-    }
-
-    .game-section {
-      background-color: #ffffff;
-      padding: 4em 2em;
-      min-height: 50vh;
-      margin-bottom: 1em;
-    }
-
-    .next-section {
-      background-color: #ffffff;
-      padding: 4em 2em;
-      min-height: 50vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    .read-on-link {
-      font-size: 1.1em;
-      color: #aa701e;
-      text-decoration: none;
-      letter-spacing: 0.05em;
-    }
-
-    .read-on-link:hover {
-      text-decoration: underline;
-    }
-
-    .section-header {
-      max-width: 1600px;
-      margin: 0 auto 2em auto;
-      font-size: 0.95em;
-      color: #333;
-      line-height: 1.7;
-      text-align: justify;
-    }
-
-    .section-header h2 {
-      font-size: 1.2em;
-      font-weight: bold;
-      margin-bottom: 0.4em;
-      text-align: left;
-    }
-
-    .section-header p {
-      margin-top: 1em;
-    }
-
-    .split-container {
-      display: flex;
-      gap: 2em;
-      max-width: 1600px;
-      margin: 0.5em auto;
-      align-items: flex-start;
-    }
-
-    .publication-info {
-      flex: 0 0 30%;
-      display: flex;
-      flex-direction: column;
-      max-height: 500px;
-    }
-
-    .citation {
-      padding: 1em;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      margin-bottom: 1em;
-      font-size: 0.9em;
-      color: #333;
-      line-height: 1.6;
-      flex-shrink: 0;
-    }
-
-    .citation a {
-      color: #007acc;
-      text-decoration: none;
-    }
-
-    .citation a:hover {
-      text-decoration: underline;
-    }
-
-    .comic-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    .comic-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: top;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease;
-    }
-
-    .comic-container img:hover {
-      transform: scale(1.02);
-    }
-
-    .comic-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 99999999 !important;
-      background-color: rgba(0,0,0,0.85);
-      cursor: pointer;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .comic-modal img {
-      max-width: 90vw;
-      max-height: 90vh;
-      object-fit: contain;
-      border: none;
-      outline: none;
-      box-shadow: none;
-    }
-
-    .game-wrapper {
-      flex: 0 0 66%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #game-container {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      max-width: 100%;
-      overflow: visible;
-    }
-
-    #game-container canvas {
-      max-width: 100%;
-      height: auto !important;
-    }
-
-    .custom-footer {
-      background-color: #fff;
-      padding: 2em;
-    }
-
-    .footer-title {
-      font-size: 1.5em;
-      margin: 0 0 0.5em 0;
-      text-align: center;
-    }
-
-    .social-icons {
-      text-align: center;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .social-icons li {
-      display: inline-block;
-      margin: 0 15px;
-      vertical-align: middle;
-    }
-
-    .social-icons a {
-      color: #333;
-      transition: color 0.3s;
-    }
-
-    .social-icons a:hover {
-      color: #007acc;
-    }
-
-    .next-section-inner {
-      max-width: 1600px;
-      width: 100%;
-      display: flex;
-      gap: 2em;
-    }
-
-    .energy-section {
-      background-color: #ffffff;
-      padding: 4em 2em;
-    }
-
-    .energy-section-inner {
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-
-    .arxiv-section {
-      background-color: #f5f5f5;
-      padding: 4em 2em;
-    }
-
-    .arxiv-section-inner {
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-
-    @media (max-width: 1024px) {
-      .split-container {
-        flex-direction: column;
-      }
-      
-      .publication-info,
-      .game-wrapper {
-        flex: 0 0 100%;
-      }
-      
-      .custom-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      
-      .header-contact {
-        text-align: left;
-        margin-top: 1em;
-      }
-
-      .next-section-inner {
-        flex-direction: column;
-      }
-
-      #coin-oracle-container {
-        align-self: center;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body>
 
-<!-- Custom Header -->
+<!-- Header -->
 <div class="custom-header">
   <a class="site-title-custom" href="/">Lóránt Nagy, PhD</a>
   <div class="header-contact">
@@ -337,101 +20,89 @@
   </div>
 </div>
 
-<!-- Welcome Section -->
+<!-- Welcome / shader -->
 <div class="welcome-section" id="welcome-section">
-  <a href="/assets/pdf/CV.pdf" class="cv-link" target="_blank" rel="noopener">
-    CV
-  </a>
+  <a href="/assets/pdf/CV.pdf" class="cv-link" target="_blank" rel="noopener">CV</a>
 </div>
 
-
-<div class="works-section">
-  <div class="game-section">
-    <div class="section-header">
-      <h2>A note on transient price impact</h2>
-      Trading moves the market against the trader, but what is the temporal nature of this effect? In price impact models, large traders are often modeled as generating permanent impact, whereas small traders are typically modeled as having only instantaneous impact. In reality, however, the truth likely lies somewhere in between. Price impact may be better described as transient: after a trade moves the price, the effect gradually decays, with the price reverting toward its original level over time.
-    </div>
-    <div class="split-container">
-      
-      <div class="publication-info">
-        <div class="citation">
-          Nagy, L. &amp; Rásonyi, M. (2025).
-          <em>On the utility problem in a market where price impact is transient</em>.
-          arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank" rel="noopener">arxiv</a>]
-        </div>
-        
-        <div class="comic-container" onclick="openModal()">
-          <img src="/assets/images/comic0.png" alt="Trading Game Comic" id="comicImg">
-        </div>
-      </div>
-      
-      <div class="game-wrapper">
-        <div id="game-container">
-          <!-- p5 canvas will be inserted here -->
-        </div>
-      </div>
-      
-    </div>
+<!-- Transient price impact — white -->
+<div class="game-section">
+  <div class="section-header">
+    <h2>A note on transient price impact</h2>
+    Trading moves the market against the trader, but what is the temporal nature of this effect? In price impact models, large traders are often modeled as generating permanent impact, whereas small traders are typically modeled as having only instantaneous impact. In reality, however, the truth likely lies somewhere in between. Price impact may be better described as transient: after a trade moves the price, the effect gradually decays, with the price reverting toward its original level over time.
   </div>
-
-  <div class="next-section">
-    <div class="next-section-inner">
-
-      <div style="flex: 1;">
-        <div class="section-header">
-          <h2>
-            
-          Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
-          <p>
-          Take two fair coins, and add a third character: an oracle that reports only one thing 
-          — whether the two coins landed on the same face or on different faces. 
-          At first sight, the three objects seem perfectly unrelated: whichever pair we pick, 
-          one does not reveal anything about the other. 
-          But this is deceptive: independence holds at the level of pairs, yet the moment any two are known, 
-          the third is fixed with certainty.
-          This somewhat paradoxical example is often cited to show that full independence 
-          in a probabilistic structure is a subtle property. 
-          </p>
-          <p>One may then naturally ask whether 
-          a similar hiding of dependence can emerge in more complex and evolving structures such as time series.
-          </p>
-          <p>
-           The answer is yes: 
-           in finance, one important example appears in stochastic-volatility models, 
-           beginning with Hull and White (1987) and continuing, in a long-memory direction, 
-           with the work of Comte and Renault (1998).
-          When volatility is governed by a long-memory driver, the alternating signs of returns 
-          can mask the underlying persistence. 
-          Ordinary autocorrelation may then suggest a world of independent shocks, 
-          while persistence quietly survives in return magnitudes, 
-          local energy, or squared values. In this sense, what looks like noise 
-          at the level of returns may still carry memory through volatility clustering.
-          </p>
-        </div>
-        <a href="/read-on.html" class="read-on-link">read on →</a>
+  <div class="split-container">
+    <div class="publication-info">
+      <div class="citation">
+        Nagy, L. &amp; Rásonyi, M. (2025).
+        <em>On the utility problem in a market where price impact is transient</em>.
+        arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank" rel="noopener">arxiv</a>]
       </div>
-
-      <div id="coin-oracle-container"></div>
-      
+      <div class="comic-container" onclick="openModal()">
+        <img src="/assets/images/comic0.png" alt="Trading Game Comic" id="comicImg">
+      </div>
+    </div>
+    <div class="game-wrapper">
+      <div id="game-container">
+        <!-- p5 canvas will be inserted here -->
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ArXiv Stats Section -->
+<!-- Stochastic volatility — grey -->
+<div class="next-section">
+  <div class="next-section-inner">
+    <div style="flex: 1;">
+      <div class="section-header">
+        <h2>Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
+        <p>
+        Take two fair coins, and add a third character: an oracle that reports only one thing 
+        — whether the two coins landed on the same face or on different faces. 
+        At first sight, the three objects seem perfectly unrelated: whichever pair we pick, 
+        one does not reveal anything about the other. 
+        But this is deceptive: independence holds at the level of pairs, yet the moment any two are known, 
+        the third is fixed with certainty.
+        This somewhat paradoxical example is often cited to show that full independence 
+        in a probabilistic structure is a subtle property. 
+        </p>
+        <p>One may then naturally ask whether 
+        a similar hiding of dependence can emerge in more complex and evolving structures such as time series.
+        </p>
+        <p>
+         The answer is yes: 
+         in finance, one important example appears in stochastic-volatility models, 
+         beginning with Hull and White (1987) and continuing, in a long-memory direction, 
+         with the work of Comte and Renault (1998).
+        When volatility is governed by a long-memory driver, the alternating signs of returns 
+        can mask the underlying persistence. 
+        Ordinary autocorrelation may then suggest a world of independent shocks, 
+        while persistence quietly survives in return magnitudes, 
+        local energy, or squared values. In this sense, what looks like noise 
+        at the level of returns may still carry memory through volatility clustering.
+        </p>
+      </div>
+      <a href="/read-on.html" class="read-on-link">read on →</a>
+    </div>
+    <div id="coin-oracle-container"></div>
+  </div>
+</div>
+
+<!-- ArXiv stats — white -->
 <div class="arxiv-section">
   <div class="arxiv-section-inner">
     <div id="arxiv-stats-container"></div>
   </div>
 </div>
 
-<!-- Energy Prices Section -->
+<!-- Energy prices — grey -->
 <div class="energy-section">
   <div class="energy-section-inner">
     <div id="energy-prices-container"></div>
   </div>
 </div>
 
-<!-- Custom Footer -->
+<!-- Footer -->
 <div class="custom-footer">
   <p class="footer-title">c o n n e c t</p>
   <ul class="social-icons">
@@ -440,7 +111,6 @@
     <li><a href="https://linkedin.com/in/lóránt-nagy-87b5a0101" target="_blank" title="LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true" style="font-size: 4em;"></i></a></li>
     <li><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=10076737" target="_blank" title="MTMT"><img src="/assets/images/mtmt_logo.png" alt="MTMT" style="width: 4em; height: 4em; display: inline-block;"></a></li>
   </ul>
-
   <div class="visitor-counter">
     <pre id="analyticsTable">loading site analytics...
 
@@ -450,6 +120,10 @@
   </div>
 </div>
 
+<!-- Modal for enlarged comic -->
+<div id="comicModal" class="comic-modal" onclick="closeModal()">
+  <img id="modalImg" alt="Enlarged comic">
+</div>
 
 <script src="/assets/js/background-shader.js"></script>
 <script>BackgroundShader.init('welcome-section');</script>
@@ -458,37 +132,23 @@
 <script src="/assets/js/game-single-file.js"></script>
 
 <script src="/assets/js/coin-oracle.js"></script>
-<script>
-  CoinOracle.init('coin-oracle-container');
-</script>
+<script>CoinOracle.init('coin-oracle-container');</script>
 
 <script src="/assets/js/arxiv-stats.js"></script>
-<script>
-  ArxivStats.init('arxiv-stats-container');
-</script>
+<script>ArxivStats.init('arxiv-stats-container');</script>
 
 <script src="/assets/js/energy-prices.js"></script>
-<script>
-  EnergyPrices.init('energy-prices-container');
-</script>
-
-<!-- Modal for enlarged comic -->
-<div id="comicModal" class="comic-modal" onclick="closeModal()">
-  <img id="modalImg" alt="Enlarged comic">
-</div>
+<script>EnergyPrices.init('energy-prices-container');</script>
 
 <script>
 function openModal() {
   const modal = document.getElementById('comicModal');
   const modalImg = document.getElementById('modalImg');
-  const comicImg = document.getElementById('comicImg');
   modal.style.display = 'flex';
-  modalImg.src = comicImg.src;
+  modalImg.src = document.getElementById('comicImg').src;
 }
-
 function closeModal() {
-  const modal = document.getElementById('comicModal');
-  modal.style.display = 'none';
+  document.getElementById('comicModal').style.display = 'none';
 }
 </script>
 
@@ -512,13 +172,10 @@ function closeModal() {
   const db = firebase.database();
 
   function formatBudapestDateKey(date) {
-    const formatter = new Intl.DateTimeFormat('en-CA', {
+    return new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Europe/Budapest',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-    return formatter.format(date);
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(date);
   }
 
   function getTodayBudapestKey() {
@@ -530,42 +187,30 @@ function closeModal() {
   const todayRef = db.ref('visitors/daily/' + todayKey);
 
   function incrementCounters() {
-    totalRef.transaction((current) => {
-      return (typeof current === 'number') ? current + 1 : 1;
-    });
-    todayRef.transaction((current) => {
-      return (typeof current === 'number') ? current + 1 : 1;
-    });
+    totalRef.transaction(c => (typeof c === 'number') ? c + 1 : 1);
+    todayRef.transaction(c => (typeof c === 'number') ? c + 1 : 1);
   }
-
   incrementCounters();
 
   const analyticsEl = document.getElementById('analyticsTable');
-  const dailyRef = db.ref('visitors/daily');
-
-  dailyRef.on('value', (snapshot) => {
+  db.ref('visitors/daily').on('value', (snapshot) => {
     const dailyData = snapshot.val() || {};
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
     const now = new Date();
     const offsets = [-6, -5, -4, -3, -2, -1, 0];
-
-    const dayCells = offsets.map(offset => String(offset).padStart(3, ' '));
-    const visitorCells = offsets.map(offset => {
-      const date = new Date(now.getTime() + offset * MS_PER_DAY);
-      const key = formatBudapestDateKey(date);
-      const val = (typeof dailyData[key] === 'number') ? dailyData[key] : 0;
-      return String(val).padStart(3, ' ');
+    const dayCells     = offsets.map(o => String(o).padStart(3, ' '));
+    const visitorCells = offsets.map(o => {
+      const key = formatBudapestDateKey(new Date(now.getTime() + o * MS_PER_DAY));
+      return String((typeof dailyData[key] === 'number') ? dailyData[key] : 0).padStart(3, ' ');
     });
-
-    const lines = [];
-    lines.push('site analytics for the last 7 days');
-    lines.push('_________________________________________');
-    lines.push('| day      |' + dayCells.map(c => ' ' + c + ' ').join('|') + ' |');
-    lines.push('|----------|' + offsets.map(() => '-----').join('|') + '|');
-    lines.push('| visitors |' + visitorCells.map(c => ' ' + c + ' ').join('|') + ' |');
-    lines.push('-----------------------------------------');
-
-    analyticsEl.textContent = lines.join('\n');
+    analyticsEl.textContent = [
+      'site analytics for the last 7 days',
+      '_________________________________________',
+      '| day      |' + dayCells.map(c => ' ' + c + ' ').join('|') + ' |',
+      '|----------|' + offsets.map(() => '-----').join('|') + '|',
+      '| visitors |' + visitorCells.map(c => ' ' + c + ' ').join('|') + ' |',
+      '-----------------------------------------',
+    ].join('\n');
   });
 </script>
 
