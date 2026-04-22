@@ -91,7 +91,7 @@ const EnergyPrices = (() => {
 
   function makeCell(title, colorKey, series, unitLabel, unitShort) {
     const cell = document.createElement("div");
-    cell.style.cssText = "background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px 14px;";
+    cell.style.cssText = "background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:12px 14px;min-width:0;overflow:hidden;";
 
     const header = document.createElement("div");
     header.style.cssText = "display:flex;align-items:baseline;gap:8px;margin-bottom:8px;";
@@ -184,7 +184,7 @@ const EnergyPrices = (() => {
 
     container.innerHTML = `
       <h2 style="font-size:18px;font-weight:500;margin-bottom:1.25rem;">Energy</h2>
-      <div id="ep-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0.75rem;"></div>
+      <div id="ep-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:0.75rem;overflow:hidden;"></div>
       <div style="font-size:11px;color:var(--color-text-tertiary);" id="ep-updated"></div>
       <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px;">source: U.S. Energy Information Administration (EIA)</div>
     `;
