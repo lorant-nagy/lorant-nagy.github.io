@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vanilla RNN</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --neg:     #378ADD;
+    --pos:     #e8824a;
+    --accent:  #aa701e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  h1 {
+    font-family: 'Spectral', serif;
+    font-weight: 300;
+    font-size: 1.6rem;
+    color: #e8e4dc;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .equation {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+  .equation span { color: var(--text); }
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 880px;
+  }
+
+  .left-col { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.4rem;
+  }
+
+  #seq-svg   { width: 100%; height: 90px;  display: block; }
+  #rnn-svg   { width: 100%; height: 260px; display: block; }
+  #trail-svg { width: 100%; height: 110px; display: block; }
+
+  .narrative {
+    font-size: 11.5px;
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 2.8em;
+  }
+  .narrative .hi  { color: var(--pos); }
+  .narrative .lo  { color: var(--neg); }
+  .narrative .dim { color: var(--muted); }
+
+  .btn-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  button {
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+  button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  button.primary { border-color: var(--accent); color: var(--accent); }
+  button.primary:hover { background: rgba(170,112,30,0.1); }
+  button:disabled { opacity: 0.3; cursor: default; }
+
+  .step-badge {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.06em;
+    margin-top: 0.5rem;
+  }
+  .step-badge span {
+    color: var(--accent);
+    font-size: 1.3rem;
+    font-family: 'Spectral', serif;
+  }
+
+  .controls-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    align-self: start;
+  }
+
+  .ctrl-section-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .ctrl-label {
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 52px;
+    flex-shrink: 0;
+  }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .ctrl-val {
+    font-size: 10px;
+    color: var(--text);
+    min-width: 34px;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="/networks/">← networks</a>
+
+<h1>vanilla RNN</h1>
+<p class="subtitle">Elman network · scalar input · 2 hidden units</p>
+<p class="equation">
+  h<sub>t</sub> = tanh( <span>W<sub>x</sub> · x<sub>t</sub></span> +
+  <span>W<sub>h</sub> · h<sub>t−1</sub></span> + <span>b</span> )
+</p>
+
+<div class="main-layout">
+  <div class="left-col">
+
+    <div class="card">
+      <div class="card-title">input sequence  x₁ … x₇</div>
+      <svg id="seq-svg"></svg>
+      <div class="btn-row">
+        <button id="btn-rand">randomise</button>
+        <button id="btn-reset">reset  t=0</button>
+        <button class="primary" id="btn-step">step →</button>
+      </div>
+      <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">network state at current step</div>
+      <svg id="rnn-svg"></svg>
+    </div>
+
+    <div class="card">
+      <div class="card-title">hidden state history</div>
+      <svg id="trail-svg"></svg>
+    </div>
+
+    <div class="card">
+      <div class="card-title">what is happening</div>
+      <div class="narrative" id="narrative">
+        Press <b>step →</b> to start the forward pass.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls-card" id="controls"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+// ── Parameters ───────────────────────────────────────────────────────────────
+const SEQ_LEN = 7;
+const H_SIZE  = 2;
+
+let sequence = [0.8, -0.5, 0.3, 0.9, -0.7, 0.2, 0.6];
+
+// Wx[j] = weight from x to h_j  (separate for each hidden unit)
+let Wx = [0.9, -0.6];
+
+// Wh[j][i] = weight from h_i to h_j
+let Wh = [
+  [ 0.7, -0.3],   // h0 receives from h0, h1
+  [ 0.4,  0.6],   // h1 receives from h0, h1
+];
+
+let b = [0.1, -0.1];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let t        = 0;
+let h        = [0, 0];
+let hHistory = [[0, 0]];
+
+// ── Math ─────────────────────────────────────────────────────────────────────
+function stepRNN(x_t, h_prev) {
+  return h_prev.map((_, j) => {
+    let z = b[j] + Wx[j] * x_t;
+    for (let i = 0; i < H_SIZE; i++) z += Wh[j][i] * h_prev[i];
+    return Math.tanh(z);
+  });
+}
+
+// ── Colour helpers ────────────────────────────────────────────────────────────
+const colorScale = d3.scaleLinear()
+  .domain([-1, 0, 1])
+  .range(['#378ADD', '#1e2230', '#e8824a'])
+  .clamp(true);
+
+function weightColor(w) {
+  return colorScale(Math.max(-1, Math.min(1, w)));
+}
+
+function weightWidth(w) {
+  return 0.5 + Math.abs(w) * 2.5;
+}
+
+// ── Arrow marker factory ──────────────────────────────────────────────────────
+function addArrowMarker(svg, id, color) {
+  svg.select('defs').remove();
+  const defs = svg.append('defs');
+  defs.append('marker')
+    .attr('id', id)
+    .attr('markerWidth', 7).attr('markerHeight', 7)
+    .attr('refX', 4).attr('refY', 3.5)
+    .attr('orient', 'auto')
+    .append('path').attr('d', 'M0,0 L0,7 L7,3.5 z')
+    .attr('fill', color || 'rgba(255,255,255,0.25)');
+}
+
+// ── SVG references ────────────────────────────────────────────────────────────
+const seqSvg   = d3.select('#seq-svg');
+const rnnSvg   = d3.select('#rnn-svg');
+const trailSvg = d3.select('#trail-svg');
+
+// ── Draw sequence ─────────────────────────────────────────────────────────────
+function drawSequence() {
+  seqSvg.selectAll('*').remove();
+  const W = 560, H = 80;
+  seqSvg.attr('viewBox', `0 0 ${W} ${H}`);
+
+  const barW = W / SEQ_LEN;
+  const midY = H / 2;
+  const scale = 28;
+
+  seqSvg.append('line')
+    .attr('x1', 0).attr('x2', W).attr('y1', midY).attr('y2', midY)
+    .attr('stroke', 'rgba(255,255,255,0.06)').attr('stroke-width', 1);
+
+  sequence.forEach((v, i) => {
+    const cx     = barW * i + barW / 2;
+    const barH   = Math.abs(v) * scale;
+    const isCur  = (i === t - 1);
+    const isPast = (i < t - 1);
+
+    seqSvg.append('rect')
+      .attr('x', cx - barW * 0.3)
+      .attr('y', v >= 0 ? midY - barH : midY)
+      .attr('width', barW * 0.6)
+      .attr('height', barH || 2)
+      .attr('fill', isCur ? colorScale(v) : isPast ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.18)')
+      .attr('rx', 2);
+
+    seqSvg.append('text')
+      .attr('x', cx).attr('y', H - 4)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace')
+      .attr('font-size', 9)
+      .attr('fill', isCur ? '#e8824a' : 'var(--muted)')
+      .text(`x${i+1}`);
+
+    seqSvg.append('text')
+      .attr('x', cx)
+      .attr('y', v >= 0 ? midY - barH - 5 : midY + barH + 12)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace')
+      .attr('font-size', 9)
+      .attr('fill', isCur ? colorScale(v) : 'rgba(255,255,255,0.25)')
+      .text(v.toFixed(2));
+
+    if (isCur) {
+      seqSvg.append('rect')
+        .attr('x', barW * i + 2).attr('y', 1)
+        .attr('width', barW - 4).attr('height', H - 2)
+        .attr('fill', 'none')
+        .attr('stroke', 'var(--accent)')
+        .attr('stroke-width', 1).attr('rx', 3).attr('opacity', 0.5);
+    }
+  });
+}
+
+// ── Draw RNN diagram ──────────────────────────────────────────────────────────
+//
+//  Layout (vertical hidden units):
+//
+//         ┌─────┐         ┌─────┐
+//  x_t ──►│  h1 │◄── Wh ─┤  h1 │  (prev)
+//         └─────┘    ╲    └─────┘
+//                     ╲
+//         ┌─────┐   ╲  ╲ ┌─────┐
+//  x_t ──►│  h2 │◄───╲──┤  h2 │  (prev)
+//         └─────┘         └─────┘
+//
+//  We show:
+//   - x_t node on the left
+//   - TWO separate arrows from x_t to h1 and h2, labelled Wx1 and Wx2
+//   - h_prev column on the right (ghosted, showing previous values)
+//   - four recurrent arrows from h_prev to h_cur, one per Wh[j][i]
+//
+function drawRNN() {
+  rnnSvg.selectAll('*').remove();
+  const W = 560, H = 250;
+  rnnSvg.attr('viewBox', `0 0 ${W} ${H}`);
+
+  const R = 26;
+
+  // Column x positions
+  const xPrev   = W - 90;   // h_{t-1} (ghost column, right)
+  const xCur    = W / 2 + 20; // h_t (current, centre-right)
+  const xInput  = 80;        // x_t (left)
+
+  // Row y positions for the two hidden units
+  const yH = [H * 0.32, H * 0.72];
+
+  const curX = (t > 0 && t <= SEQ_LEN) ? sequence[t - 1] : 0;
+
+  // ── Arrow marker ────────────────────────────────────────────────────────────
+  rnnSvg.append('defs').append('marker')
+    .attr('id', 'arr')
+    .attr('markerWidth', 7).attr('markerHeight', 7)
+    .attr('refX', 5).attr('refY', 3.5)
+    .attr('orient', 'auto')
+    .append('path').attr('d', 'M0,0 L0,7 L7,3.5 z')
+    .attr('fill', 'rgba(255,255,255,0.3)');
+
+  // ── h_{t-1} ghost nodes (right column) ─────────────────────────────────────
+  const hPrev = hHistory.length >= 2 ? hHistory[hHistory.length - 2] : [0, 0];
+
+  yH.forEach((y, j) => {
+    rnnSvg.append('circle')
+      .attr('cx', xPrev).attr('cy', y).attr('r', R)
+      .attr('fill',   colorScale(hPrev[j]))
+      .attr('stroke', 'rgba(255,255,255,0.1)')
+      .attr('stroke-width', 1)
+      .attr('opacity', 0.45);
+
+    rnnSvg.append('text')
+      .attr('x', xPrev).attr('y', y)
+      .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+      .attr('fill', 'rgba(255,255,255,0.4)')
+      .text(hPrev[j].toFixed(2));
+
+    rnnSvg.append('text')
+      .attr('x', xPrev).attr('y', y + R + 12)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+      .attr('fill', 'var(--muted)')
+      .text(`h${j+1}  t-1`);
+  });
+
+  // ── Recurrent arrows: h_prev[i] → h_cur[j] ─────────────────────────────────
+  // Curve direction rules:
+  //   self (i==j, i==0): arc upward   (control point above)
+  //   self (i==j, i==1): arc downward (control point below)
+  //   cross (i=0→j=1):  curves downward (goes from upper to lower)
+  //   cross (i=1→j=0):  curves upward   (goes from lower to upper)
+  for (let j = 0; j < H_SIZE; j++) {
+    for (let i = 0; i < H_SIZE; i++) {
+      const x1 = xPrev - R;
+      const y1 = yH[i];
+      const x2 = xCur + R;
+      const y2 = yH[j];
+      const w  = Wh[j][i];
+      const cpX = (x1 + x2) / 2;
+
+      let cpY;
+      if (i === j) {
+        // self-connection: h0→h0 arcs up, h1→h1 arcs down
+        cpY = i === 0 ? y1 - 70 : y1 + 70;
+      } else if (i < j) {
+        // going downward (h0→h1): curve below the midpoint
+        cpY = (y1 + y2) / 2 + 40;
+      } else {
+        // going upward (h1→h0): curve above the midpoint
+        cpY = (y1 + y2) / 2 - 40;
+      }
+
+      rnnSvg.append('path')
+        .attr('d', `M ${x1} ${y1} Q ${cpX} ${cpY} ${x2} ${y2}`)
+        .attr('fill', 'none')
+        .attr('stroke', weightColor(w))
+        .attr('stroke-width', weightWidth(w))
+        .attr('opacity', 0.65)
+        .attr('marker-end', 'url(#arr)');
+
+      // Label at the quadratic bezier midpoint: B(0.5) = 0.25*P0 + 0.5*CP + 0.25*P1
+      const lx = 0.25*x1 + 0.5*cpX + 0.25*x2;
+      const ly = 0.25*y1 + 0.5*cpY + 0.25*y2;
+      const labelOffset = (i === j && i === 0) ? -7
+                        : (i === j && i === 1) ?  7
+                        : (i < j)              ?  9
+                        :                        -7;
+      rnnSvg.append('text')
+        .attr('x', lx).attr('y', ly + labelOffset)
+        .attr('text-anchor', 'middle')
+        .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 8)
+        .attr('fill', weightColor(w))
+        .attr('opacity', 0.9)
+        .text(`${Wh[j][i].toFixed(2)}`);
+    }
+  }
+
+  // ── x_t input node ───────────────────────────────────────────────────────────
+  rnnSvg.append('circle')
+    .attr('cx', xInput).attr('cy', H / 2).attr('r', R)
+    .attr('fill',   t > 0 ? colorScale(curX) : '#1e2230')
+    .attr('stroke', 'rgba(255,255,255,0.15)').attr('stroke-width', 1.5);
+
+  rnnSvg.append('text')
+    .attr('x', xInput).attr('y', H / 2)
+    .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+    .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 10)
+    .attr('fill', 'rgba(255,255,255,0.8)')
+    .text(t > 0 ? curX.toFixed(2) : 'x');
+
+  rnnSvg.append('text')
+    .attr('x', xInput).attr('y', H / 2 + R + 13)
+    .attr('text-anchor', 'middle')
+    .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+    .attr('fill', 'var(--muted)')
+    .text(t > 0 ? `x${t}` : 'input');
+
+  // ── Input → hidden arrows (one per hidden unit, explicitly separate) ─────────
+  yH.forEach((y, j) => {
+    const x1 = xInput + R;
+    const y1 = H / 2;
+    const x2 = xCur - R;
+    const y2 = y;
+    const w  = Wx[j];
+
+    // Straight line from input to each hidden unit
+    rnnSvg.append('line')
+      .attr('x1', x1).attr('y1', y1)
+      .attr('x2', x2).attr('y2', y2)
+      .attr('stroke', weightColor(w))
+      .attr('stroke-width', weightWidth(w))
+      .attr('opacity', 0.75)
+      .attr('marker-end', 'url(#arr)');
+
+    // Label midpoint — offset up/down to avoid overlap
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2 + (j === 0 ? -10 : 10);
+    rnnSvg.append('text')
+      .attr('x', mx).attr('y', my)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+      .attr('fill', weightColor(w))
+      .attr('opacity', 0.9)
+      .text(`Wx${j+1}=${w.toFixed(2)}`);
+  });
+
+  // ── h_t current nodes ─────────────────────────────────────────────────────────
+  yH.forEach((y, j) => {
+    rnnSvg.append('circle')
+      .attr('cx', xCur).attr('cy', y).attr('r', R)
+      .attr('fill',   colorScale(h[j]))
+      .attr('stroke', d3.color(colorScale(h[j])).brighter(0.4))
+      .attr('stroke-width', 1.5);
+
+    rnnSvg.append('text')
+      .attr('x', xCur).attr('y', y)
+      .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 10)
+      .attr('fill', 'rgba(255,255,255,0.9)')
+      .text(h[j].toFixed(2));
+
+    rnnSvg.append('text')
+      .attr('x', xCur).attr('y', y + R + 13)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+      .attr('fill', 'var(--muted)')
+      .text(`h${j+1}  t`);
+  });
+
+  // ── Column headers ────────────────────────────────────────────────────────────
+  [ [xInput, 'x_t'], [xCur, 'h_t  (current)'], [xPrev, 'h_{t-1}'] ]
+    .forEach(([x, label]) => {
+      rnnSvg.append('text')
+        .attr('x', x).attr('y', 12)
+        .attr('text-anchor', 'middle')
+        .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+        .attr('fill', 'var(--muted)')
+        .attr('letter-spacing', '0.06em')
+        .text(label);
+    });
+}
+
+// ── Draw hidden state trail ───────────────────────────────────────────────────
+function drawTrail() {
+  trailSvg.selectAll('*').remove();
+  const W = 560, H = 100;
+  trailSvg.attr('viewBox', `0 0 ${W} ${H}`);
+
+  const colW  = W / (SEQ_LEN + 1);  // +1 for t=0
+  const unitH = (H - 28) / H_SIZE;
+
+  hHistory.forEach((hVec, step) => {
+    const isLast = step === hHistory.length - 1;
+    hVec.forEach((val, j) => {
+      const x = step * colW;
+      const y = 16 + j * unitH;
+      trailSvg.append('rect')
+        .attr('x', x + 2).attr('y', y)
+        .attr('width', colW - 4).attr('height', unitH - 3)
+        .attr('fill', colorScale(val))
+        .attr('rx', 2)
+        .attr('opacity', isLast ? 1.0 : 0.65);
+
+      trailSvg.append('text')
+        .attr('x', x + colW / 2).attr('y', y + unitH / 2 - 1)
+        .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+        .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 8)
+        .attr('fill', 'rgba(255,255,255,0.65)')
+        .text(val.toFixed(2));
+    });
+
+    trailSvg.append('text')
+      .attr('x', step * colW + colW / 2).attr('y', H - 4)
+      .attr('text-anchor', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+      .attr('fill', isLast ? 'var(--accent)' : 'var(--muted)')
+      .text(`t=${step}`);
+  });
+
+  // Row labels on the right
+  ['h₁', 'h₂'].forEach((label, j) => {
+    trailSvg.append('text')
+      .attr('x', hHistory.length * colW + 4)
+      .attr('y', 16 + j * unitH + unitH / 2 - 1)
+      .attr('dominant-baseline', 'middle')
+      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
+      .attr('fill', 'var(--muted)')
+      .text(label);
+  });
+}
+
+// ── Narrative ─────────────────────────────────────────────────────────────────
+function updateNarrative() {
+  const el = document.getElementById('narrative');
+  if (t === 0) {
+    el.innerHTML = 'Hidden state initialised to <span class="dim">h = [0, 0]</span>. Press <b>step →</b> to begin.';
+    return;
+  }
+  const x      = sequence[t - 1];
+  const hPrev  = hHistory[t - 1];
+  const parts  = h.map((hj, j) => {
+    const fromX = Wx[j] * x;
+    const fromH = Wh[j].reduce((s, w, i) => s + w * hPrev[i], 0);  // recurrent only
+    const bias  = b[j];
+    return `h${j+1}: ` +
+           `<span class="${fromX>0?'hi':'lo'}">x·Wx${j+1}=${fromX.toFixed(2)}</span> ` +
+           `+ <span class="${fromH>0?'hi':'lo'}">h_prev·Wh=${fromH.toFixed(2)}</span> ` +
+           `+ <span class="${bias>0?'hi':'lo'}">b=${bias.toFixed(2)}</span>` +
+           ` → tanh → <span class="${hj>0?'hi':'lo'}">${hj.toFixed(3)}</span>`;
+  });
+  el.innerHTML =
+    `<b>t=${t}</b>  input <span class="hi">x=${x.toFixed(2)}</span><br>` +
+    parts.join('<br>') +
+    (t === SEQ_LEN ? '<br><span class="dim">— sequence complete</span>' : '');
+}
+
+// ── Full redraw ───────────────────────────────────────────────────────────────
+function redraw() {
+  document.getElementById('t-display').textContent = t;
+  document.getElementById('btn-step').disabled = t >= SEQ_LEN;
+  drawSequence();
+  drawRNN();
+  drawTrail();
+  updateNarrative();
+}
+
+function resetAndRedraw() {
+  t = 0; h = [0, 0]; hHistory = [[0, 0]];
+  redraw();
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+document.getElementById('btn-step').addEventListener('click', () => {
+  if (t >= SEQ_LEN) return;
+  h = stepRNN(sequence[t], h);
+  t++;
+  hHistory.push([...h]);
+  redraw();
+});
+
+document.getElementById('btn-reset').addEventListener('click', resetAndRedraw);
+
+document.getElementById('btn-rand').addEventListener('click', () => {
+  sequence = Array.from({length: SEQ_LEN},
+    () => Math.round((Math.random() * 2 - 1) * 100) / 100);
+  resetAndRedraw();
+});
+
+// ── Build controls ────────────────────────────────────────────────────────────
+function buildControls() {
+  const ctrl = d3.select('#controls');
+  ctrl.selectAll('*').remove();
+
+  // Wx sliders — clearly labelled per hidden unit
+  const wxSec = ctrl.append('div');
+  wxSec.append('div').attr('class', 'ctrl-section-title').text('Wx  (x → hidden)');
+  Wx.forEach((w, j) => {
+    const row = wxSec.append('div').attr('class', 'ctrl-row');
+    row.append('span').attr('class', 'ctrl-label').text(`x → h${j+1}`);
+    const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',w);
+    const vl = row.append('span').attr('class','ctrl-val').text(w.toFixed(2));
+    sl.on('input', function() {
+      Wx[j] = +this.value; vl.text(Wx[j].toFixed(2)); resetAndRedraw();
+    });
+  });
+
+  // Wh sliders — labelled as from→to
+  const whSec = ctrl.append('div');
+  whSec.append('div').attr('class', 'ctrl-section-title').text('Wh  (recurrent)');
+  for (let j = 0; j < H_SIZE; j++) {
+    for (let i = 0; i < H_SIZE; i++) {
+      const row = whSec.append('div').attr('class', 'ctrl-row');
+      row.append('span').attr('class', 'ctrl-label').text(`h${i+1}→h${j+1}`);
+      const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',Wh[j][i]);
+      const vl = row.append('span').attr('class','ctrl-val').text(Wh[j][i].toFixed(2));
+      sl.on('input', function() {
+        Wh[j][i] = +this.value; vl.text(Wh[j][i].toFixed(2)); resetAndRedraw();
+      });
+    }
+  }
+
+  // Bias sliders
+  const bSec = ctrl.append('div');
+  bSec.append('div').attr('class', 'ctrl-section-title').text('biases');
+  b.forEach((bv, j) => {
+    const row = bSec.append('div').attr('class', 'ctrl-row');
+    row.append('span').attr('class', 'ctrl-label').text(`b  h${j+1}`);
+    const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',bv);
+    const vl = row.append('span').attr('class','ctrl-val').text(bv.toFixed(2));
+    sl.on('input', function() {
+      b[j] = +this.value; vl.text(b[j].toFixed(2)); resetAndRedraw();
+    });
+  });
+
+  // Sequence sliders
+  const seqSec = ctrl.append('div');
+  seqSec.append('div').attr('class', 'ctrl-section-title').text('sequence');
+  sequence.forEach((v, i) => {
+    const row = seqSec.append('div').attr('class', 'ctrl-row');
+    row.append('span').attr('class', 'ctrl-label').text(`x${i+1}`);
+    const sl = row.append('input').attr('type','range').attr('min',-1).attr('max',1).attr('step',0.01).attr('value',v);
+    const vl = row.append('span').attr('class','ctrl-val').text(v.toFixed(2));
+    sl.on('input', function() {
+      sequence[i] = +this.value; vl.text(sequence[i].toFixed(2)); resetAndRedraw();
+    });
+  });
+}
+
+buildControls();
+redraw();
+</script>
+</body>
+</html>

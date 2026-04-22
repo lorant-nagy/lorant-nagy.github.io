@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LSTM Explorer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --neg:     #378ADD;
+    --pos:     #e8824a;
+    --accent:  #aa701e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.5rem 3rem;
+  }
+
+  .back-link {
+    align-self: flex-start; font-size: 11px; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; margin-bottom: 1.5rem;
+  }
+  .back-link:hover { color: var(--text); }
+
+  h1 {
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 1.5rem; color: #e8e4dc;
+    letter-spacing: 0.02em; margin-bottom: 0.2rem;
+  }
+
+  .subtitle {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+
+  .equations {
+    font-size: 10.5px; color: var(--muted);
+    margin-bottom: 1.5rem; line-height: 1.9; font-style: italic;
+  }
+  .equations span { font-style: normal; }
+
+  /* ── Page wrapper ── */
+  .page { width: 100%; max-width: 1300px; display: flex; flex-direction: column; gap: 1rem; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 6px; padding: 1rem 1.25rem;
+  }
+
+  .card-title {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.85rem;
+    border-bottom: 0.5px solid var(--border); padding-bottom: 0.35rem;
+  }
+
+  /* ── Controls row (horizontal, full width) ── */
+  .controls-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+  }
+
+  .ctrl-col-title {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding-bottom: 0.35rem; margin-bottom: 0.5rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .ctrl-row { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; }
+  .ctrl-label { font-size: 9px; color: var(--muted); min-width: 32px; flex-shrink: 0; }
+
+  input[type=range] {
+    flex: 1; -webkit-appearance: none; height: 2px;
+    background: rgba(255,255,255,0.1); border-radius: 2px;
+    outline: none; cursor: pointer; min-width: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .ctrl-val { font-size: 9px; color: var(--text); min-width: 30px; text-align: right; }
+
+  /* ── Two-column rows ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* ── SVGs ── */
+  #seq-svg   { width: 100%; height: 90px;  display: block; }
+  #trail-svg { width: 100%; height: 130px; display: block; }
+  #graph-svg { width: 100%; height: 300px; display: block; }
+  #gate-svg  { width: 100%; height: 175px; display: block; }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; gap: 0.6rem; margin-top: 0.6rem; }
+
+  button {
+    background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    padding: 5px 12px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
+  }
+  button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  button.primary { border-color: var(--accent); color: var(--accent); }
+  button.primary:hover { background: rgba(170,112,30,0.1); }
+  button:disabled { opacity: 0.3; cursor: default; }
+
+  .step-badge {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.06em; margin-top: 0.4rem;
+  }
+  .step-badge span { color: var(--accent); font-size: 1.2rem; font-family: 'Spectral', serif; }
+
+  /* ── Narrative ── */
+  .narrative {
+    font-size: 11.5px; color: var(--text);
+    line-height: 1.8; min-height: 2.5em;
+  }
+  .narrative .hi   { color: var(--pos); }
+  .narrative .lo   { color: var(--neg); }
+  .narrative .dim  { color: var(--muted); }
+  .narrative .nf   { color: #378ADD; }
+  .narrative .ni   { color: #1D9E75; }
+  .narrative .nc   { color: #aa701e; }
+  .narrative .no   { color: #e8824a; }
+  .narrative .cell { color: #7F77DD; }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="/networks/">← networks</a>
+<h1>LSTM</h1>
+<p class="subtitle">long short-term memory · scalar state · 7-step sequence</p>
+<div class="equations">
+  <span style="color:#378ADD">f</span>ₜ=σ(W<sub>f</sub>ʰ·hₜ₋₁+W<sub>f</sub>ˣ·xₜ+b<sub>f</sub>) &nbsp;
+  <span style="color:#1D9E75">i</span>ₜ=σ(W<sub>i</sub>ʰ·hₜ₋₁+W<sub>i</sub>ˣ·xₜ+b<sub>i</sub>) &nbsp;
+  <span style="color:#aa701e">c̃</span>ₜ=tanh(W<sub>c</sub>ʰ·hₜ₋₁+W<sub>c</sub>ˣ·xₜ+b<sub>c</sub>) &nbsp;
+  <span style="color:#e8824a">o</span>ₜ=σ(W<sub>o</sub>ʰ·hₜ₋₁+W<sub>o</sub>ˣ·xₜ+b<sub>o</sub>) &nbsp;
+  <span style="color:#7F77DD">c</span>ₜ=<span style="color:#378ADD">f</span>ₜ⊙cₜ₋₁+<span style="color:#1D9E75">i</span>ₜ⊙<span style="color:#aa701e">c̃</span>ₜ &nbsp;
+  hₜ=<span style="color:#e8824a">o</span>ₜ⊙tanh(<span style="color:#7F77DD">c</span>ₜ)
+</div>
+
+<div class="page">
+
+  <!-- Row 0: controls (full width, horizontal) -->
+  <div class="card">
+    <div class="card-title">parameters</div>
+    <div class="controls-row" id="controls"></div>
+  </div>
+
+  <!-- Row 1: input sequence | state history -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">input sequence  x₁ … x₇</div>
+      <svg id="seq-svg"></svg>
+      <div class="btn-row">
+        <button id="btn-rand">randomise</button>
+        <button id="btn-reset">reset  t=0</button>
+        <button class="primary" id="btn-step">step →</button>
+      </div>
+      <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
+    </div>
+    <div class="card">
+      <div class="card-title">state history</div>
+      <svg id="trail-svg"></svg>
+    </div>
+  </div>
+
+  <!-- Row 2: computation graph | gate bars -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">computation graph</div>
+      <svg id="graph-svg"></svg>
+    </div>
+    <div class="card">
+      <div class="card-title">gate activations &amp; state update</div>
+      <svg id="gate-svg"></svg>
+    </div>
+  </div>
+
+  <!-- Row 3: narrative (full width) -->
+  <div class="card">
+    <div class="card-title">what is happening</div>
+    <div class="narrative" id="narrative">Press <b>step →</b> to start the forward pass.</div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const SEQ_LEN = 7;
+const GC = { f:'#378ADD', i:'#1D9E75', c:'#aa701e', o:'#e8824a' };
+const CELL_COLOR = '#7F77DD';
+
+let W = {
+  f: { wh:  0.8, wx:  0.5, b:  1.0 },
+  i: { wh:  0.6, wx:  0.9, b: -0.5 },
+  c: { wh:  0.4, wx:  1.0, b:  0.0 },
+  o: { wh:  0.7, wx:  0.6, b:  0.0 },
+};
+
+let sequence = [0.8, -0.5, 0.3, 0.9, -0.7, 0.2, 0.6];
+
+let t=0, cellState=0, hiddenState=0;
+let cHistory=[0], hHistory=[0], gateHistory=[];
+
+const sigmoid = x => 1/(1+Math.exp(-x));
+
+function stepLSTM(x_t, h_prev, c_prev) {
+  const f = sigmoid(W.f.wh*h_prev + W.f.wx*x_t + W.f.b);
+  const i = sigmoid(W.i.wh*h_prev + W.i.wx*x_t + W.i.b);
+  const c_cand = Math.tanh(W.c.wh*h_prev + W.c.wx*x_t + W.c.b);
+  const o = sigmoid(W.o.wh*h_prev + W.o.wx*x_t + W.o.b);
+  const c_new = f*c_prev + i*c_cand;
+  const h_new = o*Math.tanh(c_new);
+  return { f, i, c:c_cand, o, c_new, h_new };
+}
+
+const colorScale = d3.scaleLinear()
+  .domain([-1,0,1]).range(['#378ADD','#1e2230','#e8824a']).clamp(true);
+
+function wColor(w) { return colorScale(Math.max(-2,Math.min(2,w))/2); }
+function wWidth(w) { return 0.5+Math.abs(w)*1.8; }
+
+const seqSvg   = d3.select('#seq-svg');
+const graphSvg = d3.select('#graph-svg');
+const gateSvg  = d3.select('#gate-svg');
+const trailSvg = d3.select('#trail-svg');
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+function drawNode(svg,x,y,r,val,label,color,labelBelow) {
+  const fill = color||colorScale(val!=null?val:0);
+  svg.append('circle').attr('cx',x).attr('cy',y).attr('r',r)
+    .attr('fill',val!=null?fill:'#1e2230')
+    .attr('stroke',val!=null?d3.color(fill).brighter(0.3):'rgba(255,255,255,0.1)')
+    .attr('stroke-width',1.2);
+  if (val!=null) {
+    svg.append('text').attr('x',x).attr('y',y)
+      .attr('text-anchor','middle').attr('dominant-baseline','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',r>16?9:8)
+      .attr('fill','rgba(255,255,255,0.85)')
+      .text(typeof val==='number'?val.toFixed(2):val);
+  }
+  if (label) {
+    svg.append('text').attr('x',x).attr('y',labelBelow?y+r+11:y-r-5)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',color||'var(--muted)').text(label);
+  }
+}
+
+function addMarker(svg,id) {
+  svg.select('defs').remove();
+  svg.append('defs').append('marker').attr('id',id)
+    .attr('markerWidth',6).attr('markerHeight',6)
+    .attr('refX',4).attr('refY',3).attr('orient','auto')
+    .append('path').attr('d','M0,0 L0,6 L6,3 z').attr('fill','rgba(255,255,255,0.25)');
+}
+
+function drawEdge(svg,x1,y1,x2,y2,w,wLabel,markerId) {
+  const dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy);
+  const pad=18,ux=dx/len,uy=dy/len;
+  const sx=x1+ux*pad,sy=y1+uy*pad,ex=x2-ux*pad,ey=y2-uy*pad;
+  svg.append('line').attr('x1',sx).attr('y1',sy).attr('x2',ex).attr('y2',ey)
+    .attr('stroke',wColor(w)).attr('stroke-width',wWidth(w))
+    .attr('opacity',0.75).attr('marker-end',`url(#${markerId})`);
+  if (wLabel) {
+    const mx=(sx+ex)/2,my=(sy+ey)/2,nx=-uy,ny=ux;
+    svg.append('text').attr('x',mx+nx*10).attr('y',my+ny*10)
+      .attr('text-anchor','middle').attr('dominant-baseline','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',8)
+      .attr('fill',wColor(w)).attr('opacity',0.9).text(w.toFixed(2));
+  }
+}
+
+// ── sequence ──────────────────────────────────────────────────────────────────
+function drawSequence() {
+  seqSvg.selectAll('*').remove();
+  const W_S=600,H=80;
+  seqSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+  const barW=W_S/SEQ_LEN,midY=H/2,scale=28;
+  seqSvg.append('line').attr('x1',0).attr('x2',W_S).attr('y1',midY).attr('y2',midY)
+    .attr('stroke','rgba(255,255,255,0.06)').attr('stroke-width',1);
+  sequence.forEach((v,i)=>{
+    const cx=barW*i+barW/2,barH=Math.abs(v)*scale;
+    const isCur=i===t-1,isPast=i<t-1;
+    seqSvg.append('rect').attr('x',cx-barW*0.3).attr('y',v>=0?midY-barH:midY)
+      .attr('width',barW*0.6).attr('height',barH||2)
+      .attr('fill',isCur?colorScale(v):isPast?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.18)').attr('rx',2);
+    seqSvg.append('text').attr('x',cx).attr('y',H-4).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',isCur?'#e8824a':'var(--muted)').text(`x${i+1}`);
+    seqSvg.append('text').attr('x',cx).attr('y',v>=0?midY-barH-5:midY+barH+12)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',isCur?colorScale(v):'rgba(255,255,255,0.25)').text(v.toFixed(2));
+    if(isCur) seqSvg.append('rect').attr('x',barW*i+2).attr('y',1)
+      .attr('width',barW-4).attr('height',H-2).attr('fill','none')
+      .attr('stroke','var(--accent)').attr('stroke-width',1).attr('rx',3).attr('opacity',0.5);
+  });
+}
+
+// ── computation graph ─────────────────────────────────────────────────────────
+function drawGraph() {
+  graphSvg.selectAll('*').remove();
+  const W_S=580,H=290;
+  graphSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+  addMarker(graphSvg,'garr');
+
+  const gates=['f','i','c','o'];
+  const gLabels={f:'Σf',i:'Σi',c:'Σc̃',o:'Σo'};
+  const aLabels={f:'f',i:'i',c:'c̃',o:'o'};
+  const colX=[50,145,245,375,500];
+  const gateY={f:48,i:112,c:180,o:248};
+  const xNodeY=48,hNodeY=148,cPrevY=248;
+
+  const latest=gateHistory.length>0?gateHistory[gateHistory.length-1]:null;
+  const h_prev=hHistory.length>=2?hHistory[hHistory.length-2]:0;
+  const c_prev=cHistory.length>=2?cHistory[cHistory.length-2]:0;
+  const x_cur=t>0?sequence[t-1]:null;
+
+  // inputs
+  drawNode(graphSvg,colX[0],xNodeY,15,x_cur,'xₜ',null,true);
+  drawNode(graphSvg,colX[0],hNodeY,15,t>0?h_prev:null,'hₜ₋₁',null,true);
+  drawNode(graphSvg,colX[0],cPrevY,15,t>0?c_prev:null,'cₜ₋₁',CELL_COLOR,true);
+
+  // sum + activation nodes
+  gates.forEach(g=>{
+    const y=gateY[g];
+    const z=latest?W[g].wh*h_prev+W[g].wx*(x_cur??0)+W[g].b:null;
+    drawNode(graphSvg,colX[1],y,14,z,gLabels[g],GC[g],false);
+    drawEdge(graphSvg,colX[0],xNodeY,colX[1],y,W[g].wx,true,'garr');
+    drawEdge(graphSvg,colX[0],hNodeY,colX[1],y,W[g].wh,true,'garr');
+    graphSvg.append('text').attr('x',colX[1]+2).attr('y',y+14+9)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',7)
+      .attr('fill',GC[g]).attr('opacity',0.7).text(`b=${W[g].b.toFixed(2)}`);
+    const val=latest?latest[g]:null;
+    drawNode(graphSvg,colX[2],y,15,val,aLabels[g],GC[g],false);
+    graphSvg.append('line').attr('x1',colX[1]+14).attr('y1',y).attr('x2',colX[2]-15).attr('y2',y)
+      .attr('stroke',latest?GC[g]:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+    graphSvg.append('text').attr('x',(colX[1]+colX[2])/2).attr('y',y-8)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',7)
+      .attr('fill','var(--muted)').text(g==='c'?'tanh':'σ');
+  });
+
+  // cell update: f⊙c_prev + i⊙c̃ → c_t
+  const mfY=90,miY=200,addY=145,mX=colX[3]-30;
+  drawNode(graphSvg,mX,mfY,11,null,'⊙','rgba(255,255,255,0.3)',false);
+  drawNode(graphSvg,mX,miY,11,null,'⊙','rgba(255,255,255,0.3)',false);
+  drawNode(graphSvg,colX[3],addY,12,null,'+','rgba(255,255,255,0.3)',false);
+
+  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.f).attr('x2',mX-11).attr('y2',mfY)
+    .attr('stroke',latest?GC.f:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  graphSvg.append('line').attr('x1',colX[0]+15).attr('y1',cPrevY).attr('x2',mX-11).attr('y2',mfY)
+    .attr('stroke',t>0?CELL_COLOR:'rgba(255,255,255,0.12)').attr('stroke-width',1)
+    .attr('stroke-dasharray','3,2').attr('marker-end','url(#garr)');
+  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.i).attr('x2',mX-11).attr('y2',miY)
+    .attr('stroke',latest?GC.i:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.c).attr('x2',mX-11).attr('y2',miY)
+    .attr('stroke',latest?GC.c:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  graphSvg.append('line').attr('x1',mX+11).attr('y1',mfY).attr('x2',colX[3]-12).attr('y2',addY)
+    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  graphSvg.append('line').attr('x1',mX+11).attr('y1',miY).attr('x2',colX[3]-12).attr('y2',addY)
+    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+
+  if (latest) {
+    const fc=(latest.f*c_prev).toFixed(2),ic=(latest.i*latest.c).toFixed(2);
+    graphSvg.append('text').attr('x',mX).attr('y',mfY-15).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',7).attr('fill',GC.f)
+      .text(`${latest.f.toFixed(2)}×${c_prev.toFixed(2)}=${fc}`);
+    graphSvg.append('text').attr('x',mX).attr('y',miY+22).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',7).attr('fill',GC.i)
+      .text(`${latest.i.toFixed(2)}×${latest.c.toFixed(2)}=${ic}`);
+  }
+
+  const ctX=colX[3]+45;
+  graphSvg.append('line').attr('x1',colX[3]+12).attr('y1',addY).attr('x2',ctX-15).attr('y2',addY)
+    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  drawNode(graphSvg,ctX,addY,15,t>0?cellState:null,'cₜ',CELL_COLOR,true);
+
+  // output: o⊙tanh(c_t) → h_t
+  const tanhX=colX[4]-40,multX=colX[4]-5,htX=colX[4]+40;
+  graphSvg.append('line').attr('x1',ctX+15).attr('y1',addY).attr('x2',tanhX-13).attr('y2',addY)
+    .attr('stroke',t>0?CELL_COLOR:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  drawNode(graphSvg,tanhX,addY,12,t>0?Math.tanh(cellState):null,'tanh','rgba(255,255,255,0.35)',false);
+  graphSvg.append('line').attr('x1',tanhX+12).attr('y1',addY).attr('x2',multX-11).attr('y2',addY)
+    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.o).attr('x2',multX).attr('y2',addY+11)
+    .attr('stroke',latest?GC.o:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  drawNode(graphSvg,multX,addY,11,null,'⊙','rgba(255,255,255,0.3)',false);
+  graphSvg.append('line').attr('x1',multX+11).attr('y1',addY).attr('x2',htX-15).attr('y2',addY)
+    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
+  drawNode(graphSvg,htX,addY,15,t>0?hiddenState:null,'hₜ',null,true);
+}
+
+// ── gate bars ─────────────────────────────────────────────────────────────────
+function drawGates() {
+  gateSvg.selectAll('*').remove();
+  const W_S=580,H=165;
+  gateSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+
+  const gKeys=['f','i','c','o'],gLabels={f:'forget',i:'input',c:'candidate',o:'output'};
+  const gateX=[70,185,320,455],barMaxH=55,barY=12,barW=38;
+  const latest=gateHistory.length>0?gateHistory[gateHistory.length-1]:null;
+
+  gKeys.forEach((g,idx)=>{
+    const x=gateX[idx],val=latest?latest[g]:0,col=GC[g];
+    const barH=Math.abs(val)*barMaxH;
+    gateSvg.append('rect').attr('x',x-barW/2).attr('y',barY).attr('width',barW).attr('height',barMaxH)
+      .attr('fill','rgba(255,255,255,0.03)').attr('rx',3);
+    gateSvg.append('rect').attr('x',x-barW/2).attr('y',barY+barMaxH-barH)
+      .attr('width',barW).attr('height',barH||1)
+      .attr('fill',latest?col:'rgba(255,255,255,0.05)').attr('rx',3).attr('opacity',0.85);
+    gateSvg.append('text').attr('x',x).attr('y',barY+barMaxH-barH-4).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',latest?col:'var(--muted)').text(latest?val.toFixed(2):'—');
+    gateSvg.append('text').attr('x',x).attr('y',barY+barMaxH+13).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill',col)
+      .text(g==='c'?'c̃':g);
+    gateSvg.append('text').attr('x',x).attr('y',barY+barMaxH+24).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill','var(--muted)')
+      .text(gLabels[g]);
+  });
+
+  // equation row
+  const rowY=120,cPrev=cHistory.length>=2?cHistory[cHistory.length-2]:0;
+  gateSvg.append('rect').attr('x',15).attr('y',rowY-9).attr('width',48).attr('height',18)
+    .attr('fill',colorScale(cPrev)).attr('rx',3).attr('opacity',0.6);
+  gateSvg.append('text').attr('x',39).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.7)').text(cPrev.toFixed(2));
+  gateSvg.append('text').attr('x',39).attr('y',rowY+15).attr('text-anchor','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill','var(--muted)').text('cₜ₋₁');
+  gateSvg.append('text').attr('x',95).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',10).attr('fill',GC.f)
+    .text(latest?`×${latest.f.toFixed(2)}`:'×f');
+  gateSvg.append('line').attr('x1',128).attr('x2',178).attr('y1',rowY).attr('y2',rowY)
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
+  gateSvg.append('text').attr('x',218).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.5)')
+    .text(latest?`+ ${latest.i.toFixed(2)}×${latest.c.toFixed(2)}`:'+ i×c̃');
+  gateSvg.append('line').attr('x1',285).attr('x2',320).attr('y1',rowY).attr('y2',rowY)
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
+  gateSvg.append('rect').attr('x',320).attr('y',rowY-9).attr('width',52).attr('height',18)
+    .attr('fill',colorScale(cellState)).attr('rx',3);
+  gateSvg.append('text').attr('x',346).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.85)')
+    .text(cellState.toFixed(3));
+  gateSvg.append('text').attr('x',346).attr('y',rowY+15).attr('text-anchor','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill',CELL_COLOR).text('cₜ');
+  gateSvg.append('line').attr('x1',378).attr('x2',408).attr('y1',rowY).attr('y2',rowY)
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
+  gateSvg.append('text').attr('x',445).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.5)')
+    .text('o×tanh(c)');
+  gateSvg.append('line').attr('x1',492).attr('x2',516).attr('y1',rowY).attr('y2',rowY)
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
+  gateSvg.append('rect').attr('x',516).attr('y',rowY-9).attr('width',44).attr('height',18)
+    .attr('fill',colorScale(hiddenState)).attr('rx',3);
+  gateSvg.append('text').attr('x',538).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.85)')
+    .text(hiddenState.toFixed(3));
+  gateSvg.append('text').attr('x',538).attr('y',rowY+15).attr('text-anchor','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill','var(--muted)').text('hₜ');
+}
+
+// ── trail ─────────────────────────────────────────────────────────────────────
+function drawTrail() {
+  trailSvg.selectAll('*').remove();
+  const W_S=600,H=120;
+  trailSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+  const cols=SEQ_LEN+1,colW=W_S/cols,rowH=(H-30)/2;
+  [{label:'cₜ',history:cHistory,color:CELL_COLOR},{label:'hₜ',history:hHistory,color:'#e8824a'}]
+  .forEach((row,ri)=>{
+    row.history.forEach((val,step)=>{
+      const isLast=step===row.history.length-1;
+      const x=step*colW,y=14+ri*rowH;
+      trailSvg.append('rect').attr('x',x+2).attr('y',y).attr('width',colW-4).attr('height',rowH-4)
+        .attr('fill',colorScale(val)).attr('rx',2).attr('opacity',isLast?1:0.65);
+      trailSvg.append('text').attr('x',x+colW/2).attr('y',y+rowH/2-2)
+        .attr('text-anchor','middle').attr('dominant-baseline','middle')
+        .attr('font-family','JetBrains Mono, monospace').attr('font-size',8)
+        .attr('fill','rgba(255,255,255,0.65)').text(val.toFixed(2));
+    });
+    trailSvg.append('text').attr('x',row.history.length*colW+4).attr('y',14+ri*rowH+rowH/2-2)
+      .attr('dominant-baseline','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',row.color).text(row.label);
+  });
+  cHistory.forEach((_,step)=>{
+    const isLast=step===cHistory.length-1;
+    trailSvg.append('text').attr('x',step*colW+colW/2).attr('y',H-4)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',isLast?'var(--accent)':'var(--muted)').text(`t=${step}`);
+  });
+}
+
+// ── narrative ─────────────────────────────────────────────────────────────────
+function updateNarrative() {
+  const el=document.getElementById('narrative');
+  if(t===0){el.innerHTML='Cell state <span class="cell">c=0</span>, hidden state <span class="dim">h=0</span>. Press <b>step →</b> to begin.';return;}
+  const gates=gateHistory[gateHistory.length-1];
+  const cPrev=cHistory[cHistory.length-2];
+  const written=(gates.i*gates.c).toFixed(3);
+  el.innerHTML=
+    `<b>t=${t}</b> &nbsp; xₜ=<span class="hi">${sequence[t-1].toFixed(2)}</span> &nbsp; `+
+    `<span class="nf">forget ${gates.f.toFixed(2)}</span> kept ${Math.round(gates.f*100)}% of cₜ₋₁ &nbsp; `+
+    `<span class="ni">input ${gates.i.toFixed(2)}</span>×<span class="nc">c̃ ${gates.c.toFixed(2)}</span>=<span class="${+written>0?'hi':'lo'}">${written}</span> written &nbsp; `+
+    `<span class="cell">cₜ: ${cPrev.toFixed(3)}→${cellState.toFixed(3)}</span> &nbsp; `+
+    `<span class="no">output ${gates.o.toFixed(2)}</span>→hₜ=<span class="${hiddenState>0?'hi':'lo'}">${hiddenState.toFixed(3)}</span>`+
+    (t===SEQ_LEN?' &nbsp; <span class="dim">— sequence complete</span>':'');
+}
+
+// ── redraw ────────────────────────────────────────────────────────────────────
+function redraw(){
+  document.getElementById('t-display').textContent=t;
+  document.getElementById('btn-step').disabled=t>=SEQ_LEN;
+  drawSequence(); drawGraph(); drawGates(); drawTrail(); updateNarrative();
+}
+
+function resetAndRedraw(){
+  t=0;cellState=0;hiddenState=0;
+  cHistory=[0];hHistory=[0];gateHistory=[];
+  redraw();
+}
+
+document.getElementById('btn-step').addEventListener('click',()=>{
+  if(t>=SEQ_LEN)return;
+  const r=stepLSTM(sequence[t],hiddenState,cellState);
+  t++;cellState=r.c_new;hiddenState=r.h_new;
+  cHistory.push(cellState);hHistory.push(hiddenState);
+  gateHistory.push({f:r.f,i:r.i,c:r.c,o:r.o});
+  redraw();
+});
+document.getElementById('btn-reset').addEventListener('click',resetAndRedraw);
+document.getElementById('btn-rand').addEventListener('click',()=>{
+  sequence=Array.from({length:SEQ_LEN},()=>Math.round((Math.random()*2-1)*100)/100);
+  resetAndRedraw();
+});
+
+// ── controls (horizontal) ─────────────────────────────────────────────────────
+function buildControls(){
+  const ctrl=d3.select('#controls');
+  ctrl.selectAll('*').remove();
+
+  // four gate columns
+  [{key:'f',label:'Wf  forget',color:GC.f},{key:'i',label:'Wi  input',color:GC.i},
+   {key:'c',label:'Wc  candidate',color:GC.c},{key:'o',label:'Wo  output',color:GC.o}]
+  .forEach(({key,label,color})=>{
+    const col=ctrl.append('div');
+    col.append('div').attr('class','ctrl-col-title').style('color',color).text(label);
+    [{param:'wh',display:'Wh'},{param:'wx',display:'Wx'},{param:'b',display:'bias'}]
+    .forEach(({param,display})=>{
+      const row=col.append('div').attr('class','ctrl-row');
+      row.append('span').attr('class','ctrl-label').text(display);
+      const sl=row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',W[key][param]);
+      const vl=row.append('span').attr('class','ctrl-val').text(W[key][param].toFixed(2));
+      sl.on('input',function(){W[key][param]=+this.value;vl.text(W[key][param].toFixed(2));resetAndRedraw();});
+    });
+  });
+
+  // sequence column
+  const seqCol=ctrl.append('div');
+  seqCol.append('div').attr('class','ctrl-col-title').style('color','var(--muted)').text('sequence');
+  sequence.forEach((v,i)=>{
+    const row=seqCol.append('div').attr('class','ctrl-row');
+    row.append('span').attr('class','ctrl-label').text(`x${i+1}`);
+    const sl=row.append('input').attr('type','range').attr('min',-1).attr('max',1).attr('step',0.01).attr('value',v);
+    const vl=row.append('span').attr('class','ctrl-val').text(v.toFixed(2));
+    sl.on('input',function(){sequence[i]=+this.value;vl.text(sequence[i].toFixed(2));resetAndRedraw();});
+  });
+}
+
+buildControls();
+redraw();
+</script>
+</body>
+</html>

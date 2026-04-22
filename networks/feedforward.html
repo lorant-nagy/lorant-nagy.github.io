@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedforward Network</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --neg:     #378ADD;
+    --zero:    #1e2230;
+    --pos:     #e8824a;
+    --accent:  #aa701e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem;
+  }
+
+  .back-link { align-self:flex-start; font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:0.05em; margin-bottom:2rem; display:block; }
+  .back-link:hover { color:var(--text); }
+
+  h1 {
+    font-family: 'Spectral', serif;
+    font-weight: 300;
+    font-size: 1.6rem;
+    color: #e8e4dc;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.3rem;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .canvas-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  #nn-svg {
+    width: 100%;
+    height: 340px;
+    display: block;
+  }
+
+  .controls-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    overflow-y: auto;
+    max-height: 400px;
+  }
+
+  .ctrl-section-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .ctrl-label {
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 56px;
+    flex-shrink: 0;
+  }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .ctrl-val {
+    font-size: 11px;
+    color: var(--text);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  .legend {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: center;
+    margin-top: 1rem;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .legend-swatch {
+    width: 24px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .output-display {
+    text-align: center;
+    margin-top: 0.8rem;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .output-val {
+    font-size: 1.4rem;
+    font-family: 'Spectral', serif;
+    font-weight: 300;
+    color: var(--pos);
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  .act-fn-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .act-btn {
+    flex: 1;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 0;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+
+  .act-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(170,112,30,0.08);
+  }
+
+  .act-btn:hover:not(.active) {
+    border-color: rgba(255,255,255,0.2);
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="/networks/" style="align-self:flex-start;font-size:11px;color:#565c6e;text-decoration:none;letter-spacing:0.05em;margin-bottom:2rem;display:block;">← networks</a>
+
+<h1>feedforward network</h1>
+<p class="subtitle">2 → 3 → 1 &nbsp;·&nbsp; interactive forward pass</p>
+
+<div class="layout">
+  <div class="canvas-card">
+    <svg id="nn-svg"></svg>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:var(--neg)"></div>
+        negative
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:rgba(255,255,255,0.15)"></div>
+        zero
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch" style="background:var(--pos)"></div>
+        positive
+      </div>
+    </div>
+    <div class="output-display">
+      output
+      <span class="output-val" id="output-val">—</span>
+    </div>
+  </div>
+
+  <div class="controls-card" id="controls"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+// ── Network topology ────────────────────────────────────────────────────────
+const LAYERS = [2, 3, 1];
+
+// ── State ───────────────────────────────────────────────────────────────────
+let actFn = 'sigmoid';
+
+// Inputs
+const inputs = [0.5, 0.5];
+
+// Weights: weights[l][j][i] = weight from neuron i in layer l to neuron j in l+1
+const weights = [
+  // layer 0 → 1  (2 inputs → 3 hidden)
+  [
+    [ 0.6, -0.4],
+    [ 0.8,  0.5],
+    [-0.3,  0.9],
+  ],
+  // layer 1 → 2  (3 hidden → 1 output)
+  [
+    [ 0.7, -0.5, 0.6],
+  ],
+];
+
+// Biases: biases[l][j]
+const biases = [
+  [0.1, -0.2, 0.1],
+  [0.0],
+];
+
+// ── Activation functions ─────────────────────────────────────────────────────
+const activations = {
+  sigmoid: x => 1 / (1 + Math.exp(-x)),
+  tanh:    x => Math.tanh(x),
+  relu:    x => Math.max(0, x),
+};
+
+// ── Forward pass ─────────────────────────────────────────────────────────────
+function forwardPass() {
+  const acts = [inputs.slice()];
+  for (let l = 0; l < weights.length; l++) {
+    const layer = [];
+    for (let j = 0; j < weights[l].length; j++) {
+      let z = biases[l][j];
+      for (let i = 0; i < acts[l].length; i++) {
+        z += weights[l][j][i] * acts[l][i];
+      }
+      // last layer: linear; hidden: chosen activation
+      const a = (l === weights.length - 1) ? z : activations[actFn](z);
+      layer.push(a);
+    }
+    acts.push(layer);
+  }
+  return acts;
+}
+
+// ── Color scale ──────────────────────────────────────────────────────────────
+function neuronColor(val, isOutput) {
+  // For sigmoid output ∈ [0,1]; for tanh ∈ [-1,1]; for relu ∈ [0,∞)
+  let t;
+  if (actFn === 'tanh' || isOutput) {
+    t = (val + 1) / 2;
+  } else if (actFn === 'relu') {
+    t = Math.min(val / 2, 1);
+  } else {
+    t = val; // sigmoid already [0,1]
+  }
+  t = Math.max(0, Math.min(1, t));
+  return d3.interpolateRgb('#378ADD', '#e8824a')(t);
+}
+
+function weightColor(w) {
+  const t = (Math.max(-2, Math.min(2, w)) + 2) / 4;
+  return d3.interpolateRgb('#378ADD', '#e8824a')(t);
+}
+
+function weightWidth(w) {
+  return 0.5 + Math.abs(w) * 2.5;
+}
+
+// ── Layout ───────────────────────────────────────────────────────────────────
+const svg = d3.select('#nn-svg');
+const W = 560, H = 300;
+svg.attr('viewBox', `0 0 ${W} ${H}`);
+
+const layerX = [80, W / 2, W - 80];
+const R = 22;
+
+function nodeY(layerIdx, nodeIdx) {
+  const n = LAYERS[layerIdx];
+  const spacing = Math.min(90, (H - 60) / (n - 1 + 0.001));
+  const total = spacing * (n - 1);
+  const start = (H - total) / 2;
+  return start + nodeIdx * spacing;
+}
+
+// Groups
+const edgeGroup = svg.append('g').attr('class', 'edges');
+const nodeGroup = svg.append('g').attr('class', 'nodes');
+
+// ── Draw / update ─────────────────────────────────────────────────────────────
+function draw() {
+  const acts = forwardPass();
+
+  // ── Edges ────────────────────────────────────────────────────────────────
+  const edgeData = [];
+  for (let l = 0; l < weights.length; l++) {
+    for (let j = 0; j < weights[l].length; j++) {
+      for (let i = 0; i < weights[l][j].length; i++) {
+        edgeData.push({
+          x1: layerX[l],   y1: nodeY(l,   i),
+          x2: layerX[l+1], y2: nodeY(l+1, j),
+          w:  weights[l][j][i],
+          key: `${l}-${j}-${i}`,
+        });
+      }
+    }
+  }
+
+  const edges = edgeGroup.selectAll('line').data(edgeData, d => d.key);
+  edges.enter().append('line')
+    .attr('stroke-linecap', 'round')
+    .attr('opacity', 0.7)
+  .merge(edges)
+    .attr('x1', d => d.x1)
+    .attr('y1', d => d.y1)
+    .attr('x2', d => d.x2)
+    .attr('y2', d => d.y2)
+    .attr('stroke', d => weightColor(d.w))
+    .attr('stroke-width', d => weightWidth(d.w));
+
+  // ── Nodes ─────────────────────────────────────────────────────────────────
+  const nodeData = [];
+  for (let l = 0; l < LAYERS.length; l++) {
+    for (let i = 0; i < LAYERS[l]; i++) {
+      nodeData.push({
+        l, i,
+        x: layerX[l],
+        y: nodeY(l, i),
+        a: acts[l][i],
+        isOutput: l === LAYERS.length - 1,
+        key: `${l}-${i}`,
+      });
+    }
+  }
+
+  const nodes = nodeGroup.selectAll('g.node').data(nodeData, d => d.key);
+
+  const entered = nodes.enter().append('g').attr('class', 'node');
+  entered.append('circle')
+    .attr('r', R)
+    .attr('stroke-width', 1.5);
+  entered.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .attr('font-family', 'JetBrains Mono, monospace')
+    .attr('font-size', 10)
+    .attr('fill', 'rgba(255,255,255,0.75)');
+
+  const merged = entered.merge(nodes);
+  merged.attr('transform', d => `translate(${d.x},${d.y})`);
+  merged.select('circle')
+    .attr('fill',   d => neuronColor(d.a, d.isOutput))
+    .attr('stroke', d => d3.color(neuronColor(d.a, d.isOutput)).brighter(0.5));
+  merged.select('text')
+    .text(d => d.a.toFixed(2));
+
+  // Layer labels
+  const labelData = [
+    { x: layerX[0], label: 'input' },
+    { x: layerX[1], label: 'hidden' },
+    { x: layerX[2], label: 'output' },
+  ];
+  const labels = svg.selectAll('text.layer-label').data(labelData);
+  labels.enter().append('text').attr('class', 'layer-label')
+    .attr('text-anchor', 'middle')
+    .attr('font-family', 'JetBrains Mono, monospace')
+    .attr('font-size', 10)
+    .attr('fill', '#565c6e')
+    .attr('letter-spacing', '0.08em')
+  .merge(labels)
+    .attr('x', d => d.x)
+    .attr('y', 16)
+    .text(d => d.label);
+
+  // Output display
+  const out = acts[acts.length - 1][0];
+  d3.select('#output-val').text(out.toFixed(4));
+}
+
+// ── Build controls ────────────────────────────────────────────────────────────
+function buildControls() {
+  const ctrl = d3.select('#controls');
+  ctrl.selectAll('*').remove();
+
+  // Activation function selector
+  const actSection = ctrl.append('div');
+  actSection.append('div').attr('class', 'ctrl-section-title').text('activation');
+  const btnRow = actSection.append('div').attr('class', 'act-fn-row');
+  ['sigmoid', 'tanh', 'relu'].forEach(fn => {
+    btnRow.append('button')
+      .attr('class', `act-btn${actFn === fn ? ' active' : ''}`)
+      .text(fn)
+      .on('click', () => {
+        actFn = fn;
+        buildControls();
+        draw();
+      });
+  });
+
+  // Input sliders
+  const inputSection = ctrl.append('div');
+  inputSection.append('div').attr('class', 'ctrl-section-title').text('inputs');
+  inputs.forEach((v, i) => {
+    const row = inputSection.append('div').attr('class', 'ctrl-row');
+    row.append('span').attr('class', 'ctrl-label').text(`x${i+1}`);
+    const slider = row.append('input')
+      .attr('type', 'range').attr('min', -2).attr('max', 2).attr('step', 0.01)
+      .attr('value', v);
+    const valSpan = row.append('span').attr('class', 'ctrl-val').text(v.toFixed(2));
+    slider.on('input', function() {
+      inputs[i] = +this.value;
+      valSpan.text((+this.value).toFixed(2));
+      draw();
+    });
+  });
+
+  // Weight sliders per layer
+  weights.forEach((layer, l) => {
+    const sec = ctrl.append('div');
+    sec.append('div').attr('class', 'ctrl-section-title')
+       .text(`weights  L${l}→L${l+1}`);
+    layer.forEach((toNeuron, j) => {
+      toNeuron.forEach((w, i) => {
+        const row = sec.append('div').attr('class', 'ctrl-row');
+        row.append('span').attr('class', 'ctrl-label')
+           .text(`w${i+1}→${j+1}`);
+        const slider = row.append('input')
+          .attr('type', 'range').attr('min', -2).attr('max', 2).attr('step', 0.01)
+          .attr('value', w);
+        const valSpan = row.append('span').attr('class', 'ctrl-val').text(w.toFixed(2));
+        slider.on('input', function() {
+          weights[l][j][i] = +this.value;
+          valSpan.text((+this.value).toFixed(2));
+          draw();
+        });
+      });
+    });
+  });
+
+  // Bias sliders
+  const biasSection = ctrl.append('div');
+  biasSection.append('div').attr('class', 'ctrl-section-title').text('biases');
+  biases.forEach((layer, l) => {
+    layer.forEach((b, j) => {
+      const row = biasSection.append('div').attr('class', 'ctrl-row');
+      row.append('span').attr('class', 'ctrl-label').text(`b L${l+1}[${j+1}]`);
+      const slider = row.append('input')
+        .attr('type', 'range').attr('min', -2).attr('max', 2).attr('step', 0.01)
+        .attr('value', b);
+      const valSpan = row.append('span').attr('class', 'ctrl-val').text(b.toFixed(2));
+      slider.on('input', function() {
+        biases[l][j] = +this.value;
+        valSpan.text((+this.value).toFixed(2));
+        draw();
+      });
+    });
+  });
+}
+
+buildControls();
+draw();
+</script>
+</body>
+</html>

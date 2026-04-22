@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Network Architectures</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --accent:  #aa701e;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .back-link {
+    align-self: flex-start;
+    font-size: 11px; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; margin-bottom: 2.5rem;
+  }
+  .back-link:hover { color: var(--text); }
+
+  h1 {
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 2rem; color: #e8e4dc;
+    letter-spacing: 0.02em; margin-bottom: 0.4rem;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 11px; color: var(--muted);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 3rem; text-align: center;
+  }
+
+  /* ── Section headers ── */
+  .section-label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.25rem;
+    border-bottom: 0.5px solid rgba(255,255,255,0.06);
+    padding-bottom: 0.4rem; width: 100%; max-width: 820px;
+  }
+
+  /* ── Card grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+    width: 100%; max-width: 820px;
+    margin-bottom: 3rem;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    border-color: rgba(170,112,30,0.5);
+    transform: translateY(-2px);
+  }
+
+  .thumb { width: 100%; height: 150px; display: block; }
+
+  .card-body {
+    padding: 0.9rem 1rem 1rem;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+  }
+
+  .card-title {
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 1rem; color: #e8e4dc; margin-bottom: 0.3rem;
+  }
+
+  .card-question {
+    font-size: 10px; color: var(--muted);
+    line-height: 1.55; margin-bottom: 0.7rem;
+  }
+
+  .card-link {
+    font-size: 10px; color: var(--accent); letter-spacing: 0.05em;
+  }
+
+  /* ── Coming soon card ── */
+  .card-soon {
+    background: var(--surface);
+    border: 0.5px dashed rgba(255,255,255,0.08);
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    height: 220px; gap: 0.4rem;
+  }
+  .card-soon-title {
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 0.95rem; color: rgba(255,255,255,0.2);
+  }
+  .card-soon-label {
+    font-size: 9px; color: rgba(255,255,255,0.12);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* ── Animations ── */
+
+  /* feedforward */
+  @keyframes ff-pulse-i1 { 0%,100%{fill:#1e2230} 10%,20%{fill:#378ADD} 40%,50%{fill:#e8824a} }
+  @keyframes ff-pulse-i2 { 0%,100%{fill:#1e2230} 15%,25%{fill:#e8824a} 45%,55%{fill:#378ADD} }
+  @keyframes ff-pulse-h1 { 0%,100%{fill:#1e2230} 30%,40%{fill:#e8824a} }
+  @keyframes ff-pulse-h2 { 0%,100%{fill:#1e2230} 35%,45%{fill:#378ADD} }
+  @keyframes ff-pulse-h3 { 0%,100%{fill:#1e2230} 32%,42%{fill:#e8824a} }
+  @keyframes ff-pulse-o  { 0%,100%{fill:#1e2230} 55%,70%{fill:#e8824a} }
+  @keyframes edge-flow   { 0%,100%{opacity:0.12} 30%,60%{opacity:0.35} }
+  .ff-i1{animation:ff-pulse-i1 3s ease-in-out infinite}
+  .ff-i2{animation:ff-pulse-i2 3s ease-in-out infinite}
+  .ff-h1{animation:ff-pulse-h1 3s ease-in-out infinite}
+  .ff-h2{animation:ff-pulse-h2 3s ease-in-out infinite}
+  .ff-h3{animation:ff-pulse-h3 3s ease-in-out infinite}
+  .ff-o {animation:ff-pulse-o  3s ease-in-out infinite}
+  .ff-edge{animation:edge-flow 3s ease-in-out infinite}
+
+  /* RNN */
+  @keyframes rnn-h1 { 0%,100%{fill:#1e2230} 20%,35%{fill:#378ADD} 55%,70%{fill:#e8824a} }
+  @keyframes rnn-h2 { 0%,100%{fill:#1e2230} 25%,40%{fill:#e8824a} 60%,75%{fill:#378ADD} }
+  @keyframes rnn-x  { 0%,8%{fill:#1e2230} 9%,18%{fill:#378ADD} 19%,28%{fill:#e8824a} 29%,38%{fill:#378ADD} 39%,48%{fill:#1e2230} 49%,58%{fill:#e8824a} 59%,68%{fill:#378ADD} 69%,78%{fill:#e8824a} 79%,100%{fill:#1e2230} }
+  @keyframes rnn-arc { 0%,100%{stroke-opacity:0.1} 40%,65%{stroke-opacity:0.6} }
+  @keyframes rnn-seq { 0%{transform:translateX(0);opacity:0.5} 14%{transform:translateX(18px);opacity:0.9} 28%{transform:translateX(36px);opacity:0.9} 42%{transform:translateX(54px);opacity:0.9} 56%{transform:translateX(72px);opacity:0.9} 70%{transform:translateX(90px);opacity:0.9} 84%{transform:translateX(108px);opacity:0.9} 99%{transform:translateX(108px);opacity:0.3} 100%{transform:translateX(0);opacity:0.5} }
+  .rnn-h1{animation:rnn-h1 4s ease-in-out infinite}
+  .rnn-h2{animation:rnn-h2 4s ease-in-out infinite}
+  .rnn-x {animation:rnn-x  4s steps(1) infinite}
+  .rnn-arc{animation:rnn-arc 4s ease-in-out infinite}
+  .rnn-seq-dot{animation:rnn-seq 4s linear infinite}
+
+  /* LSTM */
+  @keyframes lstm-cell  { 0%,100%{fill:#1a1e2a} 20%,35%{fill:#0f3a2a} 50%,65%{fill:#2a1a0a} 80%,90%{fill:#1a2a3a} }
+  @keyframes lstm-gate-f{ 0%,100%{fill:#378ADD;opacity:0.3} 15%,30%{fill:#378ADD;opacity:0.9} }
+  @keyframes lstm-gate-i{ 0%,100%{fill:#1D9E75;opacity:0.3} 30%,45%{fill:#1D9E75;opacity:0.9} }
+  @keyframes lstm-gate-g{ 0%,100%{fill:#aa701e;opacity:0.3} 45%,60%{fill:#aa701e;opacity:0.9} }
+  @keyframes lstm-gate-o{ 0%,100%{fill:#e8824a;opacity:0.3} 60%,75%{fill:#e8824a;opacity:0.9} }
+  @keyframes lstm-hw    { 0%,100%{stroke-opacity:0.15} 20%,80%{stroke-opacity:0.55} }
+  .lstm-cell  {animation:lstm-cell   5s ease-in-out infinite}
+  .lstm-gate-f{animation:lstm-gate-f 5s ease-in-out infinite}
+  .lstm-gate-i{animation:lstm-gate-i 5s ease-in-out infinite}
+  .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
+  .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
+  .lstm-hw    {animation:lstm-hw     5s ease-in-out infinite}
+</style>
+</head>
+<body>
+
+<a class="back-link" href="/">← home</a>
+
+<h1>neural network architectures</h1>
+<p class="subtitle">an interactive guide</p>
+
+<div class="section-label">foundations</div>
+
+<div class="grid">
+
+  <!-- Feedforward -->
+  <a class="card" href="/networks/feedforward.html">
+    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="220" height="150" fill="#0d0f14"/>
+      <g class="ff-edge" stroke="rgba(255,255,255,1)" stroke-width="0.6" fill="none">
+        <line x1="52" y1="48" x2="110" y2="40"/>
+        <line x1="52" y1="48" x2="110" y2="75"/>
+        <line x1="52" y1="48" x2="110" y2="110"/>
+        <line x1="52" y1="102" x2="110" y2="40"/>
+        <line x1="52" y1="102" x2="110" y2="75"/>
+        <line x1="52" y1="102" x2="110" y2="110"/>
+        <line x1="110" y1="40"  x2="168" y2="75"/>
+        <line x1="110" y1="75"  x2="168" y2="75"/>
+        <line x1="110" y1="110" x2="168" y2="75"/>
+      </g>
+      <circle class="ff-i1" cx="52" cy="48"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-i2" cx="52" cy="102" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-h1" cx="110" cy="40"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-h2" cx="110" cy="75"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-h3" cx="110" cy="110" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-o"  cx="168" cy="75"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <text x="52"  y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.2)">input</text>
+      <text x="110" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.2)">hidden</text>
+      <text x="168" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.2)">output</text>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">feedforward</div>
+      <div class="card-question">how does information flow from input to output in one direction?</div>
+      <div class="card-link">explore →</div>
+    </div>
+  </a>
+
+  <!-- Vanilla RNN -->
+  <a class="card" href="/networks/rnn.html">
+    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="220" height="150" fill="#0d0f14"/>
+      <defs>
+        <marker id="arr2" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
+          <path d="M0,0 L0,5 L5,2.5 z" fill="rgba(255,255,255,0.2)"/>
+        </marker>
+      </defs>
+      <g font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.25)" text-anchor="middle">
+        <text x="30"  y="138">x₁</text><text x="48"  y="138">x₂</text>
+        <text x="66"  y="138">x₃</text><text x="84"  y="138">x₄</text>
+        <text x="102" y="138">x₅</text><text x="120" y="138">x₆</text>
+        <text x="138" y="138">x₇</text>
+      </g>
+      <circle class="rnn-seq-dot" cx="30" cy="127" r="4" fill="#aa701e" opacity="0.7"/>
+      <line x1="110" y1="122" x2="110" y2="102" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arr2)"/>
+      <circle class="rnn-x" cx="110" cy="88" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <text x="110" y="88" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.4)">xₜ</text>
+      <line x1="96" y1="82" x2="68" y2="55" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+      <line x1="96" y1="94" x2="68" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+      <circle class="rnn-h1" cx="54" cy="46"  r="16" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="rnn-h2" cx="54" cy="108" r="16" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <text x="54" y="46"  text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.4)">h₁</text>
+      <text x="54" y="108" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.4)">h₂</text>
+      <path class="rnn-arc" d="M 46 30 C 20 14, 20 14, 46 30" fill="none" stroke="#378ADD" stroke-width="1.5"/>
+      <path class="rnn-arc" d="M 46 124 C 20 140, 20 140, 46 124" fill="none" stroke="#e8824a" stroke-width="1.5" style="animation-delay:0.4s"/>
+      <path d="M 54 62 Q 30 77 54 92" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <path d="M 54 92 Q 78 77 54 62" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="70" y1="77" x2="170" y2="77" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <circle cx="180" cy="77" r="10" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
+      <text x="180" y="77" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.25)">hₜ</text>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">vanilla RNN</div>
+      <div class="card-question">can a network remember what happened several steps ago?</div>
+      <div class="card-link">explore →</div>
+    </div>
+  </a>
+
+  <!-- LSTM -->
+  <a class="card" href="/networks/lstm.html">
+    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="220" height="150" fill="#0d0f14"/>
+      <rect class="lstm-cell" x="10" y="26" width="200" height="12" rx="2" fill="#1e2230" opacity="0.5"/>
+      <line class="lstm-hw" x1="15" y1="32" x2="205" y2="32" stroke="white" stroke-width="2"/>
+      <text x="110" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.25)">cell state  cₜ</text>
+      <rect class="lstm-gate-f" x="22"  y="55" width="30" height="30" rx="4" stroke="#378ADD" stroke-width="1"/>
+      <rect class="lstm-gate-i" x="64"  y="55" width="30" height="30" rx="4" stroke="#1D9E75" stroke-width="1"/>
+      <rect class="lstm-gate-g" x="106" y="55" width="30" height="30" rx="4" stroke="#aa701e" stroke-width="1"/>
+      <rect class="lstm-gate-o" x="148" y="55" width="30" height="30" rx="4" stroke="#e8824a" stroke-width="1"/>
+      <text x="37"  y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">f</text>
+      <text x="79"  y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
+      <text x="121" y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
+      <text x="163" y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
+      <text x="37"  y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">forget</text>
+      <text x="79"  y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">input</text>
+      <text x="121" y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">cand.</text>
+      <text x="163" y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">output</text>
+      <line x1="37"  y1="55" x2="37"  y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="79"  y1="55" x2="79"  y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="121" y1="55" x2="121" y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="163" y1="55" x2="163" y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="20"  y1="130" x2="20"  y2="110" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="200" y1="130" x2="200" y2="110" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="20"  y1="110" x2="200" y2="110" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="20"  y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.25)">xₜ</text>
+      <text x="200" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.25)">hₜ₋₁</text>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">LSTM</div>
+      <div class="card-question">how do four gates decide what to remember and what to forget?</div>
+      <div class="card-link">explore →</div>
+    </div>
+  </a>
+
+  <!-- Coming soon placeholders -->
+  <div class="card-soon">
+    <div class="card-soon-title">GRU</div>
+    <div class="card-soon-label">coming soon</div>
+  </div>
+
+  <div class="card-soon">
+    <div class="card-soon-title">transformer</div>
+    <div class="card-soon-label">coming soon</div>
+  </div>
+
+  <div class="card-soon">
+    <div class="card-soon-title">convolutional</div>
+    <div class="card-soon-label">coming soon</div>
+  </div>
+
+</div>
+
+</body>
+</html>
