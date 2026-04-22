@@ -2,8 +2,8 @@ name: Update stats
 
 on:
   schedule:
-    - cron: '0 20 * * 1-5'   # 20:00 UTC, Monday–Friday only
-  workflow_dispatch:           # allows manual trigger from GitHub Actions tab
+    - cron: '0 2 * * 2-6'   # 02:00 UTC Tue–Sat (after arXiv publishes Mon–Fri papers)
+  workflow_dispatch:
 
 jobs:
   fetch:
