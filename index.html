@@ -7,6 +7,45 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap">
   <link rel="stylesheet" href="/assets/css/main.css">
+  <style>
+    /* nn card animations */
+    @keyframes ff-pulse-i1{0%,100%{fill:#1e2230}10%,20%{fill:#378ADD}40%,50%{fill:#e8824a}}
+    @keyframes ff-pulse-i2{0%,100%{fill:#1e2230}15%,25%{fill:#e8824a}45%,55%{fill:#378ADD}}
+    @keyframes ff-pulse-h1{0%,100%{fill:#1e2230}30%,40%{fill:#e8824a}}
+    @keyframes ff-pulse-h2{0%,100%{fill:#1e2230}35%,45%{fill:#378ADD}}
+    @keyframes ff-pulse-h3{0%,100%{fill:#1e2230}32%,42%{fill:#e8824a}}
+    @keyframes ff-pulse-o {0%,100%{fill:#1e2230}55%,70%{fill:#e8824a}}
+    @keyframes edge-flow  {0%,100%{opacity:0.12}30%,60%{opacity:0.35}}
+    .ff-i1{animation:ff-pulse-i1 3s ease-in-out infinite}
+    .ff-i2{animation:ff-pulse-i2 3s ease-in-out infinite}
+    .ff-h1{animation:ff-pulse-h1 3s ease-in-out infinite}
+    .ff-h2{animation:ff-pulse-h2 3s ease-in-out infinite}
+    .ff-h3{animation:ff-pulse-h3 3s ease-in-out infinite}
+    .ff-o {animation:ff-pulse-o  3s ease-in-out infinite}
+    .ff-edge{animation:edge-flow 3s ease-in-out infinite}
+    @keyframes rnn-h1{0%,100%{fill:#1e2230}20%,35%{fill:#378ADD}55%,70%{fill:#e8824a}}
+    @keyframes rnn-h2{0%,100%{fill:#1e2230}25%,40%{fill:#e8824a}60%,75%{fill:#378ADD}}
+    @keyframes rnn-x{0%,8%{fill:#1e2230}9%,18%{fill:#378ADD}19%,28%{fill:#e8824a}29%,38%{fill:#378ADD}39%,48%{fill:#1e2230}49%,58%{fill:#e8824a}59%,68%{fill:#378ADD}69%,78%{fill:#e8824a}79%,100%{fill:#1e2230}}
+    @keyframes rnn-arc{0%,100%{stroke-opacity:0.1}40%,65%{stroke-opacity:0.6}}
+    @keyframes rnn-seq{0%{transform:translateX(0);opacity:0.5}14%{transform:translateX(18px);opacity:0.9}28%{transform:translateX(36px);opacity:0.9}42%{transform:translateX(54px);opacity:0.9}56%{transform:translateX(72px);opacity:0.9}70%{transform:translateX(90px);opacity:0.9}84%{transform:translateX(108px);opacity:0.9}99%{transform:translateX(108px);opacity:0.3}100%{transform:translateX(0);opacity:0.5}}
+    .rnn-h1{animation:rnn-h1 4s ease-in-out infinite}
+    .rnn-h2{animation:rnn-h2 4s ease-in-out infinite}
+    .rnn-x{animation:rnn-x 4s steps(1) infinite}
+    .rnn-arc{animation:rnn-arc 4s ease-in-out infinite}
+    .rnn-seq-dot{animation:rnn-seq 4s linear infinite}
+    @keyframes lstm-cell{0%,100%{fill:#1a1e2a}20%,35%{fill:#0f3a2a}50%,65%{fill:#2a1a0a}80%,90%{fill:#1a2a3a}}
+    @keyframes lstm-gate-f{0%,100%{fill:#378ADD;opacity:0.3}15%,30%{fill:#378ADD;opacity:0.9}}
+    @keyframes lstm-gate-i{0%,100%{fill:#1D9E75;opacity:0.3}30%,45%{fill:#1D9E75;opacity:0.9}}
+    @keyframes lstm-gate-g{0%,100%{fill:#aa701e;opacity:0.3}45%,60%{fill:#aa701e;opacity:0.9}}
+    @keyframes lstm-gate-o{0%,100%{fill:#e8824a;opacity:0.3}60%,75%{fill:#e8824a;opacity:0.9}}
+    @keyframes lstm-hw{0%,100%{stroke-opacity:0.15}20%,80%{stroke-opacity:0.55}}
+    .lstm-cell{animation:lstm-cell 5s ease-in-out infinite}
+    .lstm-gate-f{animation:lstm-gate-f 5s ease-in-out infinite}
+    .lstm-gate-i{animation:lstm-gate-i 5s ease-in-out infinite}
+    .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
+    .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
+    .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
+  </style>
 </head>
 <body>
 
@@ -94,7 +133,7 @@
 <div style="background-color:#ffffff;padding:6em 2em;">
   <div style="max-width:1600px;margin:0 auto;">
     <div style="font-size:0.8em;font-weight:normal;color:#888;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5em;">neural network architectures — an interactive guide</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:1.5rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,220px));gap:1.25rem;margin-bottom:1.5rem;">
 
       <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
