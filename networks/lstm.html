@@ -33,8 +33,9 @@
   }
 
   .back-link {
-    align-self: flex-start; font-size: 11px; color: var(--muted);
-    text-decoration: none; letter-spacing: 0.05em; margin-bottom: 1.5rem;
+    position: fixed; top: 1.25rem; left: 1.5rem;
+    font-size: 11px; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; z-index: 10;
   }
   .back-link:hover { color: var(--text); }
 
@@ -44,20 +45,35 @@
     letter-spacing: 0.02em; margin-bottom: 0.2rem;
   }
 
+  .equations {
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 1.5rem; line-height: 2; font-style: italic;
+  }
+  .equations span { font-style: normal; }
+
+  .page { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 1rem; }
+
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .right-col { display: flex; flex-direction: column; gap: 1rem; }
+
   .subtitle {
     font-size: 11px; color: var(--muted);
     letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;
   }
 
   .equations {
-    font-size: 10.5px; color: var(--muted);
+    font-size: 13px; color: var(--muted);
     margin-bottom: 1.5rem; line-height: 1.9; font-style: italic;
   }
   .equations span { font-style: normal; }
 
   /* ── Page wrapper ── */
-  .page { width: 100%; max-width: 1300px; display: flex; flex-direction: column; gap: 1rem; }
-
   /* ── Card ── */
   .card {
     background: var(--surface);
@@ -98,14 +114,11 @@
   }
   .ctrl-val { font-size: 9px; color: var(--text); min-width: 30px; text-align: right; }
 
-  /* ── Two-column rows ── */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
   /* ── SVGs ── */
   #seq-svg   { width: 100%; height: 90px;  display: block; }
-  #trail-svg { width: 100%; height: 130px; display: block; }
-  #graph-svg { width: 100%; height: 300px; display: block; }
-  #gate-svg  { width: 100%; height: 175px; display: block; }
+  #trail-svg { width: 100%; height: 110px; display: block; }
+  #graph-svg { width: 100%; height: 420px; display: block; }
+  #gate-svg  { width: 100%; height: 160px; display: block; }
 
   /* ── Buttons ── */
   .btn-row { display: flex; gap: 0.6rem; margin-top: 0.6rem; }
@@ -146,58 +159,60 @@
 
 <a class="back-link" href="/networks/">← networks</a>
 <h1>LSTM</h1>
-<p class="subtitle">long short-term memory · scalar state · 7-step sequence</p>
 <div class="equations">
-  <span style="color:#378ADD">f</span>ₜ=σ(W<sub>f</sub>ʰ·hₜ₋₁+W<sub>f</sub>ˣ·xₜ+b<sub>f</sub>) &nbsp;
-  <span style="color:#1D9E75">i</span>ₜ=σ(W<sub>i</sub>ʰ·hₜ₋₁+W<sub>i</sub>ˣ·xₜ+b<sub>i</sub>) &nbsp;
-  <span style="color:#aa701e">c̃</span>ₜ=tanh(W<sub>c</sub>ʰ·hₜ₋₁+W<sub>c</sub>ˣ·xₜ+b<sub>c</sub>) &nbsp;
-  <span style="color:#e8824a">o</span>ₜ=σ(W<sub>o</sub>ʰ·hₜ₋₁+W<sub>o</sub>ˣ·xₜ+b<sub>o</sub>) &nbsp;
-  <span style="color:#7F77DD">c</span>ₜ=<span style="color:#378ADD">f</span>ₜ⊙cₜ₋₁+<span style="color:#1D9E75">i</span>ₜ⊙<span style="color:#aa701e">c̃</span>ₜ &nbsp;
-  hₜ=<span style="color:#e8824a">o</span>ₜ⊙tanh(<span style="color:#7F77DD">c</span>ₜ)
+  input: <span style="color:#e8824a">x</span>ₜ ∈ ℝ &nbsp;&nbsp;
+  <span style="color:#378ADD">f</span>ₜ = σ(W<sub>f</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>f</sub>) &nbsp;<span style="color:var(--muted)">forget gate</span> &nbsp;&nbsp;
+  <span style="color:#1D9E75">i</span>ₜ = σ(W<sub>i</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>i</sub>) &nbsp;<span style="color:var(--muted)">input gate</span> &nbsp;&nbsp;
+  <span style="color:#aa701e">c̃</span>ₜ = tanh(W<sub>c</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>c</sub>) &nbsp;<span style="color:var(--muted)">candidate cell</span> &nbsp;&nbsp;
+  <span style="color:#e8824a">o</span>ₜ = σ(W<sub>o</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>o</sub>) &nbsp;<span style="color:var(--muted)">output gate</span> &nbsp;&nbsp;
+  <span style="color:#7F77DD">c</span>ₜ = <span style="color:#378ADD">f</span>ₜ ⊙ <span style="color:#7F77DD">c</span>ₜ₋₁ + <span style="color:#1D9E75">i</span>ₜ ⊙ <span style="color:#aa701e">c̃</span>ₜ &nbsp;<span style="color:var(--muted)">cell state</span> &nbsp;&nbsp;
+  output: <span style="color:#e8824a">h</span>ₜ = <span style="color:#e8824a">o</span>ₜ ⊙ tanh(<span style="color:#7F77DD">c</span>ₜ) ∈ ℝ
 </div>
 
 <div class="page">
 
-  <!-- Row 0: controls (full width, horizontal) -->
+  <!-- Row 1: parameters full-width -->
   <div class="card">
     <div class="card-title">parameters</div>
     <div class="controls-row" id="controls"></div>
   </div>
 
-  <!-- Row 1: input sequence | state history -->
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">input sequence  x₁ … x₇</div>
-      <svg id="seq-svg"></svg>
-      <div class="btn-row">
-        <button id="btn-rand">randomise</button>
-        <button id="btn-reset">reset  t=0</button>
-        <button class="primary" id="btn-step">step →</button>
-      </div>
-      <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
-    </div>
-    <div class="card">
-      <div class="card-title">state history</div>
-      <svg id="trail-svg"></svg>
-    </div>
-  </div>
+  <!-- Row 2: computation graph left | sequence + gates + narrative right -->
+  <div class="main-layout">
 
-  <!-- Row 2: computation graph | gate bars -->
-  <div class="two-col">
     <div class="card">
       <div class="card-title">computation graph</div>
       <svg id="graph-svg"></svg>
     </div>
-    <div class="card">
-      <div class="card-title">gate activations &amp; state update</div>
-      <svg id="gate-svg"></svg>
-    </div>
-  </div>
 
-  <!-- Row 3: narrative (full width) -->
-  <div class="card">
-    <div class="card-title">what is happening</div>
-    <div class="narrative" id="narrative">Press <b>step →</b> to start the forward pass.</div>
+    <div class="right-col">
+      <div class="card">
+        <div class="card-title">input sequence  x₁ … x₇</div>
+        <svg id="seq-svg"></svg>
+        <div class="btn-row">
+          <button id="btn-rand">randomise</button>
+          <button id="btn-reset">reset  t=0</button>
+          <button class="primary" id="btn-step">step →</button>
+        </div>
+        <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">gate activations &amp; state update</div>
+        <svg id="gate-svg"></svg>
+      </div>
+
+      <div class="card">
+        <div class="card-title">state history</div>
+        <svg id="trail-svg"></svg>
+      </div>
+
+      <div class="card">
+        <div class="card-title">what is happening</div>
+        <div class="narrative" id="narrative">Press step → to start the forward pass.</div>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -510,12 +525,12 @@ function drawTrail() {
 // ── narrative ─────────────────────────────────────────────────────────────────
 function updateNarrative() {
   const el=document.getElementById('narrative');
-  if(t===0){el.innerHTML='Cell state <span class="cell">c=0</span>, hidden state <span class="dim">h=0</span>. Press <b>step →</b> to begin.';return;}
+  if(t===0){el.innerHTML='Cell state <span class="cell">c=0</span>, hidden state <span class="dim">h=0</span>. Press step → to begin.';return;}
   const gates=gateHistory[gateHistory.length-1];
   const cPrev=cHistory[cHistory.length-2];
   const written=(gates.i*gates.c).toFixed(3);
   el.innerHTML=
-    `<b>t=${t}</b> &nbsp; xₜ=<span class="hi">${sequence[t-1].toFixed(2)}</span> &nbsp; `+
+    `t=${t} &nbsp; xₜ=<span class="hi">${sequence[t-1].toFixed(2)}</span> &nbsp; `+
     `<span class="nf">forget ${gates.f.toFixed(2)}</span> kept ${Math.round(gates.f*100)}% of cₜ₋₁ &nbsp; `+
     `<span class="ni">input ${gates.i.toFixed(2)}</span>×<span class="nc">c̃ ${gates.c.toFixed(2)}</span>=<span class="${+written>0?'hi':'lo'}">${written}</span> written &nbsp; `+
     `<span class="cell">cₜ: ${cPrev.toFixed(3)}→${cellState.toFixed(3)}</span> &nbsp; `+

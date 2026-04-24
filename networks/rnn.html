@@ -32,6 +32,9 @@
     padding: 3rem 1.5rem 4rem;
   }
 
+  .back-link { position:fixed; top:1.25rem; left:1.5rem; font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:0.05em; z-index:10; }
+  .back-link:hover { color:var(--text); }
+
   h1 {
     font-family: 'Spectral', serif;
     font-weight: 300;
@@ -49,6 +52,15 @@
     margin-bottom: 0.6rem;
   }
 
+  .equations {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    line-height: 2;
+    font-style: italic;
+  }
+  .equations span { font-style: normal; }
+
   .equation {
     font-size: 12px;
     color: var(--muted);
@@ -57,15 +69,22 @@
   }
   .equation span { color: var(--text); }
 
-  .main-layout {
-    display: grid;
-    grid-template-columns: 1fr 240px;
-    gap: 1.25rem;
+  .page {
     width: 100%;
-    max-width: 880px;
+    max-width: 960px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .left-col { display: flex; flex-direction: column; gap: 1.25rem; }
+  .main-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .right-col { display: flex; flex-direction: column; gap: 1rem; }
 
   .card {
     background: var(--surface);
@@ -85,7 +104,7 @@
   }
 
   #seq-svg   { width: 100%; height: 90px;  display: block; }
-  #rnn-svg   { width: 100%; height: 260px; display: block; }
+  #rnn-svg   { width: 100%; height: 340px; display: block; }
   #trail-svg { width: 100%; height: 110px; display: block; }
 
   .narrative {
@@ -198,47 +217,56 @@
 
 <a class="back-link" href="/networks/">← networks</a>
 
-<h1>vanilla RNN</h1>
-<p class="subtitle">Elman network · scalar input · 2 hidden units</p>
-<p class="equation">
-  h<sub>t</sub> = tanh( <span>W<sub>x</sub> · x<sub>t</sub></span> +
-  <span>W<sub>h</sub> · h<sub>t−1</sub></span> + <span>b</span> )
-</p>
+<h1>Elman network</h1>
+<div class="equations">
+  input: <span style="color:#e8824a">x</span>ₜ ∈ ℝ &nbsp;&nbsp;
+  hidden: <span style="color:#e8824a">h</span>ₜ = tanh(W<sub>x</sub> · <span style="color:#e8824a">x</span>ₜ + W<sub>h</sub> · <span style="color:#e8824a">h</span>ₜ₋₁ + b),  W<sub>x</sub> ∈ ℝ<sup>2×1</sup>,  W<sub>h</sub> ∈ ℝ<sup>2×2</sup>,  <span style="color:#e8824a">h</span>ₜ ∈ ℝ² &nbsp;&nbsp;
+  output: <span style="color:#378ADD">ŷ</span>ₜ = v<sup>⊤</sup> · <span style="color:#e8824a">h</span>ₜ + c ∈ ℝ
+</div>
 
-<div class="main-layout">
-  <div class="left-col">
+<div class="page">
 
-    <div class="card">
-      <div class="card-title">input sequence  x₁ … x₇</div>
-      <svg id="seq-svg"></svg>
-      <div class="btn-row">
-        <button id="btn-rand">randomise</button>
-        <button id="btn-reset">reset  t=0</button>
-        <button class="primary" id="btn-step">step →</button>
-      </div>
-      <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
-    </div>
+  <!-- Row 1: parameters full-width -->
+  <div class="card">
+    <div class="card-title">parameters</div>
+    <div id="controls"></div>
+  </div>
+
+  <!-- Row 2: network diagram left | sequence + trail + narrative right -->
+  <div class="main-layout">
 
     <div class="card">
       <div class="card-title">network state at current step</div>
       <svg id="rnn-svg"></svg>
     </div>
 
-    <div class="card">
-      <div class="card-title">hidden state history</div>
-      <svg id="trail-svg"></svg>
-    </div>
+    <div class="right-col">
+      <div class="card">
+        <div class="card-title">input sequence  x₁ … x₇</div>
+        <svg id="seq-svg"></svg>
+        <div class="btn-row">
+          <button id="btn-rand">randomise</button>
+          <button id="btn-reset">reset  t=0</button>
+          <button class="primary" id="btn-step">step →</button>
+        </div>
+        <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
+      </div>
 
-    <div class="card">
-      <div class="card-title">what is happening</div>
-      <div class="narrative" id="narrative">
-        Press <b>step →</b> to start the forward pass.
+      <div class="card">
+        <div class="card-title">hidden state history</div>
+        <svg id="trail-svg"></svg>
+      </div>
+
+      <div class="card">
+        <div class="card-title">what is happening</div>
+        <div class="narrative" id="narrative">
+          Press step → to start the forward pass.
+        </div>
       </div>
     </div>
 
   </div>
 
-  <div class="controls-card" id="controls"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -622,7 +650,7 @@ function drawTrail() {
 function updateNarrative() {
   const el = document.getElementById('narrative');
   if (t === 0) {
-    el.innerHTML = 'Hidden state initialised to <span class="dim">h = [0, 0]</span>. Press <b>step →</b> to begin.';
+    el.innerHTML = 'Hidden state initialised to <span class="dim">h = [0, 0]</span>. Press step → to begin.';
     return;
   }
   const x      = sequence[t - 1];
@@ -638,7 +666,7 @@ function updateNarrative() {
            ` → tanh → <span class="${hj>0?'hi':'lo'}">${hj.toFixed(3)}</span>`;
   });
   el.innerHTML =
-    `<b>t=${t}</b>  input <span class="hi">x=${x.toFixed(2)}</span><br>` +
+    `t=${t}  input <span class="hi">x=${x.toFixed(2)}</span><br>` +
     parts.join('<br>') +
     (t === SEQ_LEN ? '<br><span class="dim">— sequence complete</span>' : '');
 }
