@@ -189,21 +189,19 @@
     <p>
       For maximum transparency, we simplify the volatility side one step further. Rather than
       working with a positive long-memory process, we take a fractional Gaussian noise sequence
-      \((G_n)\) with Hurst exponent \(H \in (\tfrac{3}{4}, 1)\) and let it play the role of
-      the hidden Gaussian scale driver directly. We restrict to \(H > \tfrac{3}{4}\) because this is the range
-      in which the squared process \(X_k^2\) itself exhibits genuine long memory, making the
-      dependence in squares not just nonzero but genuinely long-memory.
-      The observed series is then defined blockwise as
+      \((G_n)\) with Hurst exponent \(H \in (\tfrac{3}{4}, 1)\) and let it serve directly as the
+      hidden Gaussian scale driver. We restrict to \(H > \tfrac{3}{4}\) because only in this range
+      does the squared process \(X_n^2\) inherit genuine long memory rather than mere dependence.
+      The observed series is then defined by
     </p>
 
     \[
-      X_{2n-1} = G_n\,\varepsilon_{n,1}, \qquad X_{2n} = G_n\,\varepsilon_{n,2},
+      X_n = G_n\,\varepsilon_n,
     \]
 
     <p>
-      where \(\varepsilon_{n,1}, \varepsilon_{n,2} \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,1)\)
-      are fresh shocks, independent of \(G_n\) and of each other.
-      This is not the literal discretisation of the continuous-time model.
+      where \(\varepsilon_n \overset{\mathrm{iid}}{\sim} \mathcal{N}(0,1)\) are fresh shocks,
+      independent of \(G_n\). This is not the literal discretisation of the continuous-time model.
       It is a toy surrogate designed to preserve the key masking mechanism in the clearest
       possible form: a persistent scale process hiding behind rapidly changing signs.
     </p>
@@ -211,13 +209,13 @@
     <h2>4. The toy model — what autocorrelation sees and misses</h2>
 
     <p>
-      With \(G_n \sim \mathrm{fGn}(H)\) as the hidden driver, the raw observations \(X_k\)
+      With \(G_n \sim \mathrm{fGn}(H)\) as the hidden driver, the raw observations \(X_n\)
       inherit a changing sign from the Gaussian noises while their local scale is governed by \(G_n\).
-      At the level of ordinary autocovariance, for distinct times,
+      At the level of ordinary autocovariance, for distinct lags,
     </p>
 
     \[
-      \operatorname{Cov}(X_i, X_j) = 0 \qquad (i \neq j),
+      \operatorname{Cov}(X_n, X_{n+h}) = 0 \qquad (h \neq 0),
     \]
 
     <p>
@@ -228,31 +226,21 @@
     <p>But now square the process:</p>
 
     \[
-      X_{2n-1}^2 = G_n^2\,\varepsilon_{n,1}^2, \qquad
-      X_{2n}^2   = G_n^2\,\varepsilon_{n,2}^2.
+      X_n^2 = G_n^2\,\varepsilon_n^2.
     \]
 
-    <p>For different blocks \(n \neq m\),</p>
+    <p>For \(h \neq 0\),</p>
 
     \[
-      \operatorname{Cov}(X_{2n-1}^2,\,X_{2m-1}^2)
-      = \mathbb{E}[\varepsilon_{n,1}^2]\,\mathbb{E}[\varepsilon_{m,1}^2]\,
-        \operatorname{Cov}(G_n^2, G_m^2)
-      = \operatorname{Cov}(G_n^2, G_m^2).
+      \operatorname{Cov}(X_n^2,\,X_{n+h}^2)
+      = \mathbb{E}[\varepsilon_n^2]\,\mathbb{E}[\varepsilon_{n+h}^2]\,
+        \operatorname{Cov}(G_n^2, G_{n+h}^2)
+      = \operatorname{Cov}(G_n^2, G_{n+h}^2).
     \]
 
     <p>
       The hidden dependence has not disappeared. It has migrated from the signed process
-      into its magnitudes and squares. The block energy
-    </p>
-
-    \[
-      E_n = X_{2n-1}^2 + X_{2n}^2 = G_n^2\bigl(\varepsilon_{n,1}^2 + \varepsilon_{n,2}^2\bigr)
-    \]
-
-    <p>
-      satisfies \(\mathbb{E}[E_n \mid G_n] = 2G_n^2\), behaving like a noisy observation
-      of the hidden squared driver.
+      into its magnitudes and squares.
     </p>
 
     <!-- ── Simulation ─────────────────────────────────────────────────────── -->
@@ -271,16 +259,16 @@
           <div style="position:relative;height:100px;"><canvas id="cGn" role="img" aria-label="Hidden fGn driver time series">fGn driver</canvas></div>
         </div>
         <div class="sim-panel">
-          <div class="sim-panel-title">② X<sub>k</sub> — observed (G<sub>n</sub>·ε)</div>
-          <div style="position:relative;height:100px;"><canvas id="cXk" role="img" aria-label="Observed series Xk">Observed series</canvas></div>
+          <div class="sim-panel-title">② X<sub>n</sub> — observed (G<sub>n</sub>·ε<sub>n</sub>)</div>
+          <div style="position:relative;height:100px;"><canvas id="cXk" role="img" aria-label="Observed series Xn">Observed series</canvas></div>
         </div>
         <div class="sim-panel">
           <div class="sim-panel-title">③ ACF of X<sub>k</sub> — no linear memory</div>
           <div style="position:relative;height:120px;"><canvas id="cAcfX" role="img" aria-label="ACF of Xk">ACF Xk</canvas></div>
         </div>
         <div class="sim-panel">
-          <div class="sim-panel-title">④ ACF of X<sub>k</sub>² — hidden memory</div>
-          <div style="position:relative;height:120px;"><canvas id="cAcfX2" role="img" aria-label="ACF of squared Xk">ACF Xk squared</canvas></div>
+          <div class="sim-panel-title">④ ACF of X<sub>n</sub>² — hidden long memory</div>
+          <div style="position:relative;height:120px;"><canvas id="cAcfX2" role="img" aria-label="ACF of squared Xn">ACF Xk squared</canvas></div>
         </div>
         <div class="sim-panel">
           <div class="sim-panel-title">⑤ ACF of white noise — reference</div>
@@ -311,7 +299,7 @@
       When volatility is governed by a long-memory driver, the alternating signs of returns can
       mask the underlying persistence. Ordinary autocorrelation may then suggest a world of
       independent shocks, while persistence quietly survives in volatility, return magnitudes,
-      local energy, or squared returns.
+      or squared returns.
     </p>
 
     <div class="refs">
@@ -474,20 +462,16 @@
       if (token !== runToken) return;
 
       const G  = daviesHarte(N, H);
-      const X  = [];
-      for (let n=0; n<N; n++) {
-        X.push(G[n] * randn());
-        X.push(G[n] * randn());
-      }
+      const X  = Array.from({length: N}, (_, n) => G[n] * randn());
       const X2 = X.map(x => x*x);
-      const W  = Array.from({length: X.length}, randn);
+      const W  = Array.from({length: N}, randn);
 
       const lags   = Array.from({length:MAXLAG}, (_,i)=>i+1);
       const acfX   = acfFft(X,  MAXLAG);
       const acfX2  = acfFft(X2, MAXLAG);
       const acfW   = acfFft(W,  MAXLAG);
       const acfG   = acfFft(G,  MAXLAG);
-      const conf   = 1.96 / Math.sqrt(X.length);
+      const conf   = 1.96 / Math.sqrt(N);
 
       const MAX_DISPLAY = 500;
       const Gthin = thin(G, MAX_DISPLAY);
