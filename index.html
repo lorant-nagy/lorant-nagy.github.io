@@ -97,29 +97,25 @@
       <div class="section-header">
         <h2>Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
         <p>
-        Take two fair coins, and add a third character: an oracle that reports only one thing 
-        — whether the two coins landed on the same face or on different faces. 
-        At first sight, the three objects seem perfectly unrelated: whichever pair we pick, 
-        one does not reveal anything about the other. 
-        But this is deceptive: independence holds at the level of pairs, yet the moment any two are known, 
-        the third is fixed with certainty.
-        This somewhat paradoxical example is often cited to show that full independence 
-        in a probabilistic structure is a subtle property. 
-        </p>
-        <p>One may then naturally ask whether 
-        a similar hiding of dependence can emerge in more complex and evolving structures such as time series.
+          Take two fair coins, and add a third character: an oracle that reports only one thing —
+          whether the two coins landed on the same face or on different faces. At first sight,
+          the three objects seem perfectly innocent: whichever pair we pick, one does not reveal anything about the other.
+          But this is deceptive: independence holds at the level of pairs, yet the moment any two are known,
+          the third is fixed with certainty. This somewhat paradoxical example is often cited to show that
+          full independence in a probabilistic structure is a subtle property.
         </p>
         <p>
-         The answer is yes: 
-         in finance, one important example appears in stochastic-volatility models, 
-         beginning with Hull and White (1987) and continuing, in a long-memory direction, 
-         with the work of Comte and Renault (1998).
-        When volatility is governed by a long-memory driver, the alternating signs of returns 
-        can mask the underlying persistence. 
-        Ordinary autocorrelation may then suggest a world of independent shocks, 
-        while persistence quietly survives in return magnitudes, 
-        local energy, or squared values. In this sense, what looks like noise 
-        at the level of returns may still carry memory through volatility clustering.
+          One may then naturally ask whether a similar hiding of dependence can emerge in more complex
+          and evolving structures such as time series.
+        </p>
+        <p>
+          The answer is yes. In finance, one important example appears in stochastic-volatility models,
+          beginning with Hull and White (1987) and continuing, in a long-memory direction,
+          with the work of Comte and Renault (1998). When volatility is governed by a long-memory driver,
+          the alternating signs of returns can mask the underlying persistence. Ordinary autocorrelation may then
+          suggest a world of independent shocks, while persistence quietly survives in return magnitudes,
+          local energy, or squared values. In this sense, what looks like noise at the level of raw returns
+          may still conceal persistent dependence in volatility, return magnitudes, or squared returns.
         </p>
       </div>
       <a href="/read-on.html" class="read-on-link">read on →</a>
