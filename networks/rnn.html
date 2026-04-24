@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vanilla RNN</title>
+<title>Elman Network</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
 
@@ -18,122 +18,118 @@
     --accent:  #aa701e;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 1.5rem 4rem;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    padding: 1.1rem 1.4rem 0.9rem;
+    gap: 0.55rem;
+    overflow: hidden;
   }
 
-  .back-link { position:fixed; top:1.25rem; left:1.5rem; font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:0.05em; z-index:10; }
-  .back-link:hover { color:var(--text); }
+  .back-link {
+    position: fixed; top: 1rem; left: 1.25rem;
+    font-size: 11px; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; z-index: 10;
+  }
+  .back-link:hover { color: var(--text); }
 
   h1 {
-    font-family: 'Spectral', serif;
-    font-weight: 300;
-    font-size: 1.6rem;
-    color: #e8e4dc;
-    letter-spacing: 0.02em;
-    margin-bottom: 0.3rem;
-  }
-
-  .subtitle {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 1.45rem; color: #e8e4dc; letter-spacing: 0.02em;
+    padding-top: 0.1rem;
   }
 
   .equations {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 2rem;
-    line-height: 2;
-    font-style: italic;
+    font-size: 12px; color: var(--muted);
+    line-height: 1.85; font-style: italic;
   }
   .equations span { font-style: normal; }
 
-  .equation {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 2rem;
-    font-style: italic;
-  }
-  .equation span { color: var(--text); }
-
+  /* ── 2×2 main grid ── */
   .page {
-    width: 100%;
-    max-width: 960px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .main-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    align-items: start;
+    grid-template-columns: 1fr 230px;
+    grid-template-rows: 1fr auto;
+    gap: 0.7rem;
+    min-height: 0;
   }
-
-  .right-col { display: flex; flex-direction: column; gap: 1rem; }
 
   .card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
     border-radius: 6px;
-    padding: 1.25rem 1.5rem;
   }
 
   .card-title {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 1rem;
-    border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.4rem;
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.28rem; margin-bottom: 0.5rem; flex-shrink: 0;
   }
 
-  #seq-svg   { width: 100%; height: 90px;  display: block; }
-  #rnn-svg   { width: 100%; height: 340px; display: block; }
-  #trail-svg { width: 100%; height: 110px; display: block; }
-
-  .narrative {
-    font-size: 11.5px;
-    color: var(--text);
-    line-height: 1.7;
-    min-height: 2.8em;
+  /* top-left: network */
+  .network-card {
+    grid-column: 1; grid-row: 1;
+    padding: 0.8rem 1rem 0.65rem;
+    display: flex; flex-direction: column;
+    min-height: 0;
   }
+  #rnn-svg { width: 100%; flex: 1; display: block; min-height: 0; }
+
+  /* top-right: parameters */
+  .controls-card {
+    grid-column: 2; grid-row: 1;
+    padding: 0.75rem 0.85rem;
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* bottom-left: sequence + trail side by side */
+  .timelines {
+    grid-column: 1; grid-row: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+
+  .seq-card {
+    padding: 0.7rem 0.85rem;
+    display: flex; flex-direction: column;
+  }
+  .trail-card {
+    padding: 0.7rem 0.85rem;
+    display: flex; flex-direction: column;
+  }
+
+  #seq-svg   { width: 100%; height: 72px; display: block; flex-shrink: 0; }
+  #trail-svg { width: 100%; height: 72px; display: block; flex-shrink: 0; }
+
+  /* bottom-right: narrative */
+  .narrative-card {
+    grid-column: 2; grid-row: 2;
+    padding: 0.7rem 0.85rem;
+    overflow-y: auto;
+  }
+
+  .narrative { font-size: 10.5px; color: var(--text); line-height: 1.65; }
   .narrative .hi  { color: var(--pos); }
   .narrative .lo  { color: var(--neg); }
   .narrative .dim { color: var(--muted); }
 
   .btn-row {
-    display: flex;
-    gap: 0.6rem;
-    margin-top: 0.75rem;
+    display: flex; gap: 0.4rem;
+    margin-top: 0.45rem; flex-shrink: 0;
   }
 
   button {
-    background: none;
-    border: 0.5px solid var(--border);
-    border-radius: 3px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    padding: 6px 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
+    background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    padding: 4px 8px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
   }
   button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
   button.primary { border-color: var(--accent); color: var(--accent); }
@@ -141,76 +137,42 @@
   button:disabled { opacity: 0.3; cursor: default; }
 
   .step-badge {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: center;
-    letter-spacing: 0.06em;
-    margin-top: 0.5rem;
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.06em; margin-top: 0.3rem; flex-shrink: 0;
   }
-  .step-badge span {
-    color: var(--accent);
-    font-size: 1.3rem;
-    font-family: 'Spectral', serif;
-  }
+  .step-badge span { color: var(--accent); font-size: 1.1rem; font-family: 'Spectral', serif; }
 
-  .controls-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-    align-self: start;
-  }
-
+  /* controls */
   .ctrl-section-title {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.4rem;
-    margin-bottom: 0.5rem;
+    font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.2rem; margin-top: 0.5rem; margin-bottom: 0.22rem; flex-shrink: 0;
   }
+  .ctrl-section-title:first-child { margin-top: 0; }
 
-  .ctrl-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.45rem;
-  }
-
-  .ctrl-label {
-    font-size: 10px;
-    color: var(--muted);
-    min-width: 52px;
-    flex-shrink: 0;
-  }
+  .ctrl-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
+  .ctrl-label { font-size: 8.5px; color: var(--muted); min-width: 44px; flex-shrink: 0; }
 
   input[type=range] {
-    flex: 1;
-    appearance: none;
-    -webkit-appearance: none;
-    height: 2px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
+    flex: 1; -webkit-appearance: none; height: 2px;
+    background: rgba(255,255,255,0.1); border-radius: 2px;
+    outline: none; cursor: pointer; min-width: 0;
   }
   input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 11px; height: 11px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
+    -webkit-appearance: none; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
   }
+  .ctrl-val { font-size: 8.5px; color: var(--text); min-width: 28px; text-align: right; }
 
-  .ctrl-val {
-    font-size: 10px;
-    color: var(--text);
-    min-width: 34px;
-    text-align: right;
+  /* mobile */
+  @media (max-width: 600px) {
+    body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
+    .page { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; }
+    .network-card   { grid-column: 1; grid-row: 1; min-height: 240px; }
+    .controls-card  { grid-column: 1; grid-row: 2; }
+    .timelines      { grid-column: 1; grid-row: 3; }
+    .narrative-card { grid-column: 1; grid-row: 4; }
+    #rnn-svg { min-height: 200px; flex: none; }
   }
 </style>
 </head>
@@ -227,45 +189,37 @@
 
 <div class="page">
 
-  <!-- Row 1: parameters full-width -->
-  <div class="card">
-    <div class="card-title">parameters</div>
-    <div id="controls"></div>
+  <!-- top-left: network diagram -->
+  <div class="network-card card">
+    <div class="card-title">network state at step t</div>
+    <svg id="rnn-svg"></svg>
   </div>
 
-  <!-- Row 2: network diagram left | sequence + trail + narrative right -->
-  <div class="main-layout">
+  <!-- top-right: parameters -->
+  <div class="controls-card card" id="controls"></div>
 
-    <div class="card">
-      <div class="card-title">network state at current step</div>
-      <svg id="rnn-svg"></svg>
+  <!-- bottom-left: sequence + trail side by side -->
+  <div class="timelines">
+    <div class="seq-card card">
+      <div class="card-title">input sequence  x₁ … x₇</div>
+      <svg id="seq-svg"></svg>
+      <div class="btn-row">
+        <button id="btn-rand">rand</button>
+        <button id="btn-reset">reset</button>
+        <button class="primary" id="btn-step">step →</button>
+      </div>
+      <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
     </div>
-
-    <div class="right-col">
-      <div class="card">
-        <div class="card-title">input sequence  x₁ … x₇</div>
-        <svg id="seq-svg"></svg>
-        <div class="btn-row">
-          <button id="btn-rand">randomise</button>
-          <button id="btn-reset">reset  t=0</button>
-          <button class="primary" id="btn-step">step →</button>
-        </div>
-        <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">hidden state history</div>
-        <svg id="trail-svg"></svg>
-      </div>
-
-      <div class="card">
-        <div class="card-title">what is happening</div>
-        <div class="narrative" id="narrative">
-          Press step → to start the forward pass.
-        </div>
-      </div>
+    <div class="trail-card card">
+      <div class="card-title">hidden state history</div>
+      <svg id="trail-svg"></svg>
     </div>
+  </div>
 
+  <!-- bottom-right: narrative -->
+  <div class="narrative-card card">
+    <div class="card-title">what is happening</div>
+    <div class="narrative" id="narrative">Press step → to start.</div>
   </div>
 
 </div>
