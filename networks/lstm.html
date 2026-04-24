@@ -62,7 +62,7 @@
   .page {
     display: grid;
     grid-template-columns: 1fr 200px;
-    grid-template-rows: 1fr auto auto auto;
+    grid-template-rows: 1fr auto;
     gap: 0.7rem;
     min-height: 0;
   }
@@ -81,26 +81,22 @@
     overflow-y: auto;
   }
 
-  /* rows 2-4: span full width (both columns) */
-  .seq-panel {
-    grid-column: 1 / -1; grid-row: 2;
-    display: flex; flex-direction: column; min-height: 0;
-  }
-  #seq-svg { width: 100%; height: 60px; display: block; flex-shrink: 0; }
-
-  .trail-panel {
-    grid-column: 1 / -1; grid-row: 3;
-    display: flex; flex-direction: column; min-height: 0;
-  }
-  #trail-svg { width: 100%; height: 60px; display: block; flex-shrink: 0; }
-
+  /* rows 2-4: single full-width 4-column row */
   .bottom-row {
-    grid-column: 1 / -1; grid-row: 4;
+    grid-column: 1 / -1; grid-row: 2 / 5;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 0.7rem;
     min-height: 0;
   }
+
+  .seq-panel   { display: flex; flex-direction: column; min-height: 0; }
+  .trail-panel { display: flex; flex-direction: column; min-height: 0; }
+  .gate-panel  { display: flex; flex-direction: column; min-height: 0; }
+
+  #seq-svg   { width: 100%; flex: 1; display: block; min-height: 0; }
+  #trail-svg { width: 100%; flex: 1; display: block; min-height: 0; }
+  #gate-svg  { width: 100%; flex: 1; display: block; min-height: 0; }
 
   .gate-panel { display: flex; flex-direction: column; min-height: 0; }
   #gate-svg { width: 100%; height: 60px; display: block; flex-shrink: 0; }
@@ -206,23 +202,21 @@
 
   <div class="params-panel" id="controls"></div>
 
-  <div class="seq-panel">
-    <div class="card-title">input sequence  x₁ … x₇</div>
-    <svg id="seq-svg"></svg>
-    <div class="btn-row">
-      <button id="btn-rand">rand</button>
-      <button id="btn-reset">reset</button>
-      <button class="primary" id="btn-step">step →</button>
-      <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
-    </div>
-  </div>
-
-  <div class="trail-panel">
-    <div class="card-title">state history</div>
-    <svg id="trail-svg"></svg>
-  </div>
-
   <div class="bottom-row">
+    <div class="seq-panel">
+      <div class="card-title">input sequence  x₁ … x₇</div>
+      <svg id="seq-svg"></svg>
+      <div class="btn-row">
+        <button id="btn-rand">rand</button>
+        <button id="btn-reset">reset</button>
+        <button class="primary" id="btn-step">step →</button>
+        <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
+      </div>
+    </div>
+    <div class="trail-panel">
+      <div class="card-title">state history</div>
+      <svg id="trail-svg"></svg>
+    </div>
     <div class="gate-panel">
       <div class="card-title">gate activations &amp; state update</div>
       <svg id="gate-svg"></svg>
