@@ -14,273 +14,156 @@
     --text:    #c8cdd8;
     --muted:   #565c6e;
     --neg:     #378ADD;
-    --zero:    #1e2230;
     --pos:     #e8824a;
     --accent:  #aa701e;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
     font-size: 13px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 1.5rem;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    padding: 1.1rem 1.4rem 0.9rem;
+    gap: 0.55rem;
+    overflow: hidden;
   }
 
-  .back-link { position:fixed; top:1.25rem; left:1.5rem; font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:0.05em; z-index:10; }
-  .back-link:hover { color:var(--text); }
+  .back-link {
+    position: fixed; top: 1rem; left: 1.25rem;
+    font-size: 11px; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; z-index: 10;
+  }
+  .back-link:hover { color: var(--text); }
 
   h1 {
-    font-family: 'Spectral', serif;
-    font-weight: 300;
-    font-size: 1.6rem;
-    color: #e8e4dc;
-    letter-spacing: 0.02em;
-    margin-bottom: 0.3rem;
-  }
-
-  .subtitle {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 2.5rem;
-  }
-
-  .page {
-    width: 100%;
-    max-width: 1000px;
-    display: grid;
-    grid-template-columns: 3fr 1fr;
-    grid-template-rows: 3fr 1fr;
-    gap: 1rem;
-    /* min height so rows have substance */
-    min-height: 600px;
-  }
-
-  .canvas-card {
-    grid-column: 1;
-    grid-row: 1;
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem 1.5rem;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .controls-card {
-    grid-column: 2;
-    grid-row: 1 / 3;
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    overflow-y: auto;
-  }
-
-  .narrative-card {
-    grid-column: 1;
-    grid-row: 2;
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem 1.5rem;
-    overflow-y: auto;
-  }
-
-  .card-title {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.4rem;
-    margin-bottom: 0.75rem;
-    flex-shrink: 0;
-  }
-
-  #nn-svg {
-    width: 100%;
-    flex: 1;
-    display: block;
-    min-height: 260px;
-  }
-
-  .controls-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    overflow-y: auto;
-    max-height: 400px;
-  }
-
-  .ctrl-section-title {
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.4rem;
-    margin-bottom: 0.4rem;
-  }
-
-  .ctrl-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .ctrl-label {
-    font-size: 11px;
-    color: var(--muted);
-    min-width: 56px;
-    flex-shrink: 0;
-  }
-
-  input[type=range] {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 2px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-  }
-
-  .ctrl-val {
-    font-size: 11px;
-    color: var(--text);
-    min-width: 36px;
-    text-align: right;
-  }
-
-  .legend {
-    display: flex;
-    gap: 1.2rem;
-    justify-content: center;
-    margin-top: 1rem;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .legend-swatch {
-    width: 24px;
-    height: 3px;
-    border-radius: 2px;
-  }
-
-  .output-display {
-    text-align: center;
-    margin-top: 0.8rem;
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .output-val {
-    font-size: 1.4rem;
-    font-family: 'Spectral', serif;
-    font-weight: 300;
-    color: var(--pos);
-    display: block;
-    margin-top: 0.2rem;
-  }
-
-  .act-fn-row {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .act-btn {
-    flex: 1;
-    background: none;
-    border: 0.5px solid var(--border);
-    border-radius: 3px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    padding: 4px 0;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
-  }
-
-  .act-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: rgba(170,112,30,0.08);
-  }
-
-  .act-btn:hover:not(.active) {
-    border-color: rgba(255,255,255,0.2);
-    color: var(--text);
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 1.45rem; color: #e8e4dc; letter-spacing: 0.02em;
+    padding-top: 0.1rem;
   }
 
   .equations {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-    line-height: 2;
-    font-style: italic;
+    font-size: 12px; color: var(--muted);
+    line-height: 1.85; font-style: italic;
   }
   .equations span { font-style: normal; }
 
+  /* ── Main: 2×2 grid ── */
+  .page {
+    display: grid;
+    grid-template-columns: 1fr 230px;
+    grid-template-rows: 1fr auto;
+    gap: 0.7rem;
+    min-height: 0;
+  }
+
+  .canvas-card {
+    grid-column: 1; grid-row: 1;
+    padding: 0.8rem 1rem 0.65rem;
+    display: flex; flex-direction: column;
+    min-height: 0;
+  }
+
   .controls-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+    grid-column: 2; grid-row: 1;   /* only beside network, stops at its bottom */
+    padding: 0.75rem 0.85rem;
+    display: flex; flex-direction: column;
     overflow-y: auto;
   }
 
   .narrative-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 6px;
-    padding: 1.25rem 1.5rem;
+    grid-column: 1; grid-row: 2;   /* only under network, controls don't overlap */
+    padding: 0.7rem 1rem;
   }
 
-  .narrative {
-    font-size: 11.5px;
-    color: var(--text);
-    line-height: 1.8;
+  /* SVG: viewBox 560×300 — browser preserves aspect ratio automatically.
+     flex:1 means it takes all leftover height; it will never distort. */
+  #nn-svg {
+    width: 100%; flex: 1; display: block; min-height: 0;
   }
 
+  .legend {
+    display: flex; gap: 0.9rem; justify-content: center;
+    margin-top: 0.3rem; font-size: 9.5px; color: var(--muted);
+    letter-spacing: 0.06em; flex-shrink: 0;
+  }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-swatch { width: 18px; height: 2px; border-radius: 1px; }
+
+  .output-display {
+    text-align: center; margin-top: 0.2rem;
+    font-size: 10px; color: var(--muted); flex-shrink: 0;
+  }
+  .output-val {
+    font-size: 1.1rem; font-family: 'Spectral', serif;
+    font-weight: 300; color: var(--pos); display: block; margin-top: 0.05rem;
+  }
+
+  .narrative-card { padding: 0.7rem 1rem; }
+
+  .card-title {
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.25rem; margin-bottom: 0.45rem;
+  }
+
+  .narrative { font-size: 10.5px; color: var(--text); line-height: 1.65; }
   .narrative .hi  { color: var(--pos); }
   .narrative .lo  { color: var(--neg); }
   .narrative .dim { color: var(--muted); }
+
+  /* ── Controls ── */
+  .controls-card {
+    padding: 0.75rem 0.85rem;
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .ctrl-section-title {
+    font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.2rem; margin-top: 0.5rem; margin-bottom: 0.22rem;
+    flex-shrink: 0;
+  }
+  .ctrl-section-title:first-child { margin-top: 0; }
+
+  .ctrl-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
+  .ctrl-label { font-size: 8.5px; color: var(--muted); min-width: 44px; flex-shrink: 0; }
+
+  input[type=range] {
+    flex: 1; -webkit-appearance: none; height: 2px;
+    background: rgba(255,255,255,0.1); border-radius: 2px;
+    outline: none; cursor: pointer; min-width: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .ctrl-val { font-size: 8.5px; color: var(--text); min-width: 28px; text-align: right; }
+
+  .act-fn-row { display: flex; gap: 0.3rem; margin-bottom: 0.2rem; }
+  .act-btn {
+    flex: 1; background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+    padding: 3px 0; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
+  }
+  .act-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(170,112,30,0.08); }
+  .act-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+  /* ── Mobile ── */
+  @media (max-width: 600px) {
+    body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
+    .page { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
+    .canvas-card  { grid-column: 1; grid-row: 1; }
+    .narrative-card { grid-column: 1; grid-row: 2; }
+    .controls-card { grid-column: 1; grid-row: 3; max-height: 60vh; }
+    #nn-svg { min-height: 200px; flex: none; aspect-ratio: 560/300; }
+  }
 </style>
 </head>
 <body>
@@ -288,6 +171,7 @@
 <a class="back-link" href="/networks/">← networks</a>
 
 <h1>feedforward network</h1>
+
 <div class="equations">
   input: <span style="color:#e8824a">x</span> ∈ ℝ² &nbsp;&nbsp;
   hidden: <span style="color:#e8824a">a</span> = σ(W · <span style="color:#e8824a">x</span> + b),  W ∈ ℝ<sup>3×2</sup>,  <span style="color:#e8824a">a</span> ∈ ℝ³ &nbsp;&nbsp;
@@ -296,341 +180,196 @@
 
 <div class="page">
 
-  <!-- 3×3 top-left: network diagram -->
-  <div class="canvas-card">
-    <div class="card-title">network</div>
-    <svg id="nn-svg"></svg>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--neg)"></div>negative</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:rgba(255,255,255,0.15)"></div>zero</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:var(--pos)"></div>positive</div>
+    <div class="canvas-card card">
+      <div class="card-title">network</div>
+      <svg id="nn-svg"></svg>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--neg)"></div>negative</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:rgba(255,255,255,0.15)"></div>zero</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--pos)"></div>positive</div>
+      </div>
+      <div class="output-display">output <span class="output-val" id="output-val">—</span></div>
     </div>
-    <div class="output-display">
-      output
-      <span class="output-val" id="output-val">—</span>
+
+    <div class="controls-card card" id="controls"></div>
+
+    <div class="narrative-card card">
+      <div class="card-title">what is happening</div>
+      <div class="narrative" id="narrative"></div>
     </div>
-  </div>
-
-  <!-- 4×1 right column: parameters -->
-  <div class="controls-card" id="controls"></div>
-
-  <!-- 1×3 bottom-left: what is happening -->
-  <div class="narrative-card">
-    <div class="card-title">what is happening</div>
-    <div class="narrative" id="narrative"></div>
-  </div>
 
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
-// ── Network topology ────────────────────────────────────────────────────────
 const LAYERS = [2, 3, 1];
-
-// ── State ───────────────────────────────────────────────────────────────────
 let actFn = 'sigmoid';
-
-// Inputs
 const inputs = [0.5, 0.5];
-
-// Weights: weights[l][j][i] = weight from neuron i in layer l to neuron j in l+1
 const weights = [
-  // layer 0 → 1  (2 inputs → 3 hidden)
-  [
-    [ 0.6, -0.4],
-    [ 0.8,  0.5],
-    [-0.3,  0.9],
-  ],
-  // layer 1 → 2  (3 hidden → 1 output)
-  [
-    [ 0.7, -0.5, 0.6],
-  ],
+  [[ 0.6, -0.4], [ 0.8,  0.5], [-0.3,  0.9]],
+  [[ 0.7, -0.5, 0.6]],
 ];
-
-// Biases: biases[l][j]
-const biases = [
-  [0.1, -0.2, 0.1],
-  [0.0],
-];
-
-// ── Activation functions ─────────────────────────────────────────────────────
+const biases = [[0.1, -0.2, 0.1], [0.0]];
 const activations = {
   sigmoid: x => 1 / (1 + Math.exp(-x)),
   tanh:    x => Math.tanh(x),
   relu:    x => Math.max(0, x),
 };
 
-// ── Forward pass ─────────────────────────────────────────────────────────────
 function forwardPass() {
   const acts = [inputs.slice()];
   for (let l = 0; l < weights.length; l++) {
     const layer = [];
     for (let j = 0; j < weights[l].length; j++) {
       let z = biases[l][j];
-      for (let i = 0; i < acts[l].length; i++) {
-        z += weights[l][j][i] * acts[l][i];
-      }
-      // last layer: linear; hidden: chosen activation
-      const a = (l === weights.length - 1) ? z : activations[actFn](z);
-      layer.push(a);
+      for (let i = 0; i < acts[l].length; i++) z += weights[l][j][i] * acts[l][i];
+      layer.push(l === weights.length - 1 ? z : activations[actFn](z));
     }
     acts.push(layer);
   }
   return acts;
 }
 
-// ── Color scale ──────────────────────────────────────────────────────────────
 function neuronColor(val, isOutput) {
   let t;
-  if (isOutput) {
-    // Output is always linear (unbounded); map symmetrically around 0
-    t = (Math.max(-2, Math.min(2, val)) + 2) / 4;
-  } else if (actFn === 'tanh') {
-    // tanh ∈ [-1, 1]
-    t = (val + 1) / 2;
-  } else if (actFn === 'relu') {
-    // relu ∈ [0, ∞), clamp at 2
-    t = Math.min(val / 2, 1);
-  } else {
-    // sigmoid ∈ [0, 1]
-    t = val;
-  }
-  t = Math.max(0, Math.min(1, t));
-  return d3.interpolateRgb('#378ADD', '#e8824a')(t);
+  if (isOutput)              t = (Math.max(-2, Math.min(2, val)) + 2) / 4;
+  else if (actFn === 'tanh') t = (val + 1) / 2;
+  else if (actFn === 'relu') t = Math.min(val / 2, 1);
+  else                       t = val;
+  return d3.interpolateRgb('#378ADD', '#e8824a')(Math.max(0, Math.min(1, t)));
 }
-
 function weightColor(w) {
-  const t = (Math.max(-2, Math.min(2, w)) + 2) / 4;
-  return d3.interpolateRgb('#378ADD', '#e8824a')(t);
+  return d3.interpolateRgb('#378ADD', '#e8824a')((Math.max(-2, Math.min(2, w)) + 2) / 4);
 }
+function weightWidth(w) { return 0.5 + Math.abs(w) * 2.5; }
 
-function weightWidth(w) {
-  return 0.5 + Math.abs(w) * 2.5;
-}
-
-// ── Layout ───────────────────────────────────────────────────────────────────
 const svg = d3.select('#nn-svg');
 const W = 560, H = 300;
-svg.attr('viewBox', `0 0 ${W} ${H}`);
-
+svg.attr('viewBox', `0 0 ${W} ${H}`).attr('preserveAspectRatio', 'xMidYMid meet');
 const layerX = [80, W / 2, W - 80];
 const R = 22;
 
-function nodeY(layerIdx, nodeIdx) {
-  const n = LAYERS[layerIdx];
-  const spacing = Math.min(90, (H - 60) / (n - 1 + 0.001));
-  const total = spacing * (n - 1);
-  const start = (H - total) / 2;
-  return start + nodeIdx * spacing;
+function nodeY(li, ni) {
+  const n = LAYERS[li];
+  const sp = Math.min(90, (H - 60) / (n - 1 + 0.001));
+  return (H - sp * (n - 1)) / 2 + ni * sp;
 }
 
-// Groups
-const edgeGroup = svg.append('g').attr('class', 'edges');
-const nodeGroup = svg.append('g').attr('class', 'nodes');
+const edgeGroup = svg.append('g');
+const nodeGroup = svg.append('g');
 
-// ── Narrative ─────────────────────────────────────────────────────────────────
 function updateNarrative() {
   const acts = forwardPass();
   const el = document.getElementById('narrative');
-
-  // Hidden layer: show weighted sum + activation for each neuron
   const hiddenLines = weights[0].map((toNeuron, j) => {
     const z = biases[0][j] + toNeuron.reduce((s, w, i) => s + w * inputs[i], 0);
     const a = activations[actFn](z);
     const terms = toNeuron.map((w, i) =>
-      `<span class="${w >= 0 ? 'hi' : 'lo'}">${w >= 0 ? '+' : ''}${w.toFixed(2)}·x${i+1}</span>`
-    ).join(' ');
-    const bTerm = `<span class="${biases[0][j] >= 0 ? 'hi' : 'lo'}">${biases[0][j] >= 0 ? '+' : ''}${biases[0][j].toFixed(2)}</span>`;
-    return `h${j+1}: ${terms} ${bTerm} = <span class="dim">${z.toFixed(3)}</span>`
-         + ` → ${actFn} → <span class="${a >= 0 ? 'hi' : 'lo'}">${a.toFixed(3)}</span>`;
+      `<span class="${w>=0?'hi':'lo'}">${w>=0?'+':''}${w.toFixed(2)}·x${i+1}</span>`).join(' ');
+    const b = `<span class="${biases[0][j]>=0?'hi':'lo'}">${biases[0][j]>=0?'+':''}${biases[0][j].toFixed(2)}</span>`;
+    return `h${j+1}: ${terms} ${b} = <span class="dim">${z.toFixed(3)}</span> → ${actFn} → <span class="${a>=0?'hi':'lo'}">${a.toFixed(3)}</span>`;
   });
-
-  // Output layer
-  const hiddenActs = acts[1];
-  const outWeights = weights[1][0];
-  const outZ = biases[1][0] + outWeights.reduce((s, w, i) => s + w * hiddenActs[i], 0);
-  const outTerms = outWeights.map((w, i) =>
-    `<span class="${w >= 0 ? 'hi' : 'lo'}">${w >= 0 ? '+' : ''}${w.toFixed(2)}·h${i+1}</span>`
-  ).join(' ');
-  const outBias = `<span class="${biases[1][0] >= 0 ? 'hi' : 'lo'}">${biases[1][0] >= 0 ? '+' : ''}${biases[1][0].toFixed(2)}</span>`;
-  const outLine = `out: ${outTerms} ${outBias} = <span class="hi">${outZ.toFixed(4)}</span> <span class="dim">(linear — no activation)</span>`;
-
+  const ha = acts[1], ow = weights[1][0];
+  const outZ = biases[1][0] + ow.reduce((s,w,i) => s + w*ha[i], 0);
+  const outTerms = ow.map((w,i) => `<span class="${w>=0?'hi':'lo'}">${w>=0?'+':''}${w.toFixed(2)}·h${i+1}</span>`).join(' ');
+  const ob = `<span class="${biases[1][0]>=0?'hi':'lo'}">${biases[1][0]>=0?'+':''}${biases[1][0].toFixed(2)}</span>`;
   el.innerHTML =
-    `inputs:  x1 = <span class="hi">${inputs[0].toFixed(2)}</span>,  x2 = <span class="hi">${inputs[1].toFixed(2)}</span><br><br>`
-    + `hidden layer <span class="dim">(activation: ${actFn})</span><br>`
-    + hiddenLines.join('<br>') + '<br><br>'
-    + `output layer <span class="dim">(linear)</span><br>`
-    + outLine;
+    `inputs:  x1 = <span class="hi">${inputs[0].toFixed(2)}</span>,  x2 = <span class="hi">${inputs[1].toFixed(2)}</span><br><br>` +
+    `hidden <span class="dim">(${actFn})</span><br>${hiddenLines.join('<br>')}<br><br>` +
+    `output<br>out: ${outTerms} ${ob} = <span class="hi">${outZ.toFixed(4)}</span>`;
 }
 
-// ── Draw / update ─────────────────────────────────────────────────────────────
 function draw() {
   const acts = forwardPass();
-
-  // ── Edges ────────────────────────────────────────────────────────────────
   const edgeData = [];
-  for (let l = 0; l < weights.length; l++) {
-    for (let j = 0; j < weights[l].length; j++) {
-      for (let i = 0; i < weights[l][j].length; i++) {
-        edgeData.push({
-          x1: layerX[l],   y1: nodeY(l,   i),
-          x2: layerX[l+1], y2: nodeY(l+1, j),
-          w:  weights[l][j][i],
-          key: `${l}-${j}-${i}`,
-        });
-      }
-    }
-  }
+  for (let l = 0; l < weights.length; l++)
+    for (let j = 0; j < weights[l].length; j++)
+      for (let i = 0; i < weights[l][j].length; i++)
+        edgeData.push({ x1:layerX[l], y1:nodeY(l,i), x2:layerX[l+1], y2:nodeY(l+1,j), w:weights[l][j][i], key:`${l}-${j}-${i}` });
 
-  const edges = edgeGroup.selectAll('line').data(edgeData, d => d.key);
-  edges.enter().append('line')
-    .attr('stroke-linecap', 'round')
-    .attr('opacity', 0.7)
-  .merge(edges)
-    .attr('x1', d => d.x1)
-    .attr('y1', d => d.y1)
-    .attr('x2', d => d.x2)
-    .attr('y2', d => d.y2)
-    .attr('stroke', d => weightColor(d.w))
-    .attr('stroke-width', d => weightWidth(d.w));
+  const lines = edgeGroup.selectAll('line').data(edgeData, d => d.key);
+  lines.enter().append('line').attr('stroke-linecap','round').attr('opacity',0.7)
+    .merge(lines)
+    .attr('x1',d=>d.x1).attr('y1',d=>d.y1).attr('x2',d=>d.x2).attr('y2',d=>d.y2)
+    .attr('stroke',d=>weightColor(d.w)).attr('stroke-width',d=>weightWidth(d.w));
 
-  // ── Nodes ─────────────────────────────────────────────────────────────────
   const nodeData = [];
-  for (let l = 0; l < LAYERS.length; l++) {
-    for (let i = 0; i < LAYERS[l]; i++) {
-      nodeData.push({
-        l, i,
-        x: layerX[l],
-        y: nodeY(l, i),
-        a: acts[l][i],
-        isOutput: l === LAYERS.length - 1,
-        key: `${l}-${i}`,
-      });
-    }
-  }
+  for (let l = 0; l < LAYERS.length; l++)
+    for (let i = 0; i < LAYERS[l]; i++)
+      nodeData.push({ l, i, x:layerX[l], y:nodeY(l,i), a:acts[l][i], isOutput:l===LAYERS.length-1, key:`${l}-${i}` });
 
   const nodes = nodeGroup.selectAll('g.node').data(nodeData, d => d.key);
-
-  const entered = nodes.enter().append('g').attr('class', 'node');
-  entered.append('circle')
-    .attr('r', R)
-    .attr('stroke-width', 1.5);
-  entered.append('text')
-    .attr('text-anchor', 'middle')
-    .attr('dominant-baseline', 'middle')
-    .attr('font-family', 'JetBrains Mono, monospace')
-    .attr('font-size', 10)
-    .attr('fill', 'rgba(255,255,255,0.75)');
+  const entered = nodes.enter().append('g').attr('class','node');
+  entered.append('circle').attr('r',R).attr('stroke-width',1.5);
+  entered.append('text').attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',10).attr('fill','rgba(255,255,255,0.75)');
 
   const merged = entered.merge(nodes);
   merged.attr('transform', d => `translate(${d.x},${d.y})`);
   merged.select('circle')
-    .attr('fill',   d => neuronColor(d.a, d.isOutput))
+    .attr('fill', d => neuronColor(d.a, d.isOutput))
     .attr('stroke', d => d3.color(neuronColor(d.a, d.isOutput)).brighter(0.5));
-  merged.select('text')
-    .text(d => d.a.toFixed(2));
+  merged.select('text').text(d => d.a.toFixed(2));
 
-  // Layer labels
-  const labelData = [
-    { x: layerX[0], label: 'input' },
-    { x: layerX[1], label: 'hidden' },
-    { x: layerX[2], label: 'output' },
-  ];
-  const labels = svg.selectAll('text.layer-label').data(labelData);
-  labels.enter().append('text').attr('class', 'layer-label')
-    .attr('text-anchor', 'middle')
-    .attr('font-family', 'JetBrains Mono, monospace')
-    .attr('font-size', 10)
-    .attr('fill', '#565c6e')
-    .attr('letter-spacing', '0.08em')
-  .merge(labels)
-    .attr('x', d => d.x)
-    .attr('y', 16)
-    .text(d => d.label);
+  const lbls = svg.selectAll('text.layer-label').data([
+    {x:layerX[0],label:'input'},{x:layerX[1],label:'hidden'},{x:layerX[2],label:'output'}
+  ]);
+  lbls.enter().append('text').attr('class','layer-label')
+    .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
+    .attr('font-size',10).attr('fill','#565c6e').attr('letter-spacing','0.08em')
+    .merge(lbls).attr('x',d=>d.x).attr('y',16).text(d=>d.label);
 
-  // Output display
-  const out = acts[acts.length - 1][0];
-  d3.select('#output-val').text(out.toFixed(4));
-
+  d3.select('#output-val').text(acts[acts.length-1][0].toFixed(4));
   updateNarrative();
 }
 
-// ── Build controls ────────────────────────────────────────────────────────────
 function buildControls() {
   const ctrl = d3.select('#controls');
   ctrl.selectAll('*').remove();
 
-  // Activation function selector
-  const actSection = ctrl.append('div');
-  actSection.append('div').attr('class', 'ctrl-section-title').text('activation');
-  const btnRow = actSection.append('div').attr('class', 'act-fn-row');
-  ['sigmoid', 'tanh', 'relu'].forEach(fn => {
+  const actSec = ctrl.append('div');
+  actSec.append('div').attr('class','ctrl-section-title').text('activation');
+  const btnRow = actSec.append('div').attr('class','act-fn-row');
+  ['sigmoid','tanh','relu'].forEach(fn => {
     btnRow.append('button')
-      .attr('class', `act-btn${actFn === fn ? ' active' : ''}`)
+      .attr('class',`act-btn${actFn===fn?' active':''}`)
       .text(fn)
-      .on('click', () => {
-        actFn = fn;
-        buildControls();
-        draw();
-      });
+      .on('click',()=>{ actFn=fn; buildControls(); draw(); });
   });
 
-  // Input sliders
-  const inputSection = ctrl.append('div');
-  inputSection.append('div').attr('class', 'ctrl-section-title').text('inputs');
-  inputs.forEach((v, i) => {
-    const row = inputSection.append('div').attr('class', 'ctrl-row');
-    row.append('span').attr('class', 'ctrl-label').text(`x${i+1}`);
-    const slider = row.append('input')
-      .attr('type', 'range').attr('min', -2).attr('max', 2).attr('step', 0.01)
-      .attr('value', v);
-    const valSpan = row.append('span').attr('class', 'ctrl-val').text(v.toFixed(2));
-    slider.on('input', function() {
-      inputs[i] = +this.value;
-      valSpan.text((+this.value).toFixed(2));
-      draw();
-    });
+  const inSec = ctrl.append('div');
+  inSec.append('div').attr('class','ctrl-section-title').text('inputs');
+  inputs.forEach((v,i) => {
+    const row = inSec.append('div').attr('class','ctrl-row');
+    row.append('span').attr('class','ctrl-label').text(`x${i+1}`);
+    const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',v);
+    const vl = row.append('span').attr('class','ctrl-val').text(v.toFixed(2));
+    sl.on('input',function(){ inputs[i]=+this.value; vl.text((+this.value).toFixed(2)); draw(); });
   });
 
-  // Weight sliders per layer
-  weights.forEach((layer, l) => {
+  weights.forEach((layer,l) => {
     const sec = ctrl.append('div');
-    sec.append('div').attr('class', 'ctrl-section-title')
-       .text(`weights  L${l}→L${l+1}`);
-    layer.forEach((toNeuron, j) => {
-      toNeuron.forEach((w, i) => {
-        const row = sec.append('div').attr('class', 'ctrl-row');
-        row.append('span').attr('class', 'ctrl-label')
-           .text(`w${i+1}→${j+1}`);
-        const slider = row.append('input')
-          .attr('type', 'range').attr('min', -2).attr('max', 2).attr('step', 0.01)
-          .attr('value', w);
-        const valSpan = row.append('span').attr('class', 'ctrl-val').text(w.toFixed(2));
-        slider.on('input', function() {
-          weights[l][j][i] = +this.value;
-          valSpan.text((+this.value).toFixed(2));
-          draw();
-        });
+    sec.append('div').attr('class','ctrl-section-title').text(`weights  L${l}→L${l+1}`);
+    layer.forEach((toNeuron,j) => {
+      toNeuron.forEach((w,i) => {
+        const row = sec.append('div').attr('class','ctrl-row');
+        row.append('span').attr('class','ctrl-label').text(`w${i+1}→${j+1}`);
+        const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',w);
+        const vl = row.append('span').attr('class','ctrl-val').text(w.toFixed(2));
+        sl.on('input',function(){ weights[l][j][i]=+this.value; vl.text((+this.value).toFixed(2)); draw(); });
       });
     });
   });
 
-  // Bias sliders
-  const biasSection = ctrl.append('div');
-  biasSection.append('div').attr('class', 'ctrl-section-title').text('biases');
-  biases.forEach((layer, l) => {
-    layer.forEach((b, j) => {
-      const row = biasSection.append('div').attr('class', 'ctrl-row');
-      row.append('span').attr('class', 'ctrl-label').text(`b L${l+1}[${j+1}]`);
-      const slider = row.append('input')
-        .attr('type', 'range').attr('min', -2).attr('max', 2).attr('step', 0.01)
-        .attr('value', b);
-      const valSpan = row.append('span').attr('class', 'ctrl-val').text(b.toFixed(2));
-      slider.on('input', function() {
-        biases[l][j] = +this.value;
-        valSpan.text((+this.value).toFixed(2));
-        draw();
-      });
+  const bSec = ctrl.append('div');
+  bSec.append('div').attr('class','ctrl-section-title').text('biases');
+  biases.forEach((layer,l) => {
+    layer.forEach((b,j) => {
+      const row = bSec.append('div').attr('class','ctrl-row');
+      row.append('span').attr('class','ctrl-label').text(`b L${l+1}[${j+1}]`);
+      const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',b);
+      const vl = row.append('span').attr('class','ctrl-val').text(b.toFixed(2));
+      sl.on('input',function(){ biases[l][j]=+this.value; vl.text((+this.value).toFixed(2)); draw(); });
     });
   });
 }
