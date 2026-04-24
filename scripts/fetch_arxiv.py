@@ -70,8 +70,24 @@ def fetch_arxiv(query: str, max_results: int = 200) -> str:
         "sortBy":       "submittedDate",
         "sortOrder":    "descending",
     })
-    with urllib.request.urlopen(f"{base}?{params}", timeout=30) as resp:
-        return resp.read().decode("utf-8")
+    url = f"{base}?{params}"
+    # Retry with exponential backoff on 429 (rate limit) or timeout
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as resp:
+                return resp.read().decode("utf-8")
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                wait = 30 * (2 ** attempt)   # 30s, 60s, 120s, 240s, 480s
+                print(f"  arXiv 429 rate limit, waiting {wait}s (attempt {attempt+1}/5)...")
+                time.sleep(wait)
+            else:
+                raise
+        except (TimeoutError, OSError) as e:
+            wait = 20 * (2 ** attempt)   # 20s, 40s, 80s, 160s, 320s
+            print(f"  arXiv timeout/connection error: {e}, waiting {wait}s (attempt {attempt+1}/5)...")
+            time.sleep(wait)
+    raise RuntimeError("arXiv API failed after 5 retries")
 
 
 def parse_entries(xml_text: str) -> list[dict]:
@@ -113,7 +129,7 @@ def fetch_day(date: datetime.date) -> dict | None:
     print(f"  Fetching {date}  (GMT window: {start_gmt} – {end_gmt})")
 
     qfin_xml     = fetch_arxiv(build_query(QFIN_CATS, start_gmt, end_gmt))
-    time.sleep(3)
+    time.sleep(10)   # arXiv recommends 3s minimum; using 10s to avoid rate limits
     qbio_xml     = fetch_arxiv(build_query(QBIO_CATS, start_gmt, end_gmt))
     qfin_entries = parse_entries(qfin_xml)
     qbio_entries = parse_entries(qbio_xml)
@@ -167,8 +183,8 @@ def run_daily():
 def run_backfill(days: int = 60):
     print(f"=== Backfill: last {days} days ===")
     today = datetime.date.today()
-    for i in range(days, 0, -1):
-        target = today - datetime.timedelta(days=i)
+    for i in range(days, 0, -1):  # range stops at 1, so today (i=0) is never fetched
+        target = today - datetime.timedelta(days=i)  # minimum is yesterday (i=1)
         if target.weekday() >= 5:
             print(f"  Skipping {target} (weekend)")
             continue
