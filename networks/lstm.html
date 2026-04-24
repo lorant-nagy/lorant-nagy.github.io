@@ -58,10 +58,10 @@
     padding-bottom: 0.28rem; margin-bottom: 0.5rem; flex-shrink: 0;
   }
 
-  /* ── Layout: parameters top, then 2-col below ── */
+  /* ── Layout: parameters top, then unified 2-col grid ── */
   .page {
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     gap: 0.7rem;
     min-height: 0;
   }
@@ -69,7 +69,6 @@
   /* parameters: full-width horizontal strip */
   .params-row {
     display: grid;
-    /* 5 equal columns, one per gate group */
     grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
   }
@@ -80,42 +79,29 @@
     border-bottom: 0.5px solid var(--border);
   }
 
-  /* middle: graph left | gates+trail right */
-  .mid-layout {
+  /* unified grid: graph left spanning all 4 right panels */
+  .main-grid {
     display: grid;
     grid-template-columns: 1fr 230px;
+    grid-template-rows: repeat(4, 1fr);
     gap: 0.7rem;
     min-height: 0;
   }
 
   .graph-panel {
+    grid-column: 1; grid-row: 1 / 5;
     display: flex; flex-direction: column; min-height: 0;
   }
   #graph-svg { width: 100%; flex: 1; display: block; min-height: 0; }
 
-  .right-col {
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: 0.7rem;
-  }
+  .gate-panel     { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; min-height: 0; }
+  .trail-panel    { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-height: 0; }
+  .narrative-panel{ grid-column: 2; grid-row: 3; overflow-y: auto; }
+  .seq-panel      { grid-column: 2; grid-row: 4; display: flex; flex-direction: column; min-height: 0; }
 
-  .gate-panel, .trail-panel {
-    display: flex; flex-direction: column; min-height: 0;
-  }
   #gate-svg  { width: 100%; flex: 1; display: block; min-height: 0; }
   #trail-svg { width: 100%; flex: 1; display: block; min-height: 0; }
-
-  /* bottom: sequence left | narrative right */
-  .bot-layout {
-    display: grid;
-    grid-template-columns: 1fr 230px;
-    gap: 0.7rem;
-  }
-
-  .seq-panel { display: flex; flex-direction: column; }
-  #seq-svg { width: 100%; height: 72px; display: block; flex-shrink: 0; }
-
-  .narrative-panel { overflow-y: auto; }
+  #seq-svg   { width: 100%; flex: 1; display: block; min-height: 0; }
 
   .narrative {
     font-size: 10.5px; color: var(--text); line-height: 1.65;
@@ -175,12 +161,15 @@
   /* mobile */
   @media (max-width: 600px) {
     body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
-    .page { grid-template-rows: auto auto auto auto; }
+    .page { grid-template-rows: auto auto; }
     .params-row { grid-template-columns: 1fr 1fr; }
-    .mid-layout { grid-template-columns: 1fr; }
-    .right-col { grid-template-rows: auto auto; }
-    .bot-layout { grid-template-columns: 1fr; }
-    #graph-svg { min-height: 300px; flex: none; }
+    .main-grid { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto auto; }
+    .graph-panel     { grid-column: 1; grid-row: 1; min-height: 300px; }
+    .gate-panel      { grid-column: 1; grid-row: 2; min-height: 100px; }
+    .trail-panel     { grid-column: 1; grid-row: 3; min-height: 100px; }
+    .narrative-panel { grid-column: 1; grid-row: 4; }
+    .seq-panel       { grid-column: 1; grid-row: 5; }
+    #graph-svg { min-height: 280px; }
   }
 </style>
 </head>
@@ -191,11 +180,11 @@
 <h1>LSTM</h1>
 <div class="equations">
   input: <span style="color:#e8824a">x</span>ₜ ∈ ℝ &nbsp;&nbsp;
-  <span style="color:#378ADD">f</span>ₜ = σ(W<sub>f</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>f</sub>) &nbsp;<span style="color:var(--muted)">forget gate</span> &nbsp;&nbsp;
-  <span style="color:#1D9E75">i</span>ₜ = σ(W<sub>i</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>i</sub>) &nbsp;<span style="color:var(--muted)">input gate</span> &nbsp;&nbsp;
-  <span style="color:#aa701e">c̃</span>ₜ = tanh(W<sub>c</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>c</sub>) &nbsp;<span style="color:var(--muted)">candidate cell</span> &nbsp;&nbsp;
-  <span style="color:#e8824a">o</span>ₜ = σ(W<sub>o</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>o</sub>) &nbsp;<span style="color:var(--muted)">output gate</span> &nbsp;&nbsp;
-  <span style="color:#7F77DD">c</span>ₜ = <span style="color:#378ADD">f</span>ₜ ⊙ <span style="color:#7F77DD">c</span>ₜ₋₁ + <span style="color:#1D9E75">i</span>ₜ ⊙ <span style="color:#aa701e">c̃</span>ₜ &nbsp;<span style="color:var(--muted)">cell state</span> &nbsp;&nbsp;
+  forget gate: <span style="color:#378ADD">f</span>ₜ = σ(W<sub>f</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>f</sub>) &nbsp;&nbsp;
+  input gate: <span style="color:#1D9E75">i</span>ₜ = σ(W<sub>i</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>i</sub>) &nbsp;&nbsp;
+  candidate cell: <span style="color:#aa701e">c̃</span>ₜ = tanh(W<sub>c</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>c</sub>) &nbsp;&nbsp;
+  output gate: <span style="color:#e8824a">o</span>ₜ = σ(W<sub>o</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>o</sub>) &nbsp;&nbsp;
+  cell state: <span style="color:#7F77DD">c</span>ₜ = <span style="color:#378ADD">f</span>ₜ ⊙ <span style="color:#7F77DD">c</span>ₜ₋₁ + <span style="color:#1D9E75">i</span>ₜ ⊙ <span style="color:#aa701e">c̃</span>ₜ &nbsp;&nbsp;
   output: <span style="color:#e8824a">h</span>ₜ = <span style="color:#e8824a">o</span>ₜ ⊙ tanh(<span style="color:#7F77DD">c</span>ₜ) ∈ ℝ
 </div>
 
@@ -207,29 +196,28 @@
     <div class="params-row" id="controls"></div>
   </div>
 
-  <!-- middle: graph left | gates + trail right -->
-  <div class="mid-layout">
+  <!-- unified grid: graph left spanning all 4 right panels -->
+  <div class="main-grid">
 
     <div class="graph-panel">
       <div class="card-title">computation graph</div>
       <svg id="graph-svg"></svg>
     </div>
 
-    <div class="right-col">
-      <div class="gate-panel">
-        <div class="card-title">gate activations &amp; state update</div>
-        <svg id="gate-svg"></svg>
-      </div>
-      <div class="trail-panel">
-        <div class="card-title">state history</div>
-        <svg id="trail-svg"></svg>
-      </div>
+    <div class="gate-panel">
+      <div class="card-title">gate activations &amp; state update</div>
+      <svg id="gate-svg"></svg>
     </div>
 
-  </div>
+    <div class="trail-panel">
+      <div class="card-title">state history</div>
+      <svg id="trail-svg"></svg>
+    </div>
 
-  <!-- bottom: sequence left | narrative right -->
-  <div class="bot-layout">
+    <div class="narrative-panel">
+      <div class="card-title">what is happening</div>
+      <div class="narrative" id="narrative">Press step → to start the forward pass.</div>
+    </div>
 
     <div class="seq-panel">
       <div class="card-title">input sequence  x₁ … x₇</div>
@@ -240,11 +228,6 @@
         <button class="primary" id="btn-step">step →</button>
         <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
       </div>
-    </div>
-
-    <div class="narrative-panel">
-      <div class="card-title">what is happening</div>
-      <div class="narrative" id="narrative">Press step → to start the forward pass.</div>
     </div>
 
   </div>
