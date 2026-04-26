@@ -162,7 +162,13 @@
     padding: 3px 0; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
   }
   .act-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(170,112,30,0.08); }
-  .act-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .act-btn:hover:not(.active):not(:disabled) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .act-btn:disabled { opacity: 0.3; cursor: default; }
+
+  @keyframes node-pulse-expand {
+    0%   { opacity: 0.9; }
+    100% { opacity: 0;   }
+  }
 
   /* ── Mobile ── */
   @media (max-width: 600px) {
@@ -373,12 +379,23 @@ function buildControls() {
   const resetSec = ctrl.append('div');
   resetSec.append('div').attr('class','ctrl-section-title').text('reset');
   resetSec.append('button')
-    .attr('class','reset-btn')
+    .attr('class','reset-btn').attr('id','btn-zero')
     .text('zero all weights')
     .on('click', () => {
       inputs.fill(0);
       weights.forEach(l => l.forEach(n => n.fill(0)));
       biases.forEach(l => l.fill(0));
+      revealedLayers.clear(); revealedLayers.add(0);
+      buildControls(); draw();
+    });
+  resetSec.append('button')
+    .attr('class','reset-btn').attr('id','btn-rand-weights')
+    .style('margin-top','0.25rem')
+    .text('randomise weights')
+    .on('click', () => {
+      weights.forEach(l => l.forEach(n => n.forEach((_,i) => n[i] = Math.round((Math.random()*2-1)*100)/100)));
+      biases.forEach(l => l.forEach((_,i) => l[i] = Math.round((Math.random()*2-1)*100)/100));
+      revealedLayers.clear(); revealedLayers.add(0);
       buildControls(); draw();
     });
 
@@ -444,8 +461,9 @@ draw();
 (function() {
   const svgEl = document.getElementById('nn-svg');
   const NS = 'http://www.w3.org/2000/svg';
-  const DOT_DUR = 0.65;
-  const GAP     = 0.2;
+  const DOT_DUR = 1.1;
+  const GAP     = 0.3;
+  const LAYER_COLORS = ['#e8824a', '#378ADD'];
   let animDefs  = null;
   let dotEls    = [];
   let glowEls   = [];
@@ -471,8 +489,43 @@ draw();
     if (animDefs) { animDefs.remove(); animDefs = null; }
   }
 
+  function setAnimating(on) {
+    document.getElementById('fp-btn').disabled = on;
+    document.getElementById('controls').querySelectorAll('input,button').forEach(el => el.disabled = on);
+    document.querySelectorAll('.act-btn').forEach(el => el.disabled = on);
+    ['btn-zero','btn-rand-weights'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = on;
+    });
+  }
+
+  function mkPulse(x, y, color) {
+    const styleEl = document.createElement('style');
+    document.head.appendChild(styleEl);
+    glowEls.push(styleEl);
+    const uid = `fp-pulse-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    styleEl.sheet.insertRule(`
+      @keyframes ${uid} {
+        0%   { r: ${30}px; opacity: 0.9; }
+        100% { r: ${54}px; opacity: 0;   }
+      }
+    `, 0);
+    const ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('cx', x); ring.setAttribute('cy', y); ring.setAttribute('r', 30);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', color);
+    ring.setAttribute('stroke-width', '2');
+    ring.style.animationName = uid;
+    ring.style.animationDuration = '0.6s';
+    ring.style.animationTimingFunction = 'ease-out';
+    ring.style.animationFillMode = 'both';
+    svgEl.appendChild(ring);
+    glowEls.push(ring);
+  }
+
   document.getElementById('fp-btn').addEventListener('click', function() {
     clearAnim();
+    setAnimating(true);
 
     // hide non-input layers
     revealedLayers.clear();
@@ -485,11 +538,16 @@ draw();
     for (let l = 0; l < LAYERS.length - 1; l++) {
       const layerDelay = l * (DOT_DUR + GAP);
       const arriveDelay = layerDelay + DOT_DUR;
+      const dotColor = LAYER_COLORS[l] || '#e8824a';
 
-      // reveal destination layer when dots arrive
+      // reveal destination layer + pulse when dots arrive
       timers.push(setTimeout(() => {
         revealedLayers.add(l + 1);
         draw();
+        for (let j = 0; j < LAYERS[l+1]; j++) {
+          const pos = getNodePos(l+1, j);
+          mkPulse(pos.x, pos.y, dotColor);
+        }
       }, arriveDelay * 1000));
 
       // glow on destination nodes
@@ -521,6 +579,7 @@ draw();
 
           const dot = document.createElementNS(NS, 'circle');
           dot.setAttribute('r', 4.5);
+          dot.setAttribute('fill', dotColor);
           dot.classList.add('anim-dot');
           dot.style.offsetPath = `url(#${pid})`;
           dot.style.animationDuration = DOT_DUR + 's';
@@ -530,6 +589,13 @@ draw();
         }
       }
     }
+
+    // re-enable controls after last layer arrives
+    const totalMs = ((LAYERS.length - 2) * (DOT_DUR + GAP) + DOT_DUR + 0.7) * 1000;
+    timers.push(setTimeout(() => {
+      clearAnim();
+      setAnimating(false);
+    }, totalMs));
   });
 
   // when sliders move, hide non-input layers so animation is needed again

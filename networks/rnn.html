@@ -186,7 +186,8 @@
     padding: 3px 0; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
   }
   .act-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(170,112,30,0.08); }
-  .act-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .act-btn:hover:not(.active):not(:disabled) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .act-btn:disabled { opacity: 0.3; cursor: default; }
 
   /* mobile */
   @media (max-width: 600px) {
@@ -197,6 +198,42 @@
     .timelines      { grid-column: 1; grid-row: 3; }
     .narrative-card { grid-column: 1; grid-row: 4; }
     #rnn-svg { min-height: 200px; flex: none; }
+  }
+
+  @keyframes dot-travel {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  @keyframes ghost-slide {
+    0%   { opacity: 0;   transform: translateX(0px); }
+    8%   { opacity: 0.8; transform: translateX(0px); }
+    80%  { opacity: 0.5; transform: translateX(var(--ghost-dx)); }
+    100% { opacity: 0;   transform: translateX(var(--ghost-dx)); }
+  }
+  @keyframes node-glow {
+    0%   { opacity: 0; }
+    20%  { opacity: 0.55; }
+    100% { opacity: 0; }
+  }
+  .anim-dot {
+    opacity: 0; offset-rotate: 0deg;
+    animation-name: dot-travel;
+    animation-timing-function: cubic-bezier(0.37,0,0.63,1);
+    animation-fill-mode: both;
+  }
+  .anim-ghost {
+    opacity: 0;
+    animation-name: ghost-slide;
+    animation-timing-function: cubic-bezier(0.4,0,0.2,1);
+    animation-fill-mode: both;
+  }
+  .anim-glow {
+    opacity: 0; pointer-events: none;
+    animation-name: node-glow;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
   }
 </style>
 </head>
@@ -227,8 +264,6 @@
       <div class="card-title">input sequence  x₁ … x₇</div>
       <svg id="seq-svg"></svg>
       <div class="btn-row">
-        <button id="btn-rand">rand</button>
-        <button id="btn-reset">reset</button>
         <button class="primary" id="btn-step">step →</button>
         <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
       </div>
@@ -270,6 +305,8 @@ let b = [0.1, -0.1];
 let t        = 0;
 let h        = [0, 0];
 let hHistory = [[0, 0]];
+let hiddenRevealed = false;
+let prevRevealed   = false;
 
 // ── Activation ───────────────────────────────────────────────────────────────
 let actFn = 'tanh';
@@ -409,7 +446,7 @@ function drawRNN() {
   // Row y positions for the two hidden units
   const yH = [H * 0.32, H * 0.72];
 
-  const curX = (t > 0 && t <= SEQ_LEN) ? sequence[t - 1] : 0;
+  const curX = t < SEQ_LEN ? sequence[t] : sequence[SEQ_LEN - 1];
 
   // ── Arrow marker ────────────────────────────────────────────────────────────
   rnnSvg.append('defs').append('marker')
@@ -421,22 +458,25 @@ function drawRNN() {
     .attr('fill', 'rgba(255,255,255,0.3)');
 
   // ── h_{t-1} ghost nodes (right column) ─────────────────────────────────────
-  const hPrev = hHistory.length >= 2 ? hHistory[hHistory.length - 2] : [0, 0];
+  const hPrev = hHistory[hHistory.length - 1];
+  const hasPrev = prevRevealed && hHistory.length >= 2;
 
   yH.forEach((y, j) => {
-    rnnSvg.append('circle')
+    const g = rnnSvg.append('g').attr('class', 'prev-node');
+
+    g.append('circle')
       .attr('cx', xPrev).attr('cy', y).attr('r', R)
-      .attr('fill',   colorScale(hPrev[j]))
+      .attr('fill',   hasPrev ? colorScale(hPrev[j]) : '#13161d')
       .attr('stroke', 'rgba(255,255,255,0.1)')
       .attr('stroke-width', 1)
       .attr('opacity', 0.45);
 
-    rnnSvg.append('text')
+    g.append('text')
       .attr('x', xPrev).attr('y', y)
       .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
       .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
       .attr('fill', 'rgba(255,255,255,0.4)')
-      .text(hPrev[j].toFixed(2));
+      .text(hasPrev ? hPrev[j].toFixed(2) : '');
 
     rnnSvg.append('text')
       .attr('x', xPrev).attr('y', y + R + 12)
@@ -501,7 +541,7 @@ function drawRNN() {
   // ── x_t input node ───────────────────────────────────────────────────────────
   rnnSvg.append('circle')
     .attr('cx', xInput).attr('cy', H / 2).attr('r', R)
-    .attr('fill',   t > 0 ? colorScale(curX) : '#1e2230')
+    .attr('fill',   colorScale(curX))
     .attr('stroke', 'rgba(255,255,255,0.15)').attr('stroke-width', 1.5);
 
   rnnSvg.append('text')
@@ -509,14 +549,14 @@ function drawRNN() {
     .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
     .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 10)
     .attr('fill', 'rgba(255,255,255,0.8)')
-    .text(t > 0 ? curX.toFixed(2) : 'x');
+    .text(curX.toFixed(2));
 
   rnnSvg.append('text')
     .attr('x', xInput).attr('y', H / 2 + R + 13)
     .attr('text-anchor', 'middle')
     .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
     .attr('fill', 'var(--muted)')
-    .text(t > 0 ? `x${t}` : 'input');
+    .text(`x${t + 1}`);
 
   // ── Input → hidden arrows (one per hidden unit, explicitly separate) ─────────
   yH.forEach((y, j) => {
@@ -549,18 +589,20 @@ function drawRNN() {
 
   // ── h_t current nodes ─────────────────────────────────────────────────────────
   yH.forEach((y, j) => {
-    rnnSvg.append('circle')
+    const g = rnnSvg.append('g').attr('class', 'cur-node');
+
+    g.append('circle')
       .attr('cx', xCur).attr('cy', y).attr('r', R)
-      .attr('fill',   colorScale(h[j]))
-      .attr('stroke', d3.color(colorScale(h[j])).brighter(0.4))
+      .attr('fill',   hiddenRevealed ? colorScale(h[j]) : '#13161d')
+      .attr('stroke', hiddenRevealed ? d3.color(colorScale(h[j])).brighter(0.4) : 'rgba(255,255,255,0.15)')
       .attr('stroke-width', 1.5);
 
-    rnnSvg.append('text')
+    g.append('text')
       .attr('x', xCur).attr('y', y)
       .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
       .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 10)
       .attr('fill', 'rgba(255,255,255,0.9)')
-      .text(h[j].toFixed(2));
+      .text(hiddenRevealed ? h[j].toFixed(2) : '');
 
     rnnSvg.append('text')
       .attr('x', xCur).attr('y', y + R + 13)
@@ -668,26 +710,234 @@ function redraw() {
 }
 
 function resetAndRedraw() {
-  t = 0; h = [0, 0]; hHistory = [[0, 0]];
+  t = 0; h = [0, 0]; hHistory = [[0, 0]]; hiddenRevealed = false; prevRevealed = false;
   redraw();
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
+// partial hidden: only input contribution (no recurrent), before activation
+function partialRNN(x_t) {
+  return h.map((_, j) => b[j] + Wx[j] * x_t);
+}
+
 document.getElementById('btn-step').addEventListener('click', () => {
   if (t >= SEQ_LEN) return;
-  h = stepRNN(sequence[t], h);
-  t++;
-  hHistory.push([...h]);
-  redraw();
+  function setAnimating(on) {
+    ['btn-step','btn-zero','btn-rand-weights','btn-rand-seq','btn-reset-state'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = on || (id === 'btn-step' && t >= SEQ_LEN);
+    });
+    document.querySelectorAll('.act-btn').forEach(btn => btn.disabled = on);
+  }
+
+  setAnimating(true);
+  // keep hiddenRevealed as-is — mid column shows previous values while dots fly
+
+  const svgEl = document.getElementById('rnn-svg');
+  const NS  = 'http://www.w3.org/2000/svg';
+  const W = 560, H = 250, R = 26;
+  const xInput = 80, xCur = W/2+20, xPrev = W-90;
+  const yInput = H/2;
+  const yH = [H*0.32, H*0.72];
+
+  const T_DOT      = 1.1;
+  const T_GAP      = 0.3;
+  const T_GHOST    = 1.0;
+  const T_GHOST_DLY = 0.3;
+  const isFirst = t === 0;
+
+  const animEls = [];
+  const timers  = [];
+
+  const defs = svgEl.querySelector('defs') || svgEl.insertBefore(
+    document.createElementNS(NS,'defs'), svgEl.firstChild);
+
+  function mkPath(id, x1,y1, x2,y2, cpX,cpY) {
+    const d = cpX != null ? `M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}` : `M${x1},${y1} L${x2},${y2}`;
+    const p = document.createElementNS(NS,'path');
+    p.setAttribute('id',id); p.setAttribute('d',d);
+    p.setAttribute('fill','none'); p.setAttribute('stroke','none');
+    defs.appendChild(p); animEls.push(p); return p;
+  }
+
+  function mkDot(color, pathId, delay, dur) {
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('r', 5); c.setAttribute('fill', color);
+    c.classList.add('anim-dot');
+    c.style.offsetPath = `url(#${pathId})`;
+    c.style.animationDuration = dur+'s';
+    c.style.animationDelay = delay+'s';
+    svgEl.appendChild(c); animEls.push(c);
+  }
+
+  function mkGlow(x, y, color, delay) {
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',R+8);
+    c.setAttribute('fill',color); c.classList.add('anim-glow');
+    c.style.animationDuration = '0.5s';
+    c.style.animationDelay = delay+'s';
+    svgEl.appendChild(c); animEls.push(c);
+  }
+
+  function mkPulse(x, y, color) {
+    // expanding ring that grows from R to R+22 and fades out
+    const styleEl2 = document.createElement('style');
+    document.head.appendChild(styleEl2);
+    animEls.push(styleEl2);
+    const uid = `pulse-${x}-${y}-${Date.now()}`;
+    styleEl2.sheet.insertRule(`
+      @keyframes ${uid} {
+        0%   { r: ${R}px;    opacity: 0.9; }
+        100% { r: ${R+24}px; opacity: 0;   }
+      }
+    `, 0);
+    const ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('cx', x); ring.setAttribute('cy', y); ring.setAttribute('r', R);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', color);
+    ring.setAttribute('stroke-width', '2');
+    ring.style.animationName = uid;
+    ring.style.animationDuration = '0.6s';
+    ring.style.animationTimingFunction = 'ease-out';
+    ring.style.animationFillMode = 'both';
+    svgEl.appendChild(ring);
+    animEls.push(ring);
+  }
+
+  function schedule(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+  const x_t  = sequence[t];
+  const hSnap = [...h]; // snapshot of h before this step
+
+  // ── Phase 1a: orange dots xInput → xCur ──────────────────────────────────────
+  yH.forEach((y,j) => {
+    const oid = `rp-ox-${j}-${Date.now()}`;
+    mkPath(oid, xInput+R, yInput, xCur-R, y);
+    mkDot('#e8824a', oid, 0, T_DOT);
+  });
+
+  // when orange arrives: show partial hidden values
+  function updateCurNodes(vals) {
+    const rnnSvgEl = document.getElementById('rnn-svg');
+    rnnSvgEl.querySelectorAll('.cur-node').forEach((g, j) => {
+      const circle = g.querySelector('circle');
+      const text   = g.querySelector('text');
+      if (circle) circle.setAttribute('fill', colorScale(vals[j]));
+      if (text)   text.textContent = vals[j].toFixed(2);
+    });
+  }
+
+  // when orange arrives: show partial (Wx·x + b, no activation, no Wh term)
+  schedule(T_DOT * 1000, () => {
+    if (isFirst) {
+      h = stepRNN(x_t, [0, 0]);
+      t++; hHistory.push([...h]);
+      hiddenRevealed = true;
+      updateCurNodes(h);
+      yH.forEach(y => mkPulse(xCur, y, '#e8824a'));
+    } else {
+      // partial: Wx·x + b only (linear, no activation, no recurrent term)
+      const partial = yH.map((_, j) => b[j] + Wx[j] * x_t);
+      hiddenRevealed = true;
+      updateCurNodes(partial);
+      yH.forEach(y => mkPulse(xCur, y, '#e8824a'));
+    }
+  });
+
+  // ── Phase 1b: blue dots xPrev → xCur (steps 2+) ──────────────────────────────
+  if (!isFirst) {
+    const blueDelay = T_DOT + T_GAP;
+    yH.forEach((y,j) => {
+      yH.forEach((yp,i) => {
+        const x1 = xPrev-R, x2 = xCur+R;
+        const cpX = (x1+x2)/2;
+        let cpY;
+        if (i===j) cpY = i===0 ? yp-70 : yp+70;
+        else if (i<j) cpY = (yp+y)/2+40;
+        else cpY = (yp+y)/2-40;
+        const bid = `rp-bh-${i}-${j}-${Date.now()}`;
+        mkPath(bid, x1, yp, x2, y, cpX, cpY);
+        mkDot('#378ADD', bid, blueDelay, T_DOT);
+      });
+    });
+    yH.forEach(y => mkGlow(xCur, y, '#e8824a', blueDelay + T_DOT * 0.9));
+
+    // when blue arrives: full computation with recurrent term + activation, second pulse
+    schedule((blueDelay + T_DOT) * 1000, () => {
+      h = stepRNN(x_t, hSnap);
+      t++; hHistory.push([...h]);
+      hiddenRevealed = true;
+      updateCurNodes(h);
+      yH.forEach(y => mkPulse(xCur, y, '#378ADD'));
+    });
+  }
+
+  // ── Phase 2: ghost-clone xCur → xPrev (built after h is computed) ────────────
+  const ghostStart = isFirst
+    ? T_DOT + T_GHOST_DLY
+    : T_DOT + T_GAP + T_DOT + T_GHOST_DLY;
+  const dx = xPrev - xCur;
+
+  schedule(ghostStart * 1000, () => {
+    // border ring slides from mid to prev — fill and value stay in mid column
+    const styleEl = document.createElement('style');
+    document.head.appendChild(styleEl);
+    animEls.push(styleEl);
+
+    yH.forEach((y, j) => {
+      const uid = `ghost-${j}-${Date.now()}`;
+      styleEl.sheet.insertRule(`
+        @keyframes ${uid} {
+          0%   { opacity: 0;   transform: translateX(0px); }
+          8%   { opacity: 1;   transform: translateX(0px); }
+          80%  { opacity: 0.8; transform: translateX(${dx}px); }
+          100% { opacity: 0;   transform: translateX(${dx}px); }
+        }
+      `, 0);
+
+      const ring = document.createElementNS(NS, 'circle');
+      ring.setAttribute('cx', xCur);
+      ring.setAttribute('cy', y);
+      ring.setAttribute('r', R);
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#378ADD');
+      ring.setAttribute('stroke-width', '2.5');
+      ring.style.animationName = uid;
+      ring.style.animationDuration = T_GHOST + 's';
+      ring.style.animationTimingFunction = 'cubic-bezier(0.4,0,0.2,1)';
+      ring.style.animationFillMode = 'both';
+      svgEl.appendChild(ring);
+      animEls.push(ring);
+    });
+
+    mkGlow(xPrev, yH[0], '#378ADD', T_GHOST * 0.82);
+    mkGlow(xPrev, yH[1], '#378ADD', T_GHOST * 0.82);
+  });
+
+  // ── Phase 3a: ghost lands → reveal prev column, keep hidden visible ───────────
+  const ghostLandMs = (ghostStart + T_GHOST * 0.82) * 1000;
+  schedule(ghostLandMs, () => {
+    prevRevealed = t >= 1;
+    // update prev column nodes directly — full redraw would wipe the ring animation
+    if (prevRevealed) {
+      const prevH = hHistory[hHistory.length - 1];
+      document.getElementById('rnn-svg').querySelectorAll('.prev-node').forEach((g, j) => {
+        const circle = g.querySelector('circle');
+        const text   = g.querySelector('text');
+        if (circle) circle.setAttribute('fill', colorScale(prevH[j]));
+        if (text)   text.textContent = prevH[j].toFixed(2);
+      });
+    }
+  });
+
+  // ── Phase 3b: clean up anim elements, keep hidden revealed until next step ────
+  const totalMs = (ghostStart + T_GHOST + 0.5) * 1000;
+  schedule(totalMs, () => {
+    animEls.forEach(e => e.remove());
+    setAnimating(false);
+  });
 });
 
-document.getElementById('btn-reset').addEventListener('click', resetAndRedraw);
-
-document.getElementById('btn-rand').addEventListener('click', () => {
-  sequence = Array.from({length: SEQ_LEN},
-    () => Math.round((Math.random() * 2 - 1) * 100) / 100);
-  resetAndRedraw();
-});
 
 // ── Build controls ────────────────────────────────────────────────────────────
 function buildControls() {
@@ -698,12 +948,23 @@ function buildControls() {
   const resetSec = ctrl.append('div');
   resetSec.append('div').attr('class','ctrl-section-title').text('reset');
   resetSec.append('button')
-    .attr('class','reset-btn')
+    .attr('class','reset-btn').attr('id','btn-zero')
     .text('zero all weights')
     .on('click', () => {
       Wx.fill(0);
       Wh.forEach(row => row.fill(0));
       b.fill(0);
+      resetAndRedraw();
+      buildControls();
+    });
+  resetSec.append('button')
+    .attr('class','reset-btn').attr('id','btn-rand-weights')
+    .style('margin-top','0.25rem')
+    .text('randomise weights')
+    .on('click', () => {
+      Wx = Wx.map(() => Math.round((Math.random()*2-1)*100)/100);
+      Wh = Wh.map(row => row.map(() => Math.round((Math.random()*2-1)*100)/100));
+      b  = b.map(() => Math.round((Math.random()*2-1)*100)/100);
       resetAndRedraw();
       buildControls();
     });
@@ -772,6 +1033,22 @@ function buildControls() {
       sequence[i] = +this.value; vl.text(sequence[i].toFixed(2)); resetAndRedraw();
     });
   });
+
+  // sequence and state controls at bottom
+  const seqCtrlSec = ctrl.append('div');
+  seqCtrlSec.append('div').attr('class','ctrl-section-title').text('sequence');
+  seqCtrlSec.append('button')
+    .attr('class','reset-btn').attr('id','btn-rand-seq')
+    .text('randomise sequence')
+    .on('click', () => {
+      sequence = Array.from({length: SEQ_LEN}, () => Math.round((Math.random()*2-1)*100)/100);
+      resetAndRedraw(); buildControls();
+    });
+  seqCtrlSec.append('button')
+    .attr('class','reset-btn').attr('id','btn-reset-state')
+    .style('margin-top','0.25rem')
+    .text('reset state')
+    .on('click', resetAndRedraw);
 }
 
 buildControls();

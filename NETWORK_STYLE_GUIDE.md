@@ -269,7 +269,7 @@ Present for feedforward and Elman. Options: `sigmoid`, `tanh`, `relu`, `linear`.
 
 ### Reset button
 
-Every network has a "zero all weights" button at the top of the controls:
+Every network has two weight reset buttons at the top of the controls:
 
 ```css
 .reset-btn {
@@ -282,7 +282,12 @@ Every network has a "zero all weights" button at the top of the controls:
 .reset-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
 ```
 
-For feedforward: zeros `inputs`, `weights`, `biases`. For RNN: zeros `Wx`, `Wh`, `b` and resets state. For LSTM: zeros all `W[gate]` entries and resets `t`, `cellState`, `hiddenState`. The reset does **not** reset the sequence values.
+- **zero all weights** (`btn-zero`) — sets all weights and biases to 0. Also resets `revealedLayers` to `{0}` on feedforward so hidden/output go blank.
+- **randomise weights** (`btn-rand-weights`) — picks uniform random values in `[-1, 1]` for all weights and biases, then rebuilds sliders and redraws.
+
+For feedforward: zeros/randomises `weights`, `biases` (inputs are not reset — they're user data). For RNN: zeros/randomises `Wx`, `Wh`, `b` and resets sequence state. For LSTM: zeros/randomises all `W[gate]` entries and resets `t`, `cellState`, `hiddenState`.
+
+Both buttons must have IDs (`btn-zero`, `btn-rand-weights`) so they can be disabled by `setAnimating()` during animation.
 
 ---
 
@@ -405,3 +410,209 @@ Each file is fully self-contained. No shared CSS, no shared JS. D3 loaded from c
 ```
 
 Back-link always points to `/networks/`.
+
+---
+
+## Animation — Forward Pass
+
+Every network has a forward pass animation triggered by a dedicated button. The animation is purely CSS-based (CSS `@keyframes` + `offset-path` for dots, dynamically injected `<style>` tags for per-element keyframes). No `requestAnimationFrame` — `setTimeout` drives sequencing.
+
+### General rules
+
+- All interactive controls (step button, activation buttons, zero/randomise weight buttons, reset button) are **disabled for the entire duration of the animation** and re-enabled when the last cleanup callback fires.
+- Animation elements (dots, rings, glows) are appended directly to the SVG. They are tracked in an `animEls` array and removed in a cleanup callback at the end.
+- A `schedule(ms, fn)` helper wraps `setTimeout` and pushes timers into a `timers` array for potential cancellation.
+- **Never call `redraw()` mid-animation** — it calls `rnnSvg.selectAll('*').remove()` which destroys animation elements in flight. Instead, update node fills and text directly via `querySelector` on named groups (`.cur-node`, `.prev-node`).
+
+### Dot travel
+
+Each dot travels along a `<path>` element registered in `<defs>`:
+
+```css
+.anim-dot {
+  opacity: 0; offset-rotate: 0deg;
+  animation-name: dot-travel;
+  animation-timing-function: cubic-bezier(0.37,0,0.63,1);
+  animation-fill-mode: both;
+}
+@keyframes dot-travel {
+  0%   { offset-distance: 0%;   opacity: 0; }
+  8%   { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+```
+
+Dots fade in near departure and fade out near arrival. Duration and delay set per-element via `style.animationDuration` and `style.animationDelay`.
+
+### Pulse
+
+A pulse is an expanding ring that fires when a node receives new information and updates its value. It communicates "this node just changed":
+
+```js
+function mkPulse(x, y, color) {
+  // injects a unique @keyframes per call, animates r from R to R+24
+  // fill: none, stroke: color, stroke-width: 2
+  // duration: 0.6s, ease-out
+}
+```
+
+Pulse colour signals the source: **orange** (`#e8824a`) when the input contribution arrives, **blue** (`#378ADD`) when the recurrent/hidden contribution arrives.
+
+### Glow
+
+A soft filled circle behind a node, used when a layer "fires" (all inputs received):
+
+```css
+.anim-glow {
+  opacity: 0; pointer-events: none;
+  animation-name: node-glow;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+@keyframes node-glow {
+  0%   { opacity: 0; }
+  20%  { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+```
+
+---
+
+## Elman Network — Step Animation
+
+The Elman diagram has three columns: **input** (left), **hidden/current** (mid), **previous hidden** (right). The animation reflects one timestep.
+
+### State flags
+
+```js
+let hiddenRevealed = false;  // whether mid column shows values
+let prevRevealed   = false;  // whether right column shows values
+```
+
+Both reset to `false` on `resetAndRedraw()`.
+
+### What stays visible and when
+
+| Moment | Input node | Mid column | Prev column |
+|--------|-----------|------------|-------------|
+| Before first step | shows x₁ (sequence[0]) with colour | blank | blank |
+| During dots flying | shows xₜ (current input) | shows **previous step's value** (hiddenRevealed stays true from last step) | shows previous hₜ₋₁ (persists from last step) |
+| Orange lands (step 1) | unchanged | shows full σ(Wx·x+b) + **orange pulse** | still blank |
+| Orange lands (step 2+) | unchanged | shows partial Wx·x+b (no activation, no recurrent) + **orange pulse** | unchanged |
+| Blue lands (step 2+) | unchanged | shows full σ(Wx·x+Wh·h+b) + **blue pulse** | unchanged |
+| Ring departs | unchanged | fill and value **stay** — only border ring slides right | unchanged |
+| Ring lands | unchanged | unchanged | updates to new h values (direct node update, no redraw) |
+| Animation ends | unchanged | unchanged | unchanged |
+
+**Key rule**: the mid column never goes blank mid-animation. It shows the previous step's value while dots are flying, then updates in place when computations arrive.
+
+### Phase sequence
+
+**Phase 1a — orange dots** (duration `T_DOT = 1.1s`):
+- One orange dot per hidden node travels from input → mid column along a straight line
+- When they arrive (`T_DOT * 1000` ms):
+  - **Step 1**: compute full `stepRNN(x_t, [0,0])`, set `hiddenRevealed = true`, update mid nodes directly, fire **orange pulse**
+  - **Step 2+**: compute partial `b[j] + Wx[j] * x_t` (linear, no activation, no recurrent), update mid nodes, fire **orange pulse**
+
+**Phase 1b — blue dots** (steps 2+ only, delay `T_DOT + T_GAP`):
+- One blue dot per recurrent connection travels from prev → mid along curved quadratic bezier paths (matching the drawn arrows)
+- Self-connections arc above/below; cross-connections curve through the midpoint
+- When they arrive:
+  - Compute full `stepRNN(x_t, hSnap)` where `hSnap` is the snapshot of h taken at click time
+  - Update mid nodes with final activated values
+  - Fire **blue pulse**
+
+**Phase 2 — border ring copy** (fires at `ghostStart`):
+- A ring (stroke only, no fill) is created at mid column and slides to prev column using a dynamically injected `@keyframes` with the exact pixel offset baked in (CSS variable approach not used — unreliable cross-browser)
+- The mid column fill and value are **not touched** — the ring is a separate SVG element
+- When ring lands (`T_GHOST * 0.82` into the ring animation):
+  - Prev column nodes update directly (fill + text, no redraw)
+  - A blue glow fires on prev column nodes
+
+**Phase 3 — cleanup**:
+- All `animEls` removed
+- All buttons re-enabled via `setAnimating(false)`
+- `hiddenRevealed` stays `true` (mid column keeps showing values between steps)
+
+### Step 1 specifics
+
+- No blue dots (no previous state to flow back)
+- No partial value shown — orange lands and immediately shows the full computation
+- Ring still slides to prev column (communicates that the state is being stored)
+- After ring lands: prev column populates for the first time with h₁
+
+### Input node
+
+Always shows the **next input to be processed** (`sequence[t]`) with its colour. Label shows `x{t+1}`. Updates after each step as `t` increments.
+
+---
+
+## Feedforward — Forward Pass Animation
+
+Simpler than the Elman: one button press animates all layers sequentially.
+
+### State flag
+
+```js
+const revealedLayers = new Set([0]);  // input always shown, others revealed by animation
+```
+
+Moving any slider resets `revealedLayers` to `{0}` — hidden and output go blank, requiring the animation to re-reveal them.
+
+### Phase sequence
+
+For each layer transition `l → l+1`:
+- All dots for that layer fire simultaneously (one per edge)
+- Duration `DOT_DUR = 1.1s` per layer, gap `GAP = 0.3s` between layers — **matches the Elman network speed exactly**. Do not change one without the other.
+- When dots arrive: `revealedLayers.add(l+1)`, redraw (safe here — no ongoing animation elements in the SVG at that moment since dots use CSS `offset-path`)
+- A glow fires on destination nodes
+
+Layers are revealed sequentially: input already shown, hidden revealed when orange arrives, output revealed when second wave arrives.
+
+### Why redraw() is safe here
+
+The feedforward dots use CSS `offset-path` on `<path>` elements in `<defs>`. The `draw()` function only touches `edgeGroup` and `nodeGroup` — it does not remove the defs or the dot elements. So `draw()` mid-animation is safe and correctly updates node colours.
+
+---
+
+## Dynamic @keyframes Pattern
+
+For animations requiring per-element parameters (exact pixel offsets, per-node radii), inject keyframes dynamically:
+
+```js
+const styleEl = document.createElement('style');
+document.head.appendChild(styleEl);
+animEls.push(styleEl);  // cleaned up with everything else
+
+const uid = `anim-${Date.now()}`;
+styleEl.sheet.insertRule(`
+  @keyframes ${uid} {
+    0%   { transform: translateX(0px);   opacity: 0; }
+    8%   { transform: translateX(0px);   opacity: 1; }
+    80%  { transform: translateX(${dx}px); opacity: 0.8; }
+    100% { transform: translateX(${dx}px); opacity: 0; }
+  }
+`, 0);
+
+element.style.animationName = uid;
+element.style.animationDuration = '1s';
+element.style.animationFillMode = 'both';
+```
+
+**Do not use CSS custom properties (`var(--x)`) inside `@keyframes transform`** — browser support is inconsistent. Always bake the actual value into the keyframe string.
+
+---
+
+## Canonical Animation Timing
+
+All networks use the same speed constants so animations feel consistent:
+
+```js
+const DOT_DUR   = 1.1;   // seconds — dot travels along one edge layer
+const GAP       = 0.3;   // seconds — pause between phases (orange→blue, dots→ghost)
+const T_GHOST   = 1.0;   // seconds — border ring slides from mid to prev column (Elman)
+const T_GHOST_DLY = 0.3; // seconds — delay before ghost departs after hidden reveals
+```
+
+Do not change one without the others. The goal is that a human can visually follow each dot as it travels — around 1 second per layer is the right perceptual speed.
