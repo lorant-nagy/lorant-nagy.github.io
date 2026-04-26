@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Feedforward Network</title>
+<title>Feedforward — animated forward pass</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
 
@@ -173,6 +173,36 @@
     .controls-card { grid-column: 1; grid-row: 3; max-height: 60vh; }
     #nn-svg { min-height: 200px; flex: none; aspect-ratio: 560/300; }
   }
+
+  @keyframes dot-travel {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  @keyframes node-arrive {
+    0%   { opacity: 0; }
+    15%  { opacity: 0.5; }
+    100% { opacity: 0; }
+  }
+  .anim-dot {
+    fill: #e8824a; opacity: 0; offset-rotate: 0deg;
+    animation-timing-function: cubic-bezier(0.37,0,0.63,1);
+    animation-fill-mode: both; animation-name: dot-travel;
+  }
+  .anim-glow {
+    fill: #e8824a; opacity: 0; pointer-events: none;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both; animation-name: node-arrive;
+  }
+  .fp-btn {
+    background: none; border: 0.5px solid var(--accent);
+    border-radius: 3px; color: var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    padding: 3px 10px; cursor: pointer; letter-spacing: 0.06em;
+    transition: background 0.15s; margin-top: 0.5rem; flex-shrink: 0;
+  }
+  .fp-btn:hover { background: rgba(170,112,30,0.1); }
 </style>
 </head>
 <body>
@@ -192,6 +222,7 @@
     <div class="canvas-card card">
       <div class="card-title">network</div>
       <svg id="nn-svg"></svg>
+      <button class="fp-btn" id="fp-btn">forward pass →</button>
       <div class="legend">
         <div class="legend-item"><div class="legend-swatch" style="background:var(--neg)"></div>negative</div>
         <div class="legend-item"><div class="legend-swatch" style="background:rgba(255,255,255,0.15)"></div>zero</div>
@@ -320,7 +351,7 @@ function draw() {
   merged.select('circle')
     .attr('fill', d => neuronColor(d.a, d.isOutput))
     .attr('stroke', d => d3.color(neuronColor(d.a, d.isOutput)).brighter(0.5));
-  merged.select('text').text(d => d.a.toFixed(2));
+  merged.select('text').text(d => revealedLayers.has(d.l) ? d.a.toFixed(2) : '');
 
   const lbls = svg.selectAll('text.layer-label').data([
     {x:layerX[0],label:'input'},{x:layerX[1],label:'hidden'},{x:layerX[2],label:'output'}
@@ -403,8 +434,112 @@ function buildControls() {
   });
 }
 
+// only input layer shown until forward pass is run
+const revealedLayers = new Set([0]);
+
 buildControls();
 draw();
+
+// ── Forward pass animation ────────────────────────────────────────────────────
+(function() {
+  const svgEl = document.getElementById('nn-svg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const DOT_DUR = 0.65;
+  const GAP     = 0.2;
+  let animDefs  = null;
+  let dotEls    = [];
+  let glowEls   = [];
+  let timers    = [];
+
+  function getNodePos(layerIdx, nodeIdx) {
+    const n = LAYERS[layerIdx];
+    const W = 560, H = 300;
+    const spacing = Math.min(90, (H - 60) / (n - 1 + 0.001));
+    const total = spacing * (n - 1);
+    return {
+      x: [80, W/2, W-80][layerIdx],
+      y: (H - total) / 2 + nodeIdx * spacing
+    };
+  }
+
+  function clearAnim() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    dotEls.forEach(d => d.remove());
+    glowEls.forEach(g => g.remove());
+    dotEls = []; glowEls = [];
+    if (animDefs) { animDefs.remove(); animDefs = null; }
+  }
+
+  document.getElementById('fp-btn').addEventListener('click', function() {
+    clearAnim();
+
+    // hide non-input layers
+    revealedLayers.clear();
+    revealedLayers.add(0);
+    draw();
+
+    animDefs = document.createElementNS(NS, 'defs');
+    svgEl.appendChild(animDefs);
+
+    for (let l = 0; l < LAYERS.length - 1; l++) {
+      const layerDelay = l * (DOT_DUR + GAP);
+      const arriveDelay = layerDelay + DOT_DUR;
+
+      // reveal destination layer when dots arrive
+      timers.push(setTimeout(() => {
+        revealedLayers.add(l + 1);
+        draw();
+      }, arriveDelay * 1000));
+
+      // glow on destination nodes
+      for (let j = 0; j < LAYERS[l+1]; j++) {
+        const pos = getNodePos(l+1, j);
+        const glow = document.createElementNS(NS, 'circle');
+        glow.setAttribute('cx', pos.x);
+        glow.setAttribute('cy', pos.y);
+        glow.setAttribute('r', 30);
+        glow.classList.add('anim-glow');
+        glow.style.animationDuration = '0.6s';
+        glow.style.animationDelay = (arriveDelay - 0.05) + 's';
+        svgEl.appendChild(glow);
+        glowEls.push(glow);
+      }
+
+      // one dot per edge
+      for (let i = 0; i < LAYERS[l]; i++) {
+        for (let j = 0; j < LAYERS[l+1]; j++) {
+          const src = getNodePos(l, i);
+          const dst = getNodePos(l+1, j);
+          const pid = `fp-${l}-${i}-${j}`;
+
+          const pathEl = document.createElementNS(NS, 'path');
+          pathEl.setAttribute('id', pid);
+          pathEl.setAttribute('d', `M${src.x},${src.y} L${dst.x},${dst.y}`);
+          pathEl.setAttribute('fill', 'none');
+          animDefs.appendChild(pathEl);
+
+          const dot = document.createElementNS(NS, 'circle');
+          dot.setAttribute('r', 4.5);
+          dot.classList.add('anim-dot');
+          dot.style.offsetPath = `url(#${pid})`;
+          dot.style.animationDuration = DOT_DUR + 's';
+          dot.style.animationDelay = layerDelay + 's';
+          svgEl.appendChild(dot);
+          dotEls.push(dot);
+        }
+      }
+    }
+  });
+
+  // when sliders move, hide non-input layers so animation is needed again
+  document.getElementById('controls').addEventListener('input', () => {
+    revealedLayers.clear();
+    revealedLayers.add(0);
+    clearAnim();
+    draw();
+  });
+})();
 </script>
 </body>
 </html>
