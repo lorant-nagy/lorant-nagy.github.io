@@ -151,6 +151,15 @@
   }
   .ctrl-col-title:not(:first-child) { margin-top: 0.6rem; }
 
+  .reset-btn {
+    width: 100%; background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+    padding: 4px 0; cursor: pointer; transition: all 0.15s;
+    letter-spacing: 0.06em;
+  }
+  .reset-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
   .ctrl-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
   .ctrl-label { font-size: 8px; color: var(--muted); min-width: 36px; flex-shrink: 0; }
 
@@ -581,6 +590,18 @@ document.getElementById('btn-rand').addEventListener('click',()=>{
 function buildControls(){
   const ctrl=d3.select('#controls');
   ctrl.selectAll('*').remove();
+
+  // Reset to zero
+  const resetDiv = ctrl.append('div').style('margin-bottom','0.5rem');
+  resetDiv.append('button')
+    .attr('class','reset-btn')
+    .text('zero all weights')
+    .on('click', () => {
+      ['f','i','c','o'].forEach(k => { W[k].wh=0; W[k].wx=0; W[k].b=0; });
+      t=0; cellState=0; hiddenState=0;
+      cHistory=[0]; hHistory=[0]; gateHistory=[];
+      buildControls(); redraw();
+    });
 
   // four gate columns
   [{key:'f',label:'Wf  forget',color:GC.f},{key:'i',label:'Wi  input',color:GC.i},
