@@ -289,8 +289,7 @@ const ArxivStats = (() => {
         : latestKey;
 
       container.querySelector("#ax-updated").textContent = `updated: ${updatedAt}`;
-      container.querySelector("#ax-pill-fin").innerHTML = `q-fin today <b style="color:var(--color-text-primary);font-weight:500;">${latest.q_fin_count}</b>`;
-      container.querySelector("#ax-pill-bio").innerHTML = `q-bio today <b style="color:var(--color-text-primary);font-weight:500;">${latest.q_bio_count}</b>`;
+      
 
       const chartCanvas = buildChart(container.querySelector("#ax-chart-host"));
       renderChart(chartCanvas);

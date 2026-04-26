@@ -351,11 +351,14 @@ function buildControls() {
 
   weights.forEach((layer,l) => {
     const sec = ctrl.append('div');
-    sec.append('div').attr('class','ctrl-section-title').text(`weights  L${l}→L${l+1}`);
+    const isOut = l === weights.length - 1;
+    sec.append('div').attr('class','ctrl-section-title')
+      .text(isOut ? 'output weights  v' : `weights  L${l}→L${l+1}`);
     layer.forEach((toNeuron,j) => {
       toNeuron.forEach((w,i) => {
         const row = sec.append('div').attr('class','ctrl-row');
-        row.append('span').attr('class','ctrl-label').text(`w${i+1}→${j+1}`);
+        row.append('span').attr('class','ctrl-label')
+          .text(isOut ? `v${i+1}` : `w${i+1}→${j+1}`);
         const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',w);
         const vl = row.append('span').attr('class','ctrl-val').text(w.toFixed(2));
         sl.on('input',function(){ weights[l][j][i]=+this.value; vl.text((+this.value).toFixed(2)); draw(); });
@@ -366,9 +369,11 @@ function buildControls() {
   const bSec = ctrl.append('div');
   bSec.append('div').attr('class','ctrl-section-title').text('biases');
   biases.forEach((layer,l) => {
+    const isOut = l === biases.length - 1;
     layer.forEach((b,j) => {
       const row = bSec.append('div').attr('class','ctrl-row');
-      row.append('span').attr('class','ctrl-label').text(`b L${l+1}[${j+1}]`);
+      row.append('span').attr('class','ctrl-label')
+        .text(isOut ? 'c' : `b${j+1}`);
       const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',b);
       const vl = row.append('span').attr('class','ctrl-val').text(b.toFixed(2));
       sl.on('input',function(){ biases[l][j]=+this.value; vl.text((+this.value).toFixed(2)); draw(); });
