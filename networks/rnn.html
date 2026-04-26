@@ -43,7 +43,7 @@
   h1 {
     font-family: 'Spectral', serif; font-weight: 300;
     font-size: 1.45rem; color: #e8e4dc; letter-spacing: 0.02em;
-    padding-top: 0.1rem;
+    padding-top: 1.4rem;
   }
 
   .equations {
@@ -121,7 +121,7 @@
   .narrative .dim { color: var(--muted); }
 
   .btn-row {
-    display: flex; gap: 0.4rem;
+    display: flex; align-items: center; gap: 0.4rem;
     margin-top: 0.45rem; flex-shrink: 0;
   }
 
@@ -134,11 +134,17 @@
   button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
   button.primary { border-color: var(--accent); color: var(--accent); }
   button.primary:hover { background: rgba(170,112,30,0.1); }
-  button:disabled { opacity: 0.3; cursor: default; }
+  button:disabled { opacity: 0.3; cursor: default; animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { border-color: var(--accent); box-shadow: 0 0 0 0 rgba(170,112,30,0); }
+    50%       { border-color: #d4921f;      box-shadow: 0 0 0 3px rgba(170,112,30,0.18); }
+  }
+  button.primary:not(:disabled) { animation: pulse 2s ease-in-out infinite; }
 
   .step-badge {
     font-size: 10px; color: var(--muted);
-    letter-spacing: 0.06em; margin-top: 0.3rem; flex-shrink: 0;
+    letter-spacing: 0.06em; flex-shrink: 0;
   }
   .step-badge span { color: var(--accent); font-size: 1.1rem; font-family: 'Spectral', serif; }
 
@@ -164,6 +170,16 @@
   }
   .ctrl-val { font-size: 8.5px; color: var(--text); min-width: 28px; text-align: right; }
 
+  .act-fn-row { display: flex; gap: 0.3rem; margin-bottom: 0.2rem; }
+  .act-btn {
+    flex: 1; background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+    padding: 3px 0; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
+  }
+  .act-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(170,112,30,0.08); }
+  .act-btn:hover:not(.active) { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
   /* mobile */
   @media (max-width: 600px) {
     body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
@@ -182,9 +198,8 @@
 
 <h1>Elman network</h1>
 <div class="equations">
-  input: <span style="color:#e8824a">x</span>ₜ ∈ ℝ &nbsp;&nbsp;
-  hidden: <span style="color:#e8824a">h</span>ₜ = tanh(W<sub>x</sub> · <span style="color:#e8824a">x</span>ₜ + W<sub>h</sub> · <span style="color:#e8824a">h</span>ₜ₋₁ + b),  W<sub>x</sub> ∈ ℝ<sup>2×1</sup>,  W<sub>h</sub> ∈ ℝ<sup>2×2</sup>,  <span style="color:#e8824a">h</span>ₜ ∈ ℝ² &nbsp;&nbsp;
-  output: <span style="color:#378ADD">ŷ</span>ₜ = v<sup>⊤</sup> · <span style="color:#e8824a">h</span>ₜ + c ∈ ℝ
+  input: <span style="color:#e8824a">x</span><sub>t</sub> ∈ ℝ &nbsp;&nbsp;
+  hidden: <span style="color:#e8824a">h</span><sub>t</sub> = σ(W<sub>x</sub> · <span style="color:#e8824a">x</span><sub>t</sub> + W<sub>h</sub> · <span style="color:#e8824a">h</span><sub>t−1</sub> + b),  W<sub>x</sub> ∈ ℝ<sup>2×1</sup>,  W<sub>h</sub> ∈ ℝ<sup>2×2</sup>,  <span style="color:#e8824a">h</span><sub>t</sub> ∈ ℝ²
 </div>
 
 <div class="page">
@@ -207,8 +222,8 @@
         <button id="btn-rand">rand</button>
         <button id="btn-reset">reset</button>
         <button class="primary" id="btn-step">step →</button>
+        <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
       </div>
-      <div class="step-badge">t = <span id="t-display">0</span> / 7</div>
     </div>
     <div class="trail-card card">
       <div class="card-title">hidden state history</div>
@@ -248,12 +263,20 @@ let t        = 0;
 let h        = [0, 0];
 let hHistory = [[0, 0]];
 
+// ── Activation ───────────────────────────────────────────────────────────────
+let actFn = 'tanh';
+const activations = {
+  tanh:   z => Math.tanh(z),
+  relu:   z => Math.max(0, z),
+  linear: z => z,
+};
+
 // ── Math ─────────────────────────────────────────────────────────────────────
 function stepRNN(x_t, h_prev) {
   return h_prev.map((_, j) => {
     let z = b[j] + Wx[j] * x_t;
     for (let i = 0; i < H_SIZE; i++) z += Wh[j][i] * h_prev[i];
-    return Math.tanh(z);
+    return activations[actFn](z);
   });
 }
 
@@ -618,7 +641,7 @@ function updateNarrative() {
            `<span class="${fromX>0?'hi':'lo'}">x·Wx${j+1}=${fromX.toFixed(2)}</span> ` +
            `+ <span class="${fromH>0?'hi':'lo'}">h_prev·Wh=${fromH.toFixed(2)}</span> ` +
            `+ <span class="${bias>0?'hi':'lo'}">b=${bias.toFixed(2)}</span>` +
-           ` → tanh → <span class="${hj>0?'hi':'lo'}">${hj.toFixed(3)}</span>`;
+           ` → ${actFn} → <span class="${hj>0?'hi':'lo'}">${hj.toFixed(3)}</span>`;
   });
   el.innerHTML =
     `t=${t}  input <span class="hi">x=${x.toFixed(2)}</span><br>` +
@@ -662,6 +685,17 @@ document.getElementById('btn-rand').addEventListener('click', () => {
 function buildControls() {
   const ctrl = d3.select('#controls');
   ctrl.selectAll('*').remove();
+
+  // Activation function
+  const actSec = ctrl.append('div');
+  actSec.append('div').attr('class', 'ctrl-section-title').text('activation');
+  const btnRow = actSec.append('div').attr('class', 'act-fn-row');
+  ['tanh','relu','linear'].forEach(fn => {
+    btnRow.append('button')
+      .attr('class', `act-btn${actFn===fn?' active':''}`)
+      .text(fn)
+      .on('click', () => { actFn = fn; buildControls(); resetAndRedraw(); });
+  });
 
   // Wx sliders — clearly labelled per hidden unit
   const wxSec = ctrl.append('div');

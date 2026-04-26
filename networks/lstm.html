@@ -43,7 +43,7 @@
   h1 {
     font-family: 'Spectral', serif; font-weight: 300;
     font-size: 1.45rem; color: #e8e4dc; letter-spacing: 0.02em;
-    padding-top: 0.1rem;
+    padding-top: 1.4rem;
   }
 
   .equations {
@@ -184,13 +184,13 @@
 
 <h1>LSTM</h1>
 <div class="equations">
-  input: <span style="color:#e8824a">x</span>ₜ ∈ ℝ &nbsp;&nbsp;
-  forget gate: <span style="color:#378ADD">f</span>ₜ = σ(W<sub>f</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>f</sub>) &nbsp;&nbsp;
-  input gate: <span style="color:#1D9E75">i</span>ₜ = σ(W<sub>i</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>i</sub>) &nbsp;&nbsp;
-  candidate cell: <span style="color:#aa701e">c̃</span>ₜ = tanh(W<sub>c</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>c</sub>) &nbsp;&nbsp;
-  output gate: <span style="color:#e8824a">o</span>ₜ = σ(W<sub>o</sub>[<span style="color:#e8824a">h</span>ₜ₋₁, <span style="color:#e8824a">x</span>ₜ] + b<sub>o</sub>) &nbsp;&nbsp;
-  cell state: <span style="color:#7F77DD">c</span>ₜ = <span style="color:#378ADD">f</span>ₜ ⊙ <span style="color:#7F77DD">c</span>ₜ₋₁ + <span style="color:#1D9E75">i</span>ₜ ⊙ <span style="color:#aa701e">c̃</span>ₜ &nbsp;&nbsp;
-  output: <span style="color:#e8824a">h</span>ₜ = <span style="color:#e8824a">o</span>ₜ ⊙ tanh(<span style="color:#7F77DD">c</span>ₜ) ∈ ℝ
+  input: <span style="color:#e8824a">x</span><sub>t</sub> ∈ ℝ &nbsp;&nbsp;
+  forget gate: <span style="color:#378ADD">f</span><sub>t</sub> = σ(W<sub>f</sub>[<span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>f</sub>) &nbsp;&nbsp;
+  input gate: <span style="color:#1D9E75">i</span><sub>t</sub> = σ(W<sub>i</sub>[<span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>i</sub>) &nbsp;&nbsp;
+  candidate cell: <span style="color:#aa701e">c̃</span><sub>t</sub> = tanh(W<sub>c</sub>[<span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>c</sub>) &nbsp;&nbsp;
+  output gate: <span style="color:#e8824a">o</span><sub>t</sub> = σ(W<sub>o</sub>[<span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>o</sub>) &nbsp;&nbsp;
+  cell state: <span style="color:#7F77DD">c</span><sub>t</sub> = <span style="color:#378ADD">f</span><sub>t</sub> ⊙ <span style="color:#7F77DD">c</span><sub>t−1</sub> + <span style="color:#1D9E75">i</span><sub>t</sub> ⊙ <span style="color:#aa701e">c̃</span><sub>t</sub> &nbsp;&nbsp;
+  output: <span style="color:#e8824a">h</span><sub>t</sub> = <span style="color:#e8824a">o</span><sub>t</sub> ⊙ tanh(<span style="color:#7F77DD">c</span><sub>t</sub>) ∈ ℝ
 </div>
 
 <div class="page">
