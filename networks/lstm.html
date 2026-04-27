@@ -61,45 +61,56 @@
   /* ── Main grid: 2 cols row 1, full width rows 2-4 ── */
   .page {
     display: grid;
-    grid-template-columns: 1fr 200px;
-    grid-template-rows: 1fr auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
     gap: 0.7rem;
     min-height: 0;
   }
 
-  /* graph: top-left */
-  .graph-panel {
+  /* parameters: horizontal strip above graph */
+  .params-panel {
     grid-column: 1; grid-row: 1;
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    gap: 1.2rem; overflow-y: visible;
+  }
+
+  /* graph: full width, fills available height */
+  .graph-panel {
+    grid-column: 1; grid-row: 2;
     display: flex; flex-direction: column; min-height: 0;
+    position: relative;
   }
   #graph-svg { width: 100%; flex: 1; display: block; min-height: 0; }
 
-  /* parameters: right col, row 1 only — ends at graph bottom */
-  .params-panel {
-    grid-column: 2; grid-row: 1;
-    display: flex; flex-direction: column;
-    overflow-y: auto;
+  /* step buttons: top-right corner of graph panel */
+  .graph-btns {
+    position: absolute; top: 0; right: 0;
+    display: flex; align-items: center; gap: 0.4rem;
   }
 
-  /* rows 2-4: single full-width 4-column row */
+  /* bottom row: 4 panels */
   .bottom-row {
-    grid-column: 1 / -1; grid-row: 2 / 5;
+    grid-column: 1; grid-row: 3;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 0.7rem;
     min-height: 0;
   }
 
   .seq-panel   { display: flex; flex-direction: column; min-height: 0; }
   .trail-panel { display: flex; flex-direction: column; min-height: 0; }
-  .gate-panel  { display: flex; flex-direction: column; min-height: 0; }
+  #seq-svg   { width: 100%; flex: 1; display: block; min-height: 0; }
+  #trail-svg { width: 100%; flex: 1; display: block; min-height: 0; }
+  /* params horizontal layout */
+  .ctrl-col-title {
+    font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding-bottom: 0.2rem; margin-bottom: 0.3rem;
+    border-bottom: 0.5px solid var(--border); flex-shrink: 0;
+    white-space: nowrap;
+  }
 
   #seq-svg   { width: 100%; flex: 1; display: block; min-height: 0; }
   #trail-svg { width: 100%; flex: 1; display: block; min-height: 0; }
-  #gate-svg  { width: 100%; flex: 1; display: block; min-height: 0; }
-
-  .gate-panel { display: flex; flex-direction: column; min-height: 0; }
-  #gate-svg { width: 100%; height: 60px; display: block; flex-shrink: 0; }
 
   .narrative-panel { overflow-y: auto; }
   .narrative {
@@ -164,7 +175,7 @@
   .ctrl-label { font-size: 8px; color: var(--muted); min-width: 36px; flex-shrink: 0; }
 
   input[type=range] {
-    flex: 1; -webkit-appearance: none; height: 2px;
+    flex: 1; -webkit-appearance: none; appearance: none; height: 2px;
     background: rgba(255,255,255,0.1); border-radius: 2px;
     outline: none; cursor: pointer; min-width: 0;
   }
@@ -185,6 +196,31 @@
     .bottom-row    { grid-column: 1; grid-row: 5; }
     #graph-svg { min-height: 260px; flex: none; }
   }
+  @keyframes dot-travel {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  @keyframes node-glow {
+    0%   { opacity: 0; }
+    20%  { opacity: 0.55; }
+    100% { opacity: 0; }
+  }
+  .anim-dot {
+    opacity: 0; offset-rotate: 0deg;
+    animation-name: dot-travel;
+    animation-timing-function: cubic-bezier(0.37,0,0.63,1);
+    animation-fill-mode: both;
+  }
+  .anim-glow {
+    opacity: 0; pointer-events: none;
+    animation-name: node-glow;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
+  .act-btn:disabled { opacity: 0.3; cursor: default; }
+  .reset-btn:disabled { opacity: 0.3; cursor: default; }
 </style>
 </head>
 <body>
@@ -204,31 +240,27 @@
 
 <div class="page">
 
+  <div class="params-panel" id="controls"></div>
+
   <div class="graph-panel">
     <div class="card-title">computation graph</div>
+    <div class="graph-btns">
+      <button id="btn-rand">rand</button>
+      <button id="btn-reset">reset</button>
+      <button class="primary" id="btn-step">step →</button>
+      <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
+    </div>
     <svg id="graph-svg"></svg>
   </div>
-
-  <div class="params-panel" id="controls"></div>
 
   <div class="bottom-row">
     <div class="seq-panel">
       <div class="card-title">input sequence  x₁ … x₇</div>
       <svg id="seq-svg"></svg>
-      <div class="btn-row">
-        <button id="btn-rand">rand</button>
-        <button id="btn-reset">reset</button>
-        <button class="primary" id="btn-step">step →</button>
-        <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
-      </div>
     </div>
     <div class="trail-panel">
       <div class="card-title">state history</div>
       <svg id="trail-svg"></svg>
-    </div>
-    <div class="gate-panel">
-      <div class="card-title">gate activations &amp; state update</div>
-      <svg id="gate-svg"></svg>
     </div>
     <div class="narrative-panel">
       <div class="card-title">what is happening</div>
@@ -276,7 +308,6 @@ function wWidth(w) { return 0.5+Math.abs(w)*1.8; }
 
 const seqSvg   = d3.select('#seq-svg');
 const graphSvg = d3.select('#graph-svg');
-const gateSvg  = d3.select('#gate-svg');
 const trailSvg = d3.select('#trail-svg');
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -300,12 +331,79 @@ function drawNode(svg,x,y,r,val,label,color,labelBelow) {
   }
 }
 
+// outer value ring — always visible, colour encodes the node's current value
+function drawRing(svg,x,y,r,val,color) {
+  const ringColor = color || colorScale(val!=null?val:0);
+  svg.append('circle').attr('cx',x).attr('cy',y).attr('r',r+4)
+    .attr('fill','none')
+    .attr('stroke', d3.color(ringColor).copy({opacity:0.55}))
+    .attr('stroke-width',2);
+}
+
 function addMarker(svg,id) {
-  svg.select('defs').remove();
-  svg.append('defs').append('marker').attr('id',id)
+  // only remove non-animation defs
+  svg.selectAll('defs:not(.anim-defs)').remove();
+  svg.insert('defs',':first-child').append('marker').attr('id',id)
     .attr('markerWidth',6).attr('markerHeight',6)
     .attr('refX',4).attr('refY',3).attr('orient','auto')
     .append('path').attr('d','M0,0 L0,6 L6,3 z').attr('fill','rgba(255,255,255,0.25)');
+}
+
+function drawRect(svg, x, y, w, h, val, label, color) {
+  const fill = color || 'rgba(255,255,255,0.08)';
+  const stroke = color ? d3.color(color).brighter(0.3) : 'rgba(255,255,255,0.25)';
+  svg.append('rect')
+    .attr('x', x-w/2).attr('y', y-h/2).attr('width', w).attr('height', h)
+    .attr('rx', 4).attr('fill', val!=null ? fill : '#1e2230')
+    .attr('stroke', stroke).attr('stroke-width', 1.2);
+  svg.append('text').attr('x', x).attr('y', y)
+    .attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size', 9)
+    .attr('fill','rgba(255,255,255,0.85)')
+    .text(val != null ? val.toFixed(2) : label);
+}
+
+// draw a line with an inline rectangle label sitting at fraction `frac` along it
+function drawEdgeOp(svg, x1,y1, x2,y2, op, val, color, stroke, dashed) {
+  const mx = x1 + (x2-x1)*0.5, my = y1 + (y2-y1)*0.5;
+  const rw=20, rh=14;
+  const sc = stroke || 'rgba(255,255,255,0.2)';
+  const dash = dashed ? '3,2' : null;
+
+  // line first segment
+  const line1 = svg.append('line')
+    .attr('x1',x1).attr('y1',y1).attr('x2',mx - rw/2 - 2).attr('y2', y1+(y2-y1)*0.5 - (rh/2+2)*(y2-y1 ? 1 : 0))
+    .attr('stroke',sc).attr('stroke-width',1);
+  if (dash) line1.attr('stroke-dasharray', dash);
+
+  // inline op rectangle
+  const fill = color ? d3.color(color).copy({opacity:0.12}) : 'rgba(255,255,255,0.06)';
+  const bstroke = color || 'rgba(255,255,255,0.25)';
+  svg.append('rect')
+    .attr('x', mx-rw/2).attr('y', my-rh/2)
+    .attr('width',rw).attr('height',rh).attr('rx',3)
+    .attr('fill', val!=null ? fill : '#1e2230')
+    .attr('stroke', bstroke).attr('stroke-width',1);
+  svg.append('text').attr('x',mx).attr('y',my)
+    .attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8)
+    .attr('fill', color || 'rgba(255,255,255,0.6)')
+    .text(val!=null ? val.toFixed(2) : op);
+
+  // line second segment with arrow
+  const line2 = svg.append('line')
+    .attr('x1', mx+rw/2+2).attr('y1', my + (rh/2+2)*(y2>y1?1:y2<y1?-1:0))
+    .attr('x2',x2).attr('y2',y2)
+    .attr('stroke',sc).attr('stroke-width',1).attr('marker-end','url(#garr)');
+  if (dash) line2.attr('stroke-dasharray', dash);
+}
+
+function drawArrowLabel(svg, x, y, label, color) {
+  svg.append('text').attr('x',x).attr('y',y)
+    .attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',7)
+    .attr('fill', color || 'var(--muted)').attr('opacity',0.75)
+    .text(label);
 }
 
 function drawEdge(svg,x1,y1,x2,y2,w,wLabel,markerId) {
@@ -353,165 +451,90 @@ function drawSequence() {
 // ── computation graph ─────────────────────────────────────────────────────────
 function drawGraph() {
   graphSvg.selectAll('*').remove();
-  const W_S=580,H=290;
+  const W_S=700, H=290;
   graphSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
   addMarker(graphSvg,'garr');
 
-  const gates=['f','i','c','o'];
-  const gLabels={f:'Σf',i:'Σi',c:'Σc̃',o:'Σo'};
-  const aLabels={f:'f',i:'i',c:'c̃',o:'o'};
-  const colX=[50,145,245,375,500];
-  const gateY={f:48,i:112,c:180,o:248};
-  const xNodeY=48,hNodeY=148,cPrevY=248;
+  // columns: inputs | gates | hadamard merges | cell ops | output
+  const iX=48, aX=175, cX=290, rfX=370, riX=370, addX=450, ctX=510, jHX=590, hX=660;
+  const rfY=80, riY=200;     // f·c and i·c̃ well separated
+  const addY=140, gY={f:38, i:105, c:178, o:248};
+  const xY=38, hpY=143, cpY=248;
 
   const latest=gateHistory.length>0?gateHistory[gateHistory.length-1]:null;
   const h_prev=hHistory.length>=2?hHistory[hHistory.length-2]:0;
   const c_prev=cHistory.length>=2?cHistory[cHistory.length-2]:0;
-  const x_cur=t>0?sequence[t-1]:null;
+  const xIdx=t===0?0:t-1;
+  const x_cur=sequence[xIdx];
+  const act=!!latest;
+  const dim='rgba(255,255,255,0.1)';
 
-  // inputs
-  drawNode(graphSvg,colX[0],xNodeY,15,x_cur,'xₜ',null,true);
-  drawNode(graphSvg,colX[0],hNodeY,15,t>0?h_prev:null,'hₜ₋₁',null,true);
-  drawNode(graphSvg,colX[0],cPrevY,15,t>0?c_prev:null,'cₜ₋₁',CELL_COLOR,true);
-
-  // sum + activation nodes
-  gates.forEach(g=>{
-    const y=gateY[g];
-    const z=latest?W[g].wh*h_prev+W[g].wx*(x_cur??0)+W[g].b:null;
-    drawNode(graphSvg,colX[1],y,14,z,gLabels[g],GC[g],false);
-    drawEdge(graphSvg,colX[0],xNodeY,colX[1],y,W[g].wx,true,'garr');
-    drawEdge(graphSvg,colX[0],hNodeY,colX[1],y,W[g].wh,true,'garr');
-    graphSvg.append('text').attr('x',colX[1]+2).attr('y',y+14+9)
-      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',7)
-      .attr('fill',GC[g]).attr('opacity',0.7).text(`b=${W[g].b.toFixed(2)}`);
-    const val=latest?latest[g]:null;
-    drawNode(graphSvg,colX[2],y,15,val,aLabels[g],GC[g],false);
-    graphSvg.append('line').attr('x1',colX[1]+14).attr('y1',y).attr('x2',colX[2]-15).attr('y2',y)
-      .attr('stroke',latest?GC[g]:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-    graphSvg.append('text').attr('x',(colX[1]+colX[2])/2).attr('y',y-8)
-      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',7)
-      .attr('fill','var(--muted)').text(g==='c'?'tanh':'σ');
-  });
-
-  // cell update: f⊙c_prev + i⊙c̃ → c_t
-  const mfY=90,miY=200,addY=145,mX=colX[3]-30;
-  drawNode(graphSvg,mX,mfY,11,null,'⊙','rgba(255,255,255,0.3)',false);
-  drawNode(graphSvg,mX,miY,11,null,'⊙','rgba(255,255,255,0.3)',false);
-  drawNode(graphSvg,colX[3],addY,12,null,'+','rgba(255,255,255,0.3)',false);
-
-  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.f).attr('x2',mX-11).attr('y2',mfY)
-    .attr('stroke',latest?GC.f:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  graphSvg.append('line').attr('x1',colX[0]+15).attr('y1',cPrevY).attr('x2',mX-11).attr('y2',mfY)
-    .attr('stroke',t>0?CELL_COLOR:'rgba(255,255,255,0.12)').attr('stroke-width',1)
-    .attr('stroke-dasharray','3,2').attr('marker-end','url(#garr)');
-  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.i).attr('x2',mX-11).attr('y2',miY)
-    .attr('stroke',latest?GC.i:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.c).attr('x2',mX-11).attr('y2',miY)
-    .attr('stroke',latest?GC.c:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  graphSvg.append('line').attr('x1',mX+11).attr('y1',mfY).attr('x2',colX[3]-12).attr('y2',addY)
-    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  graphSvg.append('line').attr('x1',mX+11).attr('y1',miY).attr('x2',colX[3]-12).attr('y2',addY)
-    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-
-  if (latest) {
-    const fc=(latest.f*c_prev).toFixed(2),ic=(latest.i*latest.c).toFixed(2);
-    graphSvg.append('text').attr('x',mX).attr('y',mfY-15).attr('text-anchor','middle')
-      .attr('font-family','JetBrains Mono, monospace').attr('font-size',7).attr('fill',GC.f)
-      .text(`${latest.f.toFixed(2)}×${c_prev.toFixed(2)}=${fc}`);
-    graphSvg.append('text').attr('x',mX).attr('y',miY+22).attr('text-anchor','middle')
-      .attr('font-family','JetBrains Mono, monospace').attr('font-size',7).attr('fill',GC.i)
-      .text(`${latest.i.toFixed(2)}×${latest.c.toFixed(2)}=${ic}`);
+  function ln(x1,y1,x2,y2,col,curve){
+    if(curve){
+      const cpX=(x1+x2)/2, cpY=(y1+y2)/2+60;
+      graphSvg.append('path').attr('d',`M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}`)
+        .attr('fill','none').attr('stroke',col||dim).attr('stroke-width',1).attr('marker-end','url(#garr)');
+    } else {
+      graphSvg.append('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2)
+        .attr('stroke',col||dim).attr('stroke-width',1).attr('marker-end','url(#garr)');
+    }
+  }
+  function opLabel(x,y,sym,col){
+    graphSvg.append('text').attr('x',x).attr('y',y)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
+      .attr('font-size',9).attr('fill',col||'rgba(255,255,255,0.5)').text(sym);
+  }
+  function edgeLabel(x,y,txt,col){
+    graphSvg.append('text').attr('x',x).attr('y',y)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
+      .attr('font-size',7).attr('fill',col||'var(--muted)').attr('opacity',0.7).text(txt);
   }
 
-  const ctX=colX[3]+45;
-  graphSvg.append('line').attr('x1',colX[3]+12).attr('y1',addY).attr('x2',ctX-15).attr('y2',addY)
-    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  drawNode(graphSvg,ctX,addY,15,t>0?cellState:null,'cₜ',CELL_COLOR,true);
+  // inputs — always show values (0 before first step)
+  drawNode(graphSvg,iX,xY,  14,x_cur,     `x${xIdx+1}`, null,       true);
+  drawNode(graphSvg,iX,hpY, 14,t>0?h_prev:0, 'hₜ₋₁',   null,       true);
+  drawNode(graphSvg,iX,cpY, 14,t>0?c_prev:0, 'cₜ₋₁',   CELL_COLOR, true);
 
-  // output: o⊙tanh(c_t) → h_t
-  const tanhX=colX[4]-40,multX=colX[4]-5,htX=colX[4]+40;
-  graphSvg.append('line').attr('x1',ctX+15).attr('y1',addY).attr('x2',tanhX-13).attr('y2',addY)
-    .attr('stroke',t>0?CELL_COLOR:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  drawNode(graphSvg,tanhX,addY,12,t>0?Math.tanh(cellState):null,'tanh','rgba(255,255,255,0.35)',false);
-  graphSvg.append('line').attr('x1',tanhX+12).attr('y1',addY).attr('x2',multX-11).attr('y2',addY)
-    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  graphSvg.append('line').attr('x1',colX[2]+15).attr('y1',gateY.o).attr('x2',multX).attr('y2',addY+11)
-    .attr('stroke',latest?GC.o:'rgba(255,255,255,0.12)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  drawNode(graphSvg,multX,addY,11,null,'⊙','rgba(255,255,255,0.3)',false);
-  graphSvg.append('line').attr('x1',multX+11).attr('y1',addY).attr('x2',htX-15).attr('y2',addY)
-    .attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('marker-end','url(#garr)');
-  drawNode(graphSvg,htX,addY,15,t>0?hiddenState:null,'hₜ',null,true);
-}
-
-// ── gate bars ─────────────────────────────────────────────────────────────────
-function drawGates() {
-  gateSvg.selectAll('*').remove();
-  const W_S=580,H=165;
-  gateSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
-
-  const gKeys=['f','i','c','o'],gLabels={f:'forget',i:'input',c:'candidate',o:'output'};
-  const gateX=[70,185,320,455],barMaxH=55,barY=12,barW=38;
-  const latest=gateHistory.length>0?gateHistory[gateHistory.length-1]:null;
-
-  gKeys.forEach((g,idx)=>{
-    const x=gateX[idx],val=latest?latest[g]:0,col=GC[g];
-    const barH=Math.abs(val)*barMaxH;
-    gateSvg.append('rect').attr('x',x-barW/2).attr('y',barY).attr('width',barW).attr('height',barMaxH)
-      .attr('fill','rgba(255,255,255,0.03)').attr('rx',3);
-    gateSvg.append('rect').attr('x',x-barW/2).attr('y',barY+barMaxH-barH)
-      .attr('width',barW).attr('height',barH||1)
-      .attr('fill',latest?col:'rgba(255,255,255,0.05)').attr('rx',3).attr('opacity',0.85);
-    gateSvg.append('text').attr('x',x).attr('y',barY+barMaxH-barH-4).attr('text-anchor','middle')
-      .attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
-      .attr('fill',latest?col:'var(--muted)').text(latest?val.toFixed(2):'—');
-    gateSvg.append('text').attr('x',x).attr('y',barY+barMaxH+13).attr('text-anchor','middle')
-      .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill',col)
-      .text(g==='c'?'c̃':g);
-    gateSvg.append('text').attr('x',x).attr('y',barY+barMaxH+24).attr('text-anchor','middle')
-      .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill','var(--muted)')
-      .text(gLabels[g]);
+  // gate nodes (merged Σ+activation, no separate sigma node)
+  const aLabels={f:'f',i:'i',c:'c̃',o:'o'};
+  ['f','i','c','o'].forEach(g=>{
+    const y=gY[g];
+    drawEdge(graphSvg,iX,xY,  aX,y,W[g].wx,true,'garr');
+    drawEdge(graphSvg,iX,hpY, aX,y,W[g].wh,true,'garr');
+    drawNode(graphSvg,aX,y,15,act?latest[g]:null,aLabels[g],GC[g],false);
   });
 
-  // equation row
-  const rowY=120,cPrev=cHistory.length>=2?cHistory[cHistory.length-2]:0;
-  gateSvg.append('rect').attr('x',15).attr('y',rowY-9).attr('width',48).attr('height',18)
-    .attr('fill',colorScale(cPrev)).attr('rx',3).attr('opacity',0.6);
-  gateSvg.append('text').attr('x',39).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.7)').text(cPrev.toFixed(2));
-  gateSvg.append('text').attr('x',39).attr('y',rowY+15).attr('text-anchor','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill','var(--muted)').text('cₜ₋₁');
-  gateSvg.append('text').attr('x',95).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',10).attr('fill',GC.f)
-    .text(latest?`×${latest.f.toFixed(2)}`:'×f');
-  gateSvg.append('line').attr('x1',128).attr('x2',178).attr('y1',rowY).attr('y2',rowY)
-    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
-  gateSvg.append('text').attr('x',218).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.5)')
-    .text(latest?`+ ${latest.i.toFixed(2)}×${latest.c.toFixed(2)}`:'+ i×c̃');
-  gateSvg.append('line').attr('x1',285).attr('x2',320).attr('y1',rowY).attr('y2',rowY)
-    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
-  gateSvg.append('rect').attr('x',320).attr('y',rowY-9).attr('width',52).attr('height',18)
-    .attr('fill',colorScale(cellState)).attr('rx',3);
-  gateSvg.append('text').attr('x',346).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.85)')
-    .text(cellState.toFixed(3));
-  gateSvg.append('text').attr('x',346).attr('y',rowY+15).attr('text-anchor','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill',CELL_COLOR).text('cₜ');
-  gateSvg.append('line').attr('x1',378).attr('x2',408).attr('y1',rowY).attr('y2',rowY)
-    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
-  gateSvg.append('text').attr('x',445).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.5)')
-    .text('o×tanh(c)');
-  gateSvg.append('line').attr('x1',492).attr('x2',516).attr('y1',rowY).attr('y2',rowY)
-    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
-  gateSvg.append('rect').attr('x',516).attr('y',rowY-9).attr('width',44).attr('height',18)
-    .attr('fill',colorScale(hiddenState)).attr('rx',3);
-  gateSvg.append('text').attr('x',538).attr('y',rowY).attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',9).attr('fill','rgba(255,255,255,0.85)')
-    .text(hiddenState.toFixed(3));
-  gateSvg.append('text').attr('x',538).attr('y',rowY+15).attr('text-anchor','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8).attr('fill','var(--muted)').text('hₜ');
+  // f ⊙ cₜ₋₁ → f·c
+  ln(aX+15,gY.f, cX,rfY, dim);
+  ln(iX+14,cpY,  cX,rfY, dim, true);   // curved, no dash
+  opLabel(cX, rfY-10, '⊙', GC.f);
+  ln(cX, rfY, rfX-14, rfY, dim);
+  drawNode(graphSvg,rfX,rfY,13,act?latest.f*c_prev:null,'f·c',GC.f,false);
+
+  // i ⊙ c̃ → i·c̃
+  ln(aX+15,gY.i, cX,riY, dim);
+  ln(aX+15,gY.c, cX,riY, dim);
+  opLabel(cX, riY-10, '⊙', GC.i);
+  ln(cX, riY, riX-14, riY, dim);
+  drawNode(graphSvg,riX,riY,13,act?latest.i*latest.c:null,'i·c̃',GC.i,false);
+
+  // f·c + i·c̃ → cₜ
+  ln(rfX+13,rfY, addX,addY, dim);
+  ln(riX+13,riY, addX,addY, dim);
+  opLabel(addX, addY-10, '+', CELL_COLOR);
+  ln(addX, addY, ctX-15, addY, dim);
+  drawNode(graphSvg,ctX,addY,15,t>0?cellState:null,'cₜ',CELL_COLOR,true);
+
+  // tanh(cₜ) ⊙ o → hₜ
+  ln(ctX+15, addY, jHX, addY, dim);
+  ln(aX+15,  gY.o, jHX, addY, dim, true);  // curved
+  opLabel(jHX, addY-10, '⊙', '#e8824a');
+  ln(jHX, addY, hX-15, addY, dim);
+  drawNode(graphSvg,hX,addY,15,t>0?hiddenState:null,'hₜ',null,true);
 }
+
+
+// ── gate bars ─────────────────────────────────────────────────────────────────
 
 // ── trail ─────────────────────────────────────────────────────────────────────
 function drawTrail() {
@@ -563,7 +586,7 @@ function updateNarrative() {
 function redraw(){
   document.getElementById('t-display').textContent=t;
   document.getElementById('btn-step').disabled=t>=SEQ_LEN;
-  drawSequence(); drawGraph(); drawGates(); drawTrail(); updateNarrative();
+  drawSequence(); drawGraph(); drawTrail(); updateNarrative();
 }
 
 function resetAndRedraw(){
@@ -572,13 +595,239 @@ function resetAndRedraw(){
   redraw();
 }
 
-document.getElementById('btn-step').addEventListener('click',()=>{
-  if(t>=SEQ_LEN)return;
-  const r=stepLSTM(sequence[t],hiddenState,cellState);
-  t++;cellState=r.c_new;hiddenState=r.h_new;
-  cHistory.push(cellState);hHistory.push(hiddenState);
-  gateHistory.push({f:r.f,i:r.i,c:r.c,o:r.o});
-  redraw();
+document.getElementById('btn-step').addEventListener('click', () => {
+  if (t >= SEQ_LEN) return;
+
+  // ── compute everything upfront ────────────────────────────────────────────────
+  const x_t    = sequence[t];
+  const h_prev = hiddenState;
+  const c_prev = cellState;
+  const r      = stepLSTM(x_t, h_prev, c_prev);
+
+  // ── animation setup ───────────────────────────────────────────────────────────
+  const svgEl = document.getElementById('graph-svg');
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // positions — must match drawGraph exactly
+  const iX=48, aX=175, cX=290;
+  const rfX=370, rfY=80, riX=370, riY=200;
+  const addX=450, addY=140, ctX=510, jHX=590, hX=660;
+  const gateY={f:38, i:105, c:178, o:248};
+  const xNodeY=38, hNodeY=143, cPrevY=248;
+  const colX=[iX,aX,cX,rfX,ctX];
+
+  const T  = 1.1;   // dot travel duration (matches RNN/feedforward)
+  const G  = 0.3;   // gap between phases
+
+  const animEls = [];
+  const timers  = [];
+
+  function schedule(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+  function setAnimating(on) {
+    ['btn-step','btn-reset','btn-rand'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = on || (id==='btn-step' && !on && t>=SEQ_LEN);
+    });
+    document.querySelectorAll('.act-btn, .reset-btn').forEach(el => el.disabled = on);
+    document.getElementById('controls').querySelectorAll('input').forEach(el => el.disabled = on);
+  }
+
+  // get or create a persistent defs block for path elements
+  let defsEl = svgEl.querySelector('defs.anim-defs');
+  if (!defsEl) {
+    defsEl = document.createElementNS(NS, 'defs');
+    defsEl.classList.add('anim-defs');
+    svgEl.insertBefore(defsEl, svgEl.firstChild);
+  }
+  animEls.push(defsEl);
+
+  function mkPath(id, x1,y1, x2,y2, curve) {
+    const existing = defsEl.querySelector(`#${id}`);
+    if (existing) existing.remove();
+    const p = document.createElementNS(NS,'path');
+    p.setAttribute('id', id);
+    if (curve) {
+      const cpX=(x1+x2)/2, cpY=(y1+y2)/2+60;
+      p.setAttribute('d', `M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}`);
+    } else {
+      p.setAttribute('d', `M${x1},${y1} L${x2},${y2}`);
+    }
+    p.setAttribute('fill','none'); p.setAttribute('stroke','none');
+    defsEl.appendChild(p);
+  }
+
+  function revealNode(x, y, val, color) {
+    // find circle closest to (x,y) and update its fill + value text
+    let best = null, bestD = Infinity;
+    svgEl.querySelectorAll('circle:not(.anim-dot):not(.anim-glow)').forEach(c => {
+      const d = Math.abs((+c.getAttribute('cx'))-x) + Math.abs((+c.getAttribute('cy'))-y);
+      if (d < bestD) { bestD=d; best=c; }
+    });
+    if (!best || bestD > 25) return;
+    const fill = color || colorScale(val);
+    best.setAttribute('fill', fill);
+    best.setAttribute('stroke', d3.color(fill).brighter(0.3));
+    const px = +best.getAttribute('cx'), py = +best.getAttribute('cy');
+    const existing = [...svgEl.querySelectorAll('text')].find(t =>
+      Math.abs(+t.getAttribute('x')-px)<3 && Math.abs(+t.getAttribute('y')-py)<3
+    );
+    const txt = typeof val==='number' ? val.toFixed(2) : String(val);
+    if (existing) { existing.textContent = txt; }
+    else {
+      const t = document.createElementNS(NS,'text');
+      t.setAttribute('x',px); t.setAttribute('y',py);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('font-family','JetBrains Mono, monospace'); t.setAttribute('font-size','9');
+      t.setAttribute('fill','rgba(255,255,255,0.85)');
+      t.textContent = txt;
+      svgEl.appendChild(t); animEls.push(t);
+    }
+  }
+
+  function mkDot(color, pathId, delay, dur, pathD) {
+    dur = dur || T;
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('r', 5); c.setAttribute('fill', color);
+    c.classList.add('anim-dot');
+    if (pathD) {
+      c.style.offsetPath = `path('${pathD}')`;
+    } else {
+      c.style.offsetPath = `url(#${pathId})`;
+    }
+    c.style.animationDuration = dur + 's';
+    c.style.animationDelay = delay + 's';
+    svgEl.appendChild(c); animEls.push(c);
+  }
+
+  function mkGlow(x, y, color, delay, radius) {
+    radius = radius || 18;
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',radius);
+    c.setAttribute('fill',color); c.classList.add('anim-glow');
+    c.style.animationDuration = '0.55s';
+    c.style.animationDelay = delay + 's';
+    svgEl.appendChild(c); animEls.push(c);
+  }
+
+  function mkPulse(x, y, color, delay) {
+    const styleEl = document.createElement('style');
+    document.head.appendChild(styleEl); animEls.push(styleEl);
+    const uid = `lp-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
+    styleEl.sheet.insertRule(`
+      @keyframes ${uid} {
+        0%   { r: 15px; opacity: 0.9; }
+        100% { r: 34px; opacity: 0; }
+      }
+    `, 0);
+    const ring = document.createElementNS(NS,'circle');
+    ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',15);
+    ring.setAttribute('fill','none');
+    ring.setAttribute('stroke',color); ring.setAttribute('stroke-width','2');
+    ring.style.animationName = uid;
+    ring.style.animationDuration = '0.6s';
+    ring.style.animationDelay = delay + 's';
+    ring.style.animationTimingFunction = 'ease-out';
+    ring.style.animationFillMode = 'both';
+    svgEl.appendChild(ring); animEls.push(ring);
+  }
+
+  setAnimating(true);
+
+  // pre-register all paths
+  const gates = ['f','i','c','o'];
+  // phase 1: inputs → gate nodes
+  gates.forEach(g => {
+    mkPath(`lp1x-${g}`, iX+14, xNodeY,  aX-15, gateY[g]);
+    mkPath(`lp1h-${g}`, iX+14, hNodeY,  aX-15, gateY[g]);
+  });
+  // phase 2: gate nodes → hadamard merge points → result circles
+  mkPath('lp2-f-cx',  aX+15, gateY.f,  cX,      rfY);
+  mkPath('lp2-cp-cx', iX+14, cPrevY,   cX,      rfY, true);  // cₜ₋₁ curved
+  mkPath('lp2-i-cx',  aX+15, gateY.i,  cX,      riY);
+  mkPath('lp2-c-cx',  aX+15, gateY.c,  cX,      riY);
+  mkPath('lp2-cx-rf', cX,    rfY,      rfX-14,  rfY);
+  mkPath('lp2-cx-ri', cX,    riY,      riX-14,  riY);
+  // phase 3: result circles → + → cₜ
+  mkPath('lp3-rf-add', rfX+13, rfY,   addX, addY);
+  mkPath('lp3-ri-add', riX+13, riY,   addX, addY);
+  mkPath('lp3-add-ct', addX,   addY,  ctX-15, addY);
+  // phase 4: cₜ + o → ⊙ → hₜ
+  mkPath('lp4-ct-jh',  ctX+15, addY,    jHX,   addY);
+  mkPath('lp4-o-jh',   aX+15,  gateY.o, jHX,   addY, true);  // o curved
+  mkPath('lp4-jh-ht',  jHX,    addY,    hX-15, addY);
+
+  // ── Phase 1: inputs → gate nodes ──────────────────────────────────────────────
+  const p1 = 0;
+  gates.forEach(g => {
+    mkDot('#e8824a', `lp1x-${g}`, p1);
+    mkDot('#378ADD', `lp1h-${g}`, p1);
+  });
+  // cₜ₋₁ departs immediately, proportional duration, curved path inline
+  const T_cprev = T * Math.hypot(cX-(iX+14), rfY-cPrevY) / Math.hypot(cX-(aX+15), rfY-gateY.f);
+  const cprevD = `M${iX+14},${cPrevY} Q${(iX+14+cX)/2},${(cPrevY+rfY)/2+60} ${cX},${rfY}`;
+  mkDot(CELL_COLOR, 'lp2-cp-cx', p1, T_cprev, cprevD);
+  // o departs at p2 with duration = full chain length, curved path inline
+  const T_o = 5*T + 1.2*G;
+  const oD = `M${aX+15},${gateY.o} Q${(aX+15+jHX)/2},${(gateY.o+addY)/2+60} ${jHX},${addY}`;
+
+  gates.forEach(g => mkGlow(aX, gateY[g], GC[g], p1+T-0.05, 17));
+  schedule((p1+T)*1000, () => {
+    gates.forEach(g => revealNode(aX, gateY[g], r[g==='c'?'c':g], GC[g]));
+  });
+
+  // ── Phase 2: gate nodes → ⊙ label → result circles ──────────────────────────
+  const p2 = p1 + T + G;
+  mkDot(GC.f, 'lp2-f-cx', p2);
+  mkDot(GC.i, 'lp2-i-cx', p2);
+  mkDot(GC.c, 'lp2-c-cx', p2);
+  mkDot(GC.o, 'lp4-o-jh', p2, T_o, oD);  // o starts here, curved path
+
+  const p2b = p2 + T;  // wait for gate→⊙ dots to fully arrive
+  mkDot(GC.f, 'lp2-cx-rf', p2b);
+  mkDot(GC.i, 'lp2-cx-ri', p2b);
+  mkDot(GC.c, 'lp2-cx-ri', p2b);
+
+  const p2arrive = p2b + T;
+  mkGlow(rfX, rfY, GC.f, p2arrive-0.05, 16);
+  mkGlow(riX, riY, GC.i, p2arrive-0.05, 16);
+  schedule(p2arrive*1000, () => {
+    revealNode(rfX, rfY, r.f * c_prev, GC.f);
+    revealNode(riX, riY, r.i * r.c,   GC.i);
+  });
+
+  // ── Phase 3a: result circles → + ─────────────────────────────────────────────
+  const p3 = p2arrive + G*0.5;
+  mkDot(CELL_COLOR, 'lp3-rf-add', p3);
+  mkDot(CELL_COLOR, 'lp3-ri-add', p3);
+  mkGlow(addX, addY, CELL_COLOR, p3+T-0.05, 14);
+
+  // ── Phase 3b: + → cₜ ─────────────────────────────────────────────────────────
+  const p3b = p3 + T + G*0.4;
+  mkDot(CELL_COLOR, 'lp3-add-ct', p3b);
+  mkPulse(ctX, addY, CELL_COLOR, p3b+T-0.05);
+  schedule((p3b+T)*1000, () => revealNode(ctX, addY, r.c_new, CELL_COLOR));
+
+  // ── Phase 4: cₜ + o → ⊙ → hₜ ────────────────────────────────────────────────
+  const p4start = p3b + T + G*0.3;
+  mkDot(CELL_COLOR, 'lp4-ct-jh', p4start);
+  mkGlow(jHX, addY, '#e8824a', p4start+T-0.05, 16);
+
+  const p4b = p4start + T + G*0.3;
+  mkDot(CELL_COLOR, 'lp4-jh-ht', p4b);
+  mkPulse(hX, addY, '#e8824a', p4b+T-0.05);
+  schedule((p4b+T)*1000, () => revealNode(hX, addY, r.h_new, null));
+
+  // ── Commit state + full redraw only after all animation ends ──────────────────
+  const totalMs = (p4b + T + 0.4) * 1000;
+  schedule(totalMs, () => {
+    animEls.forEach(e => { try { e.remove(); } catch(_){} });
+    t++; cellState=r.c_new; hiddenState=r.h_new;
+    cHistory.push(cellState); hHistory.push(hiddenState);
+    gateHistory.push({f:r.f, i:r.i, c:r.c, o:r.o});
+    redraw();
+    setAnimating(false);
+  });
 });
 document.getElementById('btn-reset').addEventListener('click',resetAndRedraw);
 document.getElementById('btn-rand').addEventListener('click',()=>{
@@ -591,23 +840,11 @@ function buildControls(){
   const ctrl=d3.select('#controls');
   ctrl.selectAll('*').remove();
 
-  // Reset to zero
-  const resetDiv = ctrl.append('div').style('margin-bottom','0.5rem');
-  resetDiv.append('button')
-    .attr('class','reset-btn')
-    .text('zero all weights')
-    .on('click', () => {
-      ['f','i','c','o'].forEach(k => { W[k].wh=0; W[k].wx=0; W[k].b=0; });
-      t=0; cellState=0; hiddenState=0;
-      cHistory=[0]; hHistory=[0]; gateHistory=[];
-      buildControls(); redraw();
-    });
-
-  // four gate columns
+  // four gate columns side by side
   [{key:'f',label:'Wf  forget',color:GC.f},{key:'i',label:'Wi  input',color:GC.i},
    {key:'c',label:'Wc  candidate',color:GC.c},{key:'o',label:'Wo  output',color:GC.o}]
   .forEach(({key,label,color})=>{
-    const col=ctrl.append('div');
+    const col=ctrl.append('div').style('display','flex').style('flex-direction','column');
     col.append('div').attr('class','ctrl-col-title').style('color',color).text(label);
     [{param:'wh',display:'Wh'},{param:'wx',display:'Wx'},{param:'b',display:'bias'}]
     .forEach(({param,display})=>{
@@ -615,12 +852,12 @@ function buildControls(){
       row.append('span').attr('class','ctrl-label').text(display);
       const sl=row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',W[key][param]);
       const vl=row.append('span').attr('class','ctrl-val').text(W[key][param].toFixed(2));
-      sl.on('input',function(){W[key][param]=+this.value;vl.text(W[key][param].toFixed(2));resetAndRedraw();});
+      sl.on('input',function(){W[key][param]=+this.value;vl.text(W[key][param].toFixed(2));redraw();});
     });
   });
 
   // sequence column
-  const seqCol=ctrl.append('div');
+  const seqCol=ctrl.append('div').style('display','flex').style('flex-direction','column');
   seqCol.append('div').attr('class','ctrl-col-title').style('color','var(--muted)').text('sequence');
   sequence.forEach((v,i)=>{
     const row=seqCol.append('div').attr('class','ctrl-row');
@@ -629,6 +866,28 @@ function buildControls(){
     const vl=row.append('span').attr('class','ctrl-val').text(v.toFixed(2));
     sl.on('input',function(){sequence[i]=+this.value;vl.text(sequence[i].toFixed(2));resetAndRedraw();});
   });
+
+  // reset column
+  const resetCol=ctrl.append('div').style('display','flex').style('flex-direction','column').style('gap','0.3rem');
+  resetCol.append('div').attr('class','ctrl-col-title').style('color','var(--muted)').text('reset');
+  resetCol.append('button').attr('class','reset-btn').attr('id','btn-zero')
+    .text('zero weights')
+    .on('click', () => {
+      ['f','i','c','o'].forEach(k => { W[k].wh=0; W[k].wx=0; W[k].b=0; });
+      t=0; cellState=0; hiddenState=0; cHistory=[0]; hHistory=[0]; gateHistory=[];
+      buildControls(); redraw();
+    });
+  resetCol.append('button').attr('class','reset-btn').attr('id','btn-rand-weights')
+    .text('randomise')
+    .on('click', () => {
+      ['f','i','c','o'].forEach(k => {
+        W[k].wh=Math.round((Math.random()*2-1)*100)/100;
+        W[k].wx=Math.round((Math.random()*2-1)*100)/100;
+        W[k].b =Math.round((Math.random()*2-1)*100)/100;
+      });
+      t=0; cellState=0; hiddenState=0; cHistory=[0]; hHistory=[0]; gateHistory=[];
+      buildControls(); redraw();
+    });
 }
 
 buildControls();
