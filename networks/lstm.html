@@ -245,8 +245,6 @@
   <div class="graph-panel">
     <div class="card-title">computation graph</div>
     <div class="graph-btns">
-      <button id="btn-rand">rand</button>
-      <button id="btn-reset">reset</button>
       <button class="primary" id="btn-step">step →</button>
       <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
     </div>
@@ -625,7 +623,7 @@ document.getElementById('btn-step').addEventListener('click', () => {
   function schedule(ms, fn) { timers.push(setTimeout(fn, ms)); }
 
   function setAnimating(on) {
-    ['btn-step','btn-reset','btn-rand'].forEach(id => {
+    ['btn-step'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.disabled = on || (id==='btn-step' && !on && t>=SEQ_LEN);
     });
@@ -831,12 +829,6 @@ document.getElementById('btn-step').addEventListener('click', () => {
     setAnimating(false);
   });
 });
-document.getElementById('btn-reset').addEventListener('click',resetAndRedraw);
-document.getElementById('btn-rand').addEventListener('click',()=>{
-  sequence=Array.from({length:SEQ_LEN},()=>Math.round((Math.random()*2-1)*100)/100);
-  resetAndRedraw();
-});
-
 // ── controls (horizontal) ─────────────────────────────────────────────────────
 function buildControls(){
   const ctrl=d3.select('#controls');
@@ -873,14 +865,14 @@ function buildControls(){
   const resetCol=ctrl.append('div').style('display','flex').style('flex-direction','column').style('gap','0.3rem');
   resetCol.append('div').attr('class','ctrl-col-title').style('color','var(--muted)').text('reset');
   resetCol.append('button').attr('class','reset-btn').attr('id','btn-zero')
-    .text('zero weights')
+    .text('zero all weights')
     .on('click', () => {
       ['f','i','c','o'].forEach(k => { W[k].wh=0; W[k].wx=0; W[k].b=0; });
       t=0; cellState=0; hiddenState=0; cHistory=[0]; hHistory=[0]; gateHistory=[];
       buildControls(); redraw();
     });
   resetCol.append('button').attr('class','reset-btn').attr('id','btn-rand-weights')
-    .text('randomise')
+    .text('randomise weights')
     .on('click', () => {
       ['f','i','c','o'].forEach(k => {
         W[k].wh=Math.round((Math.random()*2-1)*100)/100;
