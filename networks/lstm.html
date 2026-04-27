@@ -493,7 +493,7 @@ function drawGraph() {
   // inputs — always show values (0 before first step)
   drawNode(graphSvg,iX,xY,  14,x_cur,     `x${xIdx+1}`, null,       true);
   drawNode(graphSvg,iX,hpY, 14,t>0?h_prev:0, 'hₜ₋₁',   null,       true);
-  drawNode(graphSvg,iX,cpY, 14,t>0?c_prev:0, 'cₜ₋₁',   CELL_COLOR, true);
+  drawNode(graphSvg,iX,cpY, 14,t>0?c_prev:0, 'cₜ₋₁',   null,       true);
 
   // gate nodes (merged Σ+activation, no separate sigma node)
   const aLabels={f:'f',i:'i',c:'c̃',o:'o'};
@@ -501,7 +501,7 @@ function drawGraph() {
     const y=gY[g];
     drawEdge(graphSvg,iX,xY,  aX,y,W[g].wx,true,'garr');
     drawEdge(graphSvg,iX,hpY, aX,y,W[g].wh,true,'garr');
-    drawNode(graphSvg,aX,y,15,act?latest[g]:null,aLabels[g],GC[g],false);
+    drawNode(graphSvg,aX,y,15,act?latest[g]:null,aLabels[g],null,false);
   });
 
   // f ⊙ cₜ₋₁ → f·c
@@ -509,21 +509,21 @@ function drawGraph() {
   ln(iX+14,cpY,  cX,rfY, dim, true);   // curved, no dash
   opLabel(cX, rfY-10, '⊙', GC.f);
   ln(cX, rfY, rfX-14, rfY, dim);
-  drawNode(graphSvg,rfX,rfY,13,act?latest.f*c_prev:null,'f·c',GC.f,false);
+  drawNode(graphSvg,rfX,rfY,13,act?latest.f*c_prev:null,'f·c',null,false);
 
   // i ⊙ c̃ → i·c̃
   ln(aX+15,gY.i, cX,riY, dim);
   ln(aX+15,gY.c, cX,riY, dim);
   opLabel(cX, riY-10, '⊙', GC.i);
   ln(cX, riY, riX-14, riY, dim);
-  drawNode(graphSvg,riX,riY,13,act?latest.i*latest.c:null,'i·c̃',GC.i,false);
+  drawNode(graphSvg,riX,riY,13,act?latest.i*latest.c:null,'i·c̃',null,false);
 
   // f·c + i·c̃ → cₜ
   ln(rfX+13,rfY, addX,addY, dim);
   ln(riX+13,riY, addX,addY, dim);
   opLabel(addX, addY-10, '+', CELL_COLOR);
   ln(addX, addY, ctX-15, addY, dim);
-  drawNode(graphSvg,ctX,addY,15,t>0?cellState:null,'cₜ',CELL_COLOR,true);
+  drawNode(graphSvg,ctX,addY,15,t>0?cellState:null,'cₜ',null,true);
 
   // tanh(cₜ) ⊙ o → hₜ
   ln(ctX+15, addY, jHX, addY, dim);
@@ -716,7 +716,8 @@ document.getElementById('btn-step').addEventListener('click', () => {
     const uid = `lp-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
     styleEl.sheet.insertRule(`
       @keyframes ${uid} {
-        0%   { r: 15px; opacity: 0.9; }
+        0%   { r: 15px; opacity: 0; }
+        12%  { r: 17px; opacity: 0.9; }
         100% { r: 34px; opacity: 0; }
       }
     `, 0);
@@ -724,11 +725,12 @@ document.getElementById('btn-step').addEventListener('click', () => {
     ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',15);
     ring.setAttribute('fill','none');
     ring.setAttribute('stroke',color); ring.setAttribute('stroke-width','2');
+    ring.style.opacity = '0';
     ring.style.animationName = uid;
     ring.style.animationDuration = '0.6s';
     ring.style.animationDelay = delay + 's';
     ring.style.animationTimingFunction = 'ease-out';
-    ring.style.animationFillMode = 'both';
+    ring.style.animationFillMode = 'forwards';
     svgEl.appendChild(ring); animEls.push(ring);
   }
 
@@ -773,7 +775,7 @@ document.getElementById('btn-step').addEventListener('click', () => {
 
   gates.forEach(g => mkGlow(aX, gateY[g], GC[g], p1+T-0.05, 17));
   schedule((p1+T)*1000, () => {
-    gates.forEach(g => revealNode(aX, gateY[g], r[g==='c'?'c':g], GC[g]));
+    gates.forEach(g => revealNode(aX, gateY[g], r[g==='c'?'c':g], null));
   });
 
   // ── Phase 2: gate nodes → ⊙ label → result circles ──────────────────────────
@@ -792,8 +794,8 @@ document.getElementById('btn-step').addEventListener('click', () => {
   mkGlow(rfX, rfY, GC.f, p2arrive-0.05, 16);
   mkGlow(riX, riY, GC.i, p2arrive-0.05, 16);
   schedule(p2arrive*1000, () => {
-    revealNode(rfX, rfY, r.f * c_prev, GC.f);
-    revealNode(riX, riY, r.i * r.c,   GC.i);
+    revealNode(rfX, rfY, r.f * c_prev, null);
+    revealNode(riX, riY, r.i * r.c,   null);
   });
 
   // ── Phase 3a: result circles → + ─────────────────────────────────────────────
@@ -806,7 +808,7 @@ document.getElementById('btn-step').addEventListener('click', () => {
   const p3b = p3 + T + G*0.4;
   mkDot(CELL_COLOR, 'lp3-add-ct', p3b);
   mkPulse(ctX, addY, CELL_COLOR, p3b+T-0.05);
-  schedule((p3b+T)*1000, () => revealNode(ctX, addY, r.c_new, CELL_COLOR));
+  schedule((p3b+T)*1000, () => revealNode(ctX, addY, r.c_new, null));
 
   // ── Phase 4: cₜ + o → ⊙ → hₜ ────────────────────────────────────────────────
   const p4start = p3b + T + G*0.3;
