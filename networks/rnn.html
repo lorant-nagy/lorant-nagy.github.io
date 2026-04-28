@@ -160,7 +160,7 @@
   .ctrl-label { font-size: 8.5px; color: var(--muted); min-width: 44px; flex-shrink: 0; }
 
   input[type=range] {
-    flex: 1; -webkit-appearance: none; height: 2px;
+    flex: 1; appearance: none; -webkit-appearance: none; height: 2px;
     background: rgba(255,255,255,0.1); border-radius: 2px;
     outline: none; cursor: pointer; min-width: 0;
   }
@@ -337,19 +337,6 @@ function weightColor(w) {
 
 function weightWidth(w) {
   return 0.5 + Math.abs(w) * 2.5;
-}
-
-// ── Arrow marker factory ──────────────────────────────────────────────────────
-function addArrowMarker(svg, id, color) {
-  svg.select('defs').remove();
-  const defs = svg.append('defs');
-  defs.append('marker')
-    .attr('id', id)
-    .attr('markerWidth', 7).attr('markerHeight', 7)
-    .attr('refX', 4).attr('refY', 3.5)
-    .attr('orient', 'auto')
-    .append('path').attr('d', 'M0,0 L0,7 L7,3.5 z')
-    .attr('fill', color || 'rgba(255,255,255,0.25)');
 }
 
 // ── SVG references ────────────────────────────────────────────────────────────
@@ -715,11 +702,6 @@ function resetAndRedraw() {
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
-// partial hidden: only input contribution (no recurrent), before activation
-function partialRNN(x_t) {
-  return h.map((_, j) => b[j] + Wx[j] * x_t);
-}
-
 document.getElementById('btn-step').addEventListener('click', () => {
   if (t >= SEQ_LEN) return;
   function setAnimating(on) {

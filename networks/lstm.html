@@ -109,9 +109,6 @@
     white-space: nowrap;
   }
 
-  #seq-svg   { width: 100%; flex: 1; display: block; min-height: 0; }
-  #trail-svg { width: 100%; flex: 1; display: block; min-height: 0; }
-
   .narrative-panel { overflow-y: auto; }
   .narrative {
     font-size: 10.5px; color: var(--text); line-height: 1.65;
@@ -155,11 +152,6 @@
   .step-badge span { color: var(--accent); font-size: 1.1rem; font-family: 'Spectral', serif; }
 
   /* parameters controls */
-  .ctrl-col-title {
-    font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase;
-    padding-bottom: 0.25rem; margin-bottom: 0.4rem;
-    border-bottom: 0.5px solid var(--border); flex-shrink: 0;
-  }
   .ctrl-col-title:not(:first-child) { margin-top: 0.6rem; }
 
   .reset-btn {
@@ -190,7 +182,7 @@
     body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
     .page { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto auto; }
     .graph-panel   { grid-column: 1; grid-row: 1; min-height: 280px; }
-    .params-panel  { grid-column: 1; grid-row: 2; grid-row: unset; }
+    .params-panel  { grid-column: 1; grid-row: unset; }
     .seq-panel     { grid-column: 1; grid-row: 3; }
     .trail-panel   { grid-column: 1; grid-row: 4; }
     .bottom-row    { grid-column: 1; grid-row: 5; }
@@ -331,15 +323,6 @@ function drawNode(svg,x,y,r,val,label,color,labelBelow) {
   }
 }
 
-// outer value ring — always visible, colour encodes the node's current value
-function drawRing(svg,x,y,r,val,color) {
-  const ringColor = color || colorScale(val!=null?val:0);
-  svg.append('circle').attr('cx',x).attr('cy',y).attr('r',r+4)
-    .attr('fill','none')
-    .attr('stroke', d3.color(ringColor).copy({opacity:0.55}))
-    .attr('stroke-width',2);
-}
-
 function addMarker(svg,id) {
   // only remove non-animation defs
   svg.selectAll('defs:not(.anim-defs)').remove();
@@ -347,63 +330,6 @@ function addMarker(svg,id) {
     .attr('markerWidth',6).attr('markerHeight',6)
     .attr('refX',4).attr('refY',3).attr('orient','auto')
     .append('path').attr('d','M0,0 L0,6 L6,3 z').attr('fill','rgba(255,255,255,0.25)');
-}
-
-function drawRect(svg, x, y, w, h, val, label, color) {
-  const fill = color || 'rgba(255,255,255,0.08)';
-  const stroke = color ? d3.color(color).brighter(0.3) : 'rgba(255,255,255,0.25)';
-  svg.append('rect')
-    .attr('x', x-w/2).attr('y', y-h/2).attr('width', w).attr('height', h)
-    .attr('rx', 4).attr('fill', val!=null ? fill : '#1e2230')
-    .attr('stroke', stroke).attr('stroke-width', 1.2);
-  svg.append('text').attr('x', x).attr('y', y)
-    .attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size', 9)
-    .attr('fill','rgba(255,255,255,0.85)')
-    .text(val != null ? val.toFixed(2) : label);
-}
-
-// draw a line with an inline rectangle label sitting at fraction `frac` along it
-function drawEdgeOp(svg, x1,y1, x2,y2, op, val, color, stroke, dashed) {
-  const mx = x1 + (x2-x1)*0.5, my = y1 + (y2-y1)*0.5;
-  const rw=20, rh=14;
-  const sc = stroke || 'rgba(255,255,255,0.2)';
-  const dash = dashed ? '3,2' : null;
-
-  // line first segment
-  const line1 = svg.append('line')
-    .attr('x1',x1).attr('y1',y1).attr('x2',mx - rw/2 - 2).attr('y2', y1+(y2-y1)*0.5 - (rh/2+2)*(y2-y1 ? 1 : 0))
-    .attr('stroke',sc).attr('stroke-width',1);
-  if (dash) line1.attr('stroke-dasharray', dash);
-
-  // inline op rectangle
-  const fill = color ? d3.color(color).copy({opacity:0.12}) : 'rgba(255,255,255,0.06)';
-  const bstroke = color || 'rgba(255,255,255,0.25)';
-  svg.append('rect')
-    .attr('x', mx-rw/2).attr('y', my-rh/2)
-    .attr('width',rw).attr('height',rh).attr('rx',3)
-    .attr('fill', val!=null ? fill : '#1e2230')
-    .attr('stroke', bstroke).attr('stroke-width',1);
-  svg.append('text').attr('x',mx).attr('y',my)
-    .attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8)
-    .attr('fill', color || 'rgba(255,255,255,0.6)')
-    .text(val!=null ? val.toFixed(2) : op);
-
-  // line second segment with arrow
-  const line2 = svg.append('line')
-    .attr('x1', mx+rw/2+2).attr('y1', my + (rh/2+2)*(y2>y1?1:y2<y1?-1:0))
-    .attr('x2',x2).attr('y2',y2)
-    .attr('stroke',sc).attr('stroke-width',1).attr('marker-end','url(#garr)');
-  if (dash) line2.attr('stroke-dasharray', dash);
-}
-
-function drawArrowLabel(svg, x, y, label, color) {
-  svg.append('text').attr('x',x).attr('y',y)
-    .attr('text-anchor','middle').attr('dominant-baseline','middle')
-    .attr('font-family','JetBrains Mono, monospace').attr('font-size',7)
-    .attr('fill', color || 'var(--muted)').attr('opacity',0.75)
-    .text(label);
 }
 
 function drawEdge(svg,x1,y1,x2,y2,w,wLabel,markerId) {
@@ -484,12 +410,6 @@ function drawGraph() {
       .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
       .attr('font-size',9).attr('fill',col||'rgba(255,255,255,0.5)').text(sym);
   }
-  function edgeLabel(x,y,txt,col){
-    graphSvg.append('text').attr('x',x).attr('y',y)
-      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
-      .attr('font-size',7).attr('fill',col||'var(--muted)').attr('opacity',0.7).text(txt);
-  }
-
   // inputs — always show values (0 before first step)
   drawNode(graphSvg,iX,xY,  14,x_cur,     `x${xIdx+1}`, null,       true);
   drawNode(graphSvg,iX,hpY, 14,t>0?h_prev:0, 'hₜ₋₁',   null,       true);
