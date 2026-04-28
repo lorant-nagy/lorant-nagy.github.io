@@ -285,6 +285,8 @@ let sequence = [0.8, -0.5, 0.3, 0.9, -0.7, 0.2, 0.6];
 
 let t=0, cellState=0, hiddenState=0;
 let cHistory=[0], hHistory=[0], gateHistory=[];
+let showCurrentState = false;
+let showTransientState = false;
 
 const sigmoid = x => 1/(1+Math.exp(-x));
 
@@ -460,11 +462,11 @@ function drawGraph() {
   const xY=38, hpY=143, cpY=248;
 
   const latest=gateHistory.length>0?gateHistory[gateHistory.length-1]:null;
-  const h_prev=hHistory.length>=2?hHistory[hHistory.length-2]:0;
-  const c_prev=cHistory.length>=2?cHistory[cHistory.length-2]:0;
-  const xIdx=t===0?0:t-1;
+  const h_prev=t>0?hiddenState:0;
+  const c_prev=t>0?cellState:0;
+  const xIdx=t<SEQ_LEN?t:SEQ_LEN-1;
   const x_cur=sequence[xIdx];
-  const act=!!latest;
+  const act=!!latest && showTransientState;
   const dim='rgba(255,255,255,0.1)';
 
   function ln(x1,y1,x2,y2,col,curve){
@@ -521,14 +523,14 @@ function drawGraph() {
   ln(riX+13,riY, addX,addY, dim);
   opLabel(addX, addY-10, '+', CELL_COLOR);
   ln(addX, addY, ctX-15, addY, dim);
-  drawNode(graphSvg,ctX,addY,15,t>0?cellState:null,'cₜ',null,true);
+  drawNode(graphSvg,ctX,addY,15,(t>0 && showCurrentState)?cellState:null,'cₜ',null,true);
 
   // tanh(cₜ) ⊙ o → hₜ
   ln(ctX+15, addY, jHX, addY, dim);
   ln(aX+15,  gY.o, jHX, addY, dim, true);  // curved
   opLabel(jHX, addY-10, '⊙', '#e8824a');
   ln(jHX, addY, hX-15, addY, dim);
-  drawNode(graphSvg,hX,addY,15,t>0?hiddenState:null,'hₜ',null,true);
+  drawNode(graphSvg,hX,addY,15,(t>0 && showCurrentState)?hiddenState:null,'hₜ',null,true);
 }
 
 
@@ -590,6 +592,8 @@ function redraw(){
 function resetAndRedraw(){
   t=0;cellState=0;hiddenState=0;
   cHistory=[0];hHistory=[0];gateHistory=[];
+  showCurrentState = false;
+  showTransientState = false;
   redraw();
 }
 
@@ -616,6 +620,8 @@ document.getElementById('btn-step').addEventListener('click', () => {
 
   const T  = 1.1;   // dot travel duration (matches RNN/feedforward)
   const G  = 0.3;   // gap between phases
+  const T_COPY = 0.95;
+  const HOLD_AFTER_COPY = 0.9;
 
   const animEls = [];
   const timers  = [];
@@ -683,6 +689,22 @@ document.getElementById('btn-step').addEventListener('click', () => {
     }
   }
 
+  function clearNode(x, y) {
+    let best = null, bestD = Infinity;
+    svgEl.querySelectorAll('circle:not(.anim-dot):not(.anim-glow)').forEach(c => {
+      const d = Math.abs((+c.getAttribute('cx'))-x) + Math.abs((+c.getAttribute('cy'))-y);
+      if (d < bestD) { bestD=d; best=c; }
+    });
+    if (!best || bestD > 25) return;
+    best.setAttribute('fill', '#1e2230');
+    best.setAttribute('stroke', 'rgba(255,255,255,0.1)');
+    const px = +best.getAttribute('cx'), py = +best.getAttribute('cy');
+    const existing = [...svgEl.querySelectorAll('text')].find(t =>
+      Math.abs(+t.getAttribute('x')-px)<3 && Math.abs(+t.getAttribute('y')-py)<3
+    );
+    if (existing) existing.textContent = '';
+  }
+
   function mkDot(color, pathId, delay, dur, pathD) {
     dur = dur || T;
     const c = document.createElementNS(NS,'circle');
@@ -732,7 +754,40 @@ document.getElementById('btn-step').addEventListener('click', () => {
     svgEl.appendChild(ring); animEls.push(ring);
   }
 
+  function mkGhostCopy(x1, y1, x2, y2, color, delay, dur, radius) {
+    radius = radius || 15;
+    const styleEl = document.createElement('style');
+    document.head.appendChild(styleEl); animEls.push(styleEl);
+    const uid = `lcopy-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    styleEl.sheet.insertRule(`
+      @keyframes ${uid} {
+        0%   { opacity: 0;   transform: translate(0px, 0px); }
+        10%  { opacity: 0.95; transform: translate(0px, 0px); }
+        82%  { opacity: 0.85; transform: translate(${dx}px, ${dy}px); }
+        100% { opacity: 0;   transform: translate(${dx}px, ${dy}px); }
+      }
+    `, 0);
+
+    const ring = document.createElementNS(NS,'circle');
+    ring.setAttribute('cx', x1);
+    ring.setAttribute('cy', y1);
+    ring.setAttribute('r', radius);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', color);
+    ring.setAttribute('stroke-width', '2.4');
+    ring.style.opacity = '0';
+    ring.style.animationName = uid;
+    ring.style.animationDuration = dur + 's';
+    ring.style.animationDelay = delay + 's';
+    ring.style.animationTimingFunction = 'cubic-bezier(0.4,0,0.2,1)';
+    ring.style.animationFillMode = 'both';
+    svgEl.appendChild(ring); animEls.push(ring);
+  }
+
   setAnimating(true);
+  showTransientState = true;
 
   // pre-register all paths
   const gates = ['f','i','c','o'];
@@ -818,13 +873,30 @@ document.getElementById('btn-step').addEventListener('click', () => {
   mkPulse(hX, addY, '#e8824a', p4b+T-0.05);
   schedule((p4b+T)*1000, () => revealNode(hX, addY, r.h_new, null));
 
+  // ── Phase 5: copy c_t and h_t back to previous-state inputs ─────────────────
+  const p5 = p4b + T + G*0.35;
+  mkGhostCopy(ctX, addY, iX, cPrevY, CELL_COLOR, p5, T_COPY, 15);
+  mkGhostCopy(hX,  addY, iX, hNodeY, '#e8824a', p5, T_COPY, 15);
+  mkGlow(iX, cPrevY, CELL_COLOR, p5 + T_COPY*0.8, 16);
+  mkGlow(iX, hNodeY, '#e8824a', p5 + T_COPY*0.8, 16);
+  schedule((p5 + T_COPY*0.82)*1000, () => {
+    revealNode(iX, cPrevY, r.c_new, null);
+    revealNode(iX, hNodeY, r.h_new, null);
+  });
+  schedule((p5 + T_COPY*0.82 + HOLD_AFTER_COPY)*1000, () => {
+    clearNode(ctX, addY);
+    clearNode(hX, addY);
+  });
+
   // ── Commit state + full redraw only after all animation ends ──────────────────
-  const totalMs = (p4b + T + 0.4) * 1000;
+  const totalMs = (p5 + T_COPY + HOLD_AFTER_COPY + 0.35) * 1000;
   schedule(totalMs, () => {
     animEls.forEach(e => { try { e.remove(); } catch(_){} });
     t++; cellState=r.c_new; hiddenState=r.h_new;
     cHistory.push(cellState); hHistory.push(hiddenState);
     gateHistory.push({f:r.f, i:r.i, c:r.c, o:r.o});
+    showCurrentState = false;
+    showTransientState = false;
     redraw();
     setAnimating(false);
   });
@@ -869,6 +941,7 @@ function buildControls(){
     .on('click', () => {
       ['f','i','c','o'].forEach(k => { W[k].wh=0; W[k].wx=0; W[k].b=0; });
       t=0; cellState=0; hiddenState=0; cHistory=[0]; hHistory=[0]; gateHistory=[];
+      showCurrentState = false; showTransientState = false;
       buildControls(); redraw();
     });
   resetCol.append('button').attr('class','reset-btn').attr('id','btn-rand-weights')
@@ -880,6 +953,7 @@ function buildControls(){
         W[k].b =Math.round((Math.random()*2-1)*100)/100;
       });
       t=0; cellState=0; hiddenState=0; cHistory=[0]; hHistory=[0]; gateHistory=[];
+      showCurrentState = false; showTransientState = false;
       buildControls(); redraw();
     });
 }

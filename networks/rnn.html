@@ -731,7 +731,7 @@ document.getElementById('btn-step').addEventListener('click', () => {
   }
 
   setAnimating(true);
-  // keep hiddenRevealed as-is — mid column shows previous values while dots fly
+  // hidden visibility is controlled within this step lifecycle
 
   const svgEl = document.getElementById('rnn-svg');
   const NS  = 'http://www.w3.org/2000/svg';
@@ -914,7 +914,7 @@ document.getElementById('btn-step').addEventListener('click', () => {
     mkGlow(xPrev, yH[1], '#378ADD', T_GHOST * 0.82);
   });
 
-  // ── Phase 3a: ghost lands → reveal prev column, keep hidden visible ───────────
+  // ── Phase 3a: ghost lands → reveal prev column ────────────────────────────────
   const ghostLandMs = (ghostStart + T_GHOST * 0.82) * 1000;
   schedule(ghostLandMs, () => {
     prevRevealed = t >= 1;
@@ -930,10 +930,12 @@ document.getElementById('btn-step').addEventListener('click', () => {
     }
   });
 
-  // ── Phase 3b: clean up anim elements, keep hidden revealed until next step ────
+  // ── Phase 3b: clean up anim elements, then clear h_t for next iteration ───────
   const totalMs = (ghostStart + T_GHOST + 0.5) * 1000;
   schedule(totalMs, () => {
     animEls.forEach(e => e.remove());
+    hiddenRevealed = false;
+    redraw();
     setAnimating(false);
   });
 });
