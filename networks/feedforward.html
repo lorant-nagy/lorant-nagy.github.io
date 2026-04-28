@@ -69,8 +69,8 @@
   }
 
   .controls-card {
-    grid-column: 2; grid-row: 1;   /* only beside network, stops at its bottom */
-    padding: 0.75rem 0.85rem;
+    grid-column: 2; grid-row: 1 / span 2;   /* full right column height */
+    padding: 0.95rem 0.85rem 0.75rem;
     display: flex; flex-direction: column;
     overflow-y: auto;
   }
@@ -131,11 +131,19 @@
   }
   .ctrl-section-title:first-child { margin-top: 0; }
 
+  .weights-section {
+    margin-left: 8px;
+  }
+
+  .reset-section {
+    margin-top: 0.35rem;
+  }
+
   .ctrl-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
   .ctrl-label { font-size: 8.5px; color: var(--muted); min-width: 44px; flex-shrink: 0; }
 
   input[type=range] {
-    flex: 1; -webkit-appearance: none; height: 2px;
+    flex: 1; appearance: none; -webkit-appearance: none; height: 2px;
     background: rgba(255,255,255,0.1); border-radius: 2px;
     outline: none; cursor: pointer; min-width: 0;
   }
@@ -144,6 +152,32 @@
     border-radius: 50%; background: var(--accent); cursor: pointer;
   }
   .ctrl-val { font-size: 8.5px; color: var(--text); min-width: 28px; text-align: right; }
+
+  .preset-select {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    padding: 4px 6px;
+    outline: none;
+  }
+
+  .preset-note {
+    margin-top: 0.3rem;
+    font-size: 8.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .preset-note strong { color: var(--text); font-weight: 500; }
+  .preset-note .task { color: var(--accent); }
+
+  .preset-section {
+    margin-bottom: 0.45rem;
+  }
 
   .fine-btn, .zero-btn {
     background: none; border: 0.5px solid var(--border);
@@ -241,6 +275,92 @@ const activations = {
   linear:  x => x,
 };
 
+let currentPreset = 'custom';
+const PRESETS = {
+  custom: {
+    label: 'Custom',
+    task: 'manual mode',
+    explanation: 'Use the sliders to build your own mapping. The explanation below updates from the current weights and biases.'
+  },
+  sum: {
+    label: 'Sum',
+    task: 'y ≈ x1 + x2',
+    explanation: 'Two hidden units pass x1 and x2 straight through, then the output adds them.',
+    actFn: 'linear',
+    inputs: [0.7, -0.2],
+    weights: [
+      [[1, 0], [0, 1], [0, 0]],
+      [[1, 1, 0]],
+    ],
+    biases: [[0, 0, 0], [0]],
+  },
+  difference: {
+    label: 'Difference',
+    task: 'y ≈ x1 − x2',
+    explanation: 'The hidden layer keeps the two inputs separate, and the output subtracts the second from the first.',
+    actFn: 'linear',
+    inputs: [0.7, 0.2],
+    weights: [
+      [[1, 0], [0, 1], [0, 0]],
+      [[1, -1, 0]],
+    ],
+    biases: [[0, 0, 0], [0]],
+  },
+  max: {
+    label: 'Max',
+    task: 'y = max(x1, x2)',
+    explanation: 'With ReLU, the network can compute max(x1, x2) exactly as relu(x1−x2) + relu(x2) − relu(−x2).',
+    actFn: 'relu',
+    inputs: [0.8, -0.2],
+    weights: [
+      [[1, -1], [0, 1], [0, -1]],
+      [[1, 1, -1]],
+    ],
+    biases: [[0, 0, 0], [0]],
+  },
+};
+
+function setVector(target, source) {
+  target.length = 0;
+  source.forEach(v => target.push(v));
+}
+
+function setMatrix(target, source) {
+  target.length = 0;
+  source.forEach(row => target.push(row.slice()));
+}
+
+function presetExplanationHtml() {
+  const preset = PRESETS[currentPreset];
+  return `<strong>${preset.label}</strong><br><span class="task">${preset.task}</span><br>${preset.explanation}`;
+}
+
+function updatePresetNote() {
+  const el = document.getElementById('preset-note');
+  if (el) el.innerHTML = presetExplanationHtml();
+}
+
+function markCustom() {
+  if (currentPreset === 'custom') return;
+  currentPreset = 'custom';
+  const select = document.getElementById('preset-select');
+  if (select) select.value = 'custom';
+  updatePresetNote();
+}
+
+function applyPreset(name) {
+  currentPreset = name;
+  const preset = PRESETS[name];
+  if (name !== 'custom') {
+    actFn = preset.actFn;
+    setVector(inputs, preset.inputs);
+    setMatrix(weights, preset.weights);
+    setMatrix(biases, preset.biases);
+  }
+  buildControls();
+  draw();
+}
+
 function forwardPass() {
   const acts = [inputs.slice()];
   for (let l = 0; l < weights.length; l++) {
@@ -285,11 +405,13 @@ function nodeY(li, ni) {
 }
 
 const edgeGroup = svg.append('g');
+const edgeLabelGroup = svg.append('g');
 const nodeGroup = svg.append('g');
 
 function updateNarrative() {
   const acts = forwardPass();
   const el = document.getElementById('narrative');
+  const preset = PRESETS[currentPreset];
   const hiddenLines = weights[0].map((toNeuron, j) => {
     const z = biases[0][j] + toNeuron.reduce((s, w, i) => s + w * inputs[i], 0);
     const a = activations[actFn](z);
@@ -303,6 +425,7 @@ function updateNarrative() {
   const outTerms = ow.map((w,i) => `<span class="${w>=0?'hi':'lo'}">${w>=0?'+':''}${w.toFixed(2)}·h${i+1}</span>`).join(' ');
   const ob = `<span class="${biases[1][0]>=0?'hi':'lo'}">${biases[1][0]>=0?'+':''}${biases[1][0].toFixed(2)}</span>`;
   el.innerHTML =
+    `<span class="dim">preset</span> <span class="hi">${preset.label}</span> — ${preset.task}<br><br>` +
     `inputs:  x1 = <span class="hi">${inputs[0].toFixed(2)}</span>,  x2 = <span class="hi">${inputs[1].toFixed(2)}</span><br><br>` +
     `hidden <span class="dim">(${actFn})</span><br>${hiddenLines.join('<br>')}<br><br>` +
     `output<br>out: ${outTerms} ${ob} = <span class="hi">${outZ.toFixed(4)}</span>`;
@@ -314,13 +437,43 @@ function draw() {
   for (let l = 0; l < weights.length; l++)
     for (let j = 0; j < weights[l].length; j++)
       for (let i = 0; i < weights[l][j].length; i++)
-        edgeData.push({ x1:layerX[l], y1:nodeY(l,i), x2:layerX[l+1], y2:nodeY(l+1,j), w:weights[l][j][i], key:`${l}-${j}-${i}` });
+        edgeData.push({
+          x1:layerX[l],
+          y1:nodeY(l,i),
+          x2:layerX[l+1],
+          y2:nodeY(l+1,j),
+          w:weights[l][j][i],
+          label:l===0?`w${i+1}→${j+1}`:`v${i+1}`,
+          key:`${l}-${j}-${i}`
+        });
 
   const lines = edgeGroup.selectAll('line').data(edgeData, d => d.key);
   lines.enter().append('line').attr('stroke-linecap','round').attr('opacity',0.7)
     .merge(lines)
     .attr('x1',d=>d.x1).attr('y1',d=>d.y1).attr('x2',d=>d.x2).attr('y2',d=>d.y2)
     .attr('stroke',d=>weightColor(d.w)).attr('stroke-width',d=>weightWidth(d.w));
+
+  const edgeLabels = edgeLabelGroup.selectAll('text.edge-name').data(edgeData, d => d.key);
+  edgeLabels.enter().append('text').attr('class','edge-name')
+    .attr('text-anchor','middle').attr('dominant-baseline','middle')
+    .attr('font-family','JetBrains Mono, monospace').attr('font-size',8)
+    .merge(edgeLabels)
+    .attr('x', d => {
+      const dx = d.x2 - d.x1, dy = d.y2 - d.y1;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      return (d.x1 + d.x2) / 2 + nx * 10;
+    })
+    .attr('y', d => {
+      const dx = d.x2 - d.x1, dy = d.y2 - d.y1;
+      const len = Math.hypot(dx, dy) || 1;
+      const ny = dx / len;
+      return (d.y1 + d.y2) / 2 + ny * 10;
+    })
+    .attr('fill', d => weightColor(d.w))
+    .attr('opacity', 0.85)
+    .text(d => d.label);
+  edgeLabels.exit().remove();
 
   const nodeData = [];
   for (let l = 0; l < LAYERS.length; l++)
@@ -362,7 +515,8 @@ function buildControls() {
   const clamp = v => Math.max(MIN_VAL, Math.min(MAX_VAL, v));
   const roundStep = v => Math.round(clamp(v) * 100) / 100;
 
-  function addScalarControl(section, label, value, setValue) {
+  function addScalarControl(section, label, value, setValue, options = {}) {
+    const { marksCustom = true } = options;
     const row = section.append('div').attr('class','ctrl-row');
     row.append('span').attr('class','ctrl-label').text(label);
 
@@ -397,6 +551,7 @@ function buildControls() {
 
     function apply(next) {
       const v = roundStep(next);
+      if (marksCustom) markCustom();
       setValue(v);
       sl.property('value', v);
       vl.text(v.toFixed(2));
@@ -409,13 +564,29 @@ function buildControls() {
     zero.on('click', () => apply(0));
   }
 
+  const presetSec = ctrl.append('div').attr('class','preset-section');
+  presetSec.append('div').attr('class','ctrl-section-title').text('presets');
+  const presetRow = presetSec.append('div').attr('class','ctrl-row');
+  presetRow.append('span').attr('class','ctrl-label').text('task');
+  const presetSelect = presetRow.append('select')
+    .attr('class','preset-select')
+    .attr('id','preset-select');
+  Object.entries(PRESETS).forEach(([key, preset]) => {
+    presetSelect.append('option').attr('value', key).text(preset.label);
+  });
+  presetSelect.property('value', currentPreset)
+    .on('change', function() { applyPreset(this.value); });
+  presetSec.append('div').attr('class','preset-note').attr('id','preset-note');
+  updatePresetNote();
+
   // Reset to zero
-  const resetSec = ctrl.append('div');
+  const resetSec = ctrl.append('div').attr('class','reset-section');
   resetSec.append('div').attr('class','ctrl-section-title').text('reset');
   resetSec.append('button')
     .attr('class','reset-btn').attr('id','btn-zero')
     .text('zero all weights')
     .on('click', () => {
+      currentPreset = 'custom';
       inputs.fill(0);
       weights.forEach(l => l.forEach(n => n.fill(0)));
       biases.forEach(l => l.fill(0));
@@ -426,6 +597,7 @@ function buildControls() {
     .style('margin-top','0.25rem')
     .text('randomise weights')
     .on('click', () => {
+      currentPreset = 'custom';
       weights.forEach(l => l.forEach(n => n.forEach((_,i) => n[i] = Math.round((Math.random()*2-1)*100)/100)));
       biases.forEach(l => l.forEach((_,i) => l[i] = Math.round((Math.random()*2-1)*100)/100));
       buildControls(); draw();
@@ -438,17 +610,23 @@ function buildControls() {
     btnRow.append('button')
       .attr('class',`act-btn${actFn===fn?' active':''}`)
       .text(fn)
-      .on('click',()=>{ actFn=fn; buildControls(); draw(); });
+      .on('click',()=>{ currentPreset='custom'; actFn=fn; buildControls(); draw(); });
   });
 
   const inSec = ctrl.append('div');
   inSec.append('div').attr('class','ctrl-section-title').text('inputs');
   inputs.forEach((v,i) => {
-    addScalarControl(inSec, `x${i+1}`, v, next => { inputs[i] = next; });
+    addScalarControl(
+      inSec,
+      `x${i+1}`,
+      v,
+      next => { inputs[i] = next; },
+      { marksCustom: false }
+    );
   });
 
   weights.forEach((layer,l) => {
-    const sec = ctrl.append('div');
+    const sec = ctrl.append('div').attr('class','weights-section');
     const isOut = l === weights.length - 1;
     sec.append('div').attr('class','ctrl-section-title')
       .text(isOut ? 'output weights  v' : `weights  L${l}→L${l+1}`);
