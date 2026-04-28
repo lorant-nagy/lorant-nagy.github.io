@@ -26,8 +26,8 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: python scripts/fetch_arxiv.py
 
-      - name: Run energy prices fetch
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-        run: python scripts/fetch_energy.py
+#      - name: Run energy prices fetch
+#        env:
+#          FIREBASE_SERVICE_ACCOUNT: #$#{{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+#          EIA_API_KEY: #$#{{ secrets.EIA_API_KEY }}
+#        run: python scripts/fetch_energy.py
