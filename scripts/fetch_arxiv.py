@@ -2,6 +2,7 @@ import os
 import json
 import time
 import datetime
+import zoneinfo
 import urllib.request
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -24,9 +25,8 @@ firebase_admin.initialize_app(cred, {"databaseURL": DATABASE_URL})
 # Constants
 # ---------------------------------------------------------------------------
 
-BUDAPEST_TZ = datetime.timezone(datetime.timedelta(hours=1))
-# Note: UTC+1 covers most of the year; summer is UTC+2 but arXiv data is
-# still captured correctly since we fetch by full Budapest calendar day.
+BUDAPEST_TZ = zoneinfo.ZoneInfo("Europe/Budapest")
+# DST-aware: UTC+1 in winter, UTC+2 in summer (CEST, typically late March–late Oct).
 
 QFIN_CATS = [
     "q-fin.CP", "q-fin.EC", "q-fin.GN", "q-fin.MF",
@@ -170,11 +170,13 @@ def write_to_firebase(date: datetime.date, data: dict):
 
 def run_daily():
     budapest_now = datetime.datetime.now(BUDAPEST_TZ)
-    today        = budapest_now.date()
-    print(f"=== Daily fetch for {today} ===")
-    day_data = fetch_day(today)
+    # arXiv publishes submissions from the *previous* business day.
+    # The cron fires at 02:00 UTC (after arXiv's nightly publish), so we want yesterday.
+    yesterday = (budapest_now - datetime.timedelta(days=1)).date()
+    print(f"=== Daily fetch for {yesterday} (yesterday in Budapest) ===")
+    day_data = fetch_day(yesterday)
     if day_data is not None:
-        write_to_firebase(today, day_data)
+        write_to_firebase(yesterday, day_data)
     else:
         print("  Nothing written — previous data preserved in Firebase")
     print("=== Done ===")
