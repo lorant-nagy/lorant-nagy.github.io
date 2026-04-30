@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRU</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --neg:     #378ADD;
+    --pos:     #e8824a;
+    --accent:  #aa701e;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    padding: 1.1rem 1.4rem 0.9rem;
+    gap: 0.55rem;
+    overflow: hidden;
+  }
+
+  .back-link {
+    position: fixed; top: 1rem; left: 1.25rem;
+    font-size: 11px; color: var(--muted);
+    text-decoration: none; letter-spacing: 0.05em; z-index: 10;
+  }
+  .back-link:hover { color: var(--text); }
+
+  h1 {
+    font-family: 'Spectral', serif; font-weight: 300;
+    font-size: 1.45rem; color: #e8e4dc; letter-spacing: 0.02em;
+    padding-top: 1.4rem;
+  }
+
+  .equations {
+    font-size: 12px; color: var(--muted);
+    line-height: 1.85; font-style: italic;
+  }
+  .equations span { font-style: normal; }
+
+  .card-title {
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.28rem; margin-bottom: 0.5rem; flex-shrink: 0;
+  }
+
+  .page {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 0.7rem;
+    min-height: 0;
+  }
+
+  .params-panel {
+    grid-column: 1; grid-row: 1;
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    gap: 1.2rem; overflow-y: visible;
+  }
+
+  .graph-panel {
+    grid-column: 1; grid-row: 2;
+    display: flex; flex-direction: column; min-height: 0;
+    position: relative;
+  }
+  #graph-svg { width: 100%; flex: 1; display: block; min-height: 0; }
+
+  .graph-btns {
+    position: absolute; top: 0; right: 0;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+
+  .bottom-row {
+    grid-column: 1; grid-row: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.7rem;
+    min-height: 0;
+  }
+
+  .seq-panel   { display: flex; flex-direction: column; min-height: 0; }
+  .trail-panel { display: flex; flex-direction: column; min-height: 0; }
+  #seq-svg   { width: 100%; flex: 1; display: block; min-height: 0; }
+  #trail-svg { width: 100%; flex: 1; display: block; min-height: 0; }
+
+  .ctrl-col-title {
+    font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding-bottom: 0.2rem; margin-bottom: 0.3rem;
+    border-bottom: 0.5px solid var(--border); flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .ctrl-col-title:not(:first-child) { margin-top: 0.6rem; }
+
+  .narrative-panel { overflow-y: auto; }
+  .narrative {
+    font-size: 10.5px; color: var(--text); line-height: 1.65;
+  }
+  .narrative .hi   { color: var(--pos); }
+  .narrative .lo   { color: var(--neg); }
+  .narrative .dim  { color: var(--muted); }
+  .narrative .nr   { color: #378ADD; }
+  .narrative .nz   { color: #1D9E75; }
+  .narrative .nh   { color: #aa701e; }
+
+  .btn-row {
+    display: flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.4rem; flex-shrink: 0;
+  }
+
+  button {
+    background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    padding: 4px 8px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
+  }
+  button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  button.primary { border-color: var(--accent); color: var(--accent); }
+  button.primary:hover { background: rgba(170,112,30,0.1); }
+  button:disabled { opacity: 0.3; cursor: default; animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { border-color: var(--accent); box-shadow: 0 0 0 0 rgba(170,112,30,0); }
+    50%       { border-color: #d4921f;      box-shadow: 0 0 0 3px rgba(170,112,30,0.18); }
+  }
+  button.primary:not(:disabled) { animation: pulse 2s ease-in-out infinite; }
+
+  .step-badge {
+    font-size: 10px; color: var(--muted);
+    letter-spacing: 0.06em; flex-shrink: 0;
+  }
+  .step-badge span { color: var(--accent); font-size: 1.1rem; font-family: 'Spectral', serif; }
+
+  .reset-btn {
+    width: 100%; background: none; border: 0.5px solid var(--border);
+    border-radius: 3px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
+    padding: 4px 0; cursor: pointer; transition: all 0.15s;
+    letter-spacing: 0.06em;
+  }
+  .reset-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+
+  .ctrl-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
+  .ctrl-label { font-size: 8px; color: var(--muted); min-width: 36px; flex-shrink: 0; }
+
+  input[type=range] {
+    flex: 1; -webkit-appearance: none; appearance: none; height: 2px;
+    background: rgba(255,255,255,0.1); border-radius: 2px;
+    outline: none; cursor: pointer; min-width: 0;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+  }
+  .ctrl-val { font-size: 8px; color: var(--text); min-width: 26px; text-align: right; }
+
+  @media (max-width: 600px) {
+    body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
+    .page { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto auto; }
+    .graph-panel   { grid-column: 1; grid-row: 1; min-height: 280px; }
+    .params-panel  { grid-column: 1; grid-row: unset; }
+    .seq-panel     { grid-column: 1; grid-row: 3; }
+    .trail-panel   { grid-column: 1; grid-row: 4; }
+    .bottom-row    { grid-column: 1; grid-row: 5; }
+    #graph-svg { min-height: 260px; flex: none; }
+  }
+
+  @keyframes dot-travel {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    8%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  @keyframes node-glow {
+    0%   { opacity: 0; }
+    20%  { opacity: 0.55; }
+    100% { opacity: 0; }
+  }
+  .anim-dot {
+    opacity: 0; offset-rotate: 0deg;
+    animation-name: dot-travel;
+    animation-timing-function: cubic-bezier(0.37,0,0.63,1);
+    animation-fill-mode: both;
+  }
+  .anim-glow {
+    opacity: 0; pointer-events: none;
+    animation-name: node-glow;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
+  .act-btn:disabled { opacity: 0.3; cursor: default; }
+  .reset-btn:disabled { opacity: 0.3; cursor: default; }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="/networks/">← networks</a>
+
+<h1>GRU</h1>
+<div class="equations">
+  input: <span style="color:#e8824a">x</span><sub>t</sub> ∈ ℝ &nbsp;&nbsp;
+  reset gate: <span style="color:#378ADD">r</span><sub>t</sub> = σ(W<sub>r</sub>[<span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>r</sub>) &nbsp;&nbsp;
+  update gate: <span style="color:#1D9E75">z</span><sub>t</sub> = σ(W<sub>z</sub>[<span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>z</sub>) &nbsp;&nbsp;
+  candidate: <span style="color:#aa701e">h̃</span><sub>t</sub> = tanh(W<sub>h</sub>[<span style="color:#378ADD">r</span><sub>t</sub> ⊙ <span style="color:#e8824a">h</span><sub>t−1</sub>, <span style="color:#e8824a">x</span><sub>t</sub>] + b<sub>h</sub>) &nbsp;&nbsp;
+  output: <span style="color:#e8824a">h</span><sub>t</sub> = (1−<span style="color:#1D9E75">z</span><sub>t</sub>) ⊙ <span style="color:#e8824a">h</span><sub>t−1</sub> + <span style="color:#1D9E75">z</span><sub>t</sub> ⊙ <span style="color:#aa701e">h̃</span><sub>t</sub> ∈ ℝ
+</div>
+
+<div class="page">
+
+  <div class="params-panel" id="controls"></div>
+
+  <div class="graph-panel">
+    <div class="card-title">computation graph</div>
+    <div class="graph-btns">
+      <button class="primary" id="btn-step">step →</button>
+      <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
+    </div>
+    <svg id="graph-svg"></svg>
+  </div>
+
+  <div class="bottom-row">
+    <div class="seq-panel">
+      <div class="card-title">input sequence  x₁ … x₇</div>
+      <svg id="seq-svg"></svg>
+    </div>
+    <div class="trail-panel">
+      <div class="card-title">state history</div>
+      <svg id="trail-svg"></svg>
+    </div>
+    <div class="narrative-panel">
+      <div class="card-title">what is happening</div>
+      <div class="narrative" id="narrative">Press step → to start the forward pass.</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+const SEQ_LEN = 7;
+// reset=blue, update=green, candidate=amber — matches LSTM colour logic
+const GC = { r:'#378ADD', z:'#1D9E75', h:'#aa701e' };
+const H_COLOR = '#e8824a';  // hidden state colour (same as LSTM hₜ)
+
+const sigmoid = x => 1/(1+Math.exp(-x));
+
+let W = {
+  r: { wh:  0.5, wx:  0.8, b: -0.2 },
+  z: { wh:  0.7, wx:  0.6, b:  0.3 },
+  h: { wh:  0.4, wx:  1.0, b:  0.0 },
+};
+
+let sequence = [0.8, -0.5, 0.3, 0.9, -0.7, 0.2, 0.6];
+
+let t=0, hiddenState=0;
+let hHistory=[0], gateHistory=[];
+let showTransientState = false;
+let showCurrentState   = false;
+
+const colorScale = d3.scaleLinear()
+  .domain([-1,0,1]).range(['#378ADD','#1e2230','#e8824a']).clamp(true);
+
+function wColor(w) { return colorScale(Math.max(-2,Math.min(2,w))/2); }
+function wWidth(w) { return 0.5+Math.abs(w)*1.8; }
+
+const seqSvg   = d3.select('#seq-svg');
+const graphSvg = d3.select('#graph-svg');
+const trailSvg = d3.select('#trail-svg');
+
+// ── GRU step ──────────────────────────────────────────────────────────────────
+function stepGRU(x_t, h_prev) {
+  const r     = sigmoid(W.r.wh*h_prev + W.r.wx*x_t + W.r.b);
+  const z     = sigmoid(W.z.wh*h_prev + W.z.wx*x_t + W.z.b);
+  const h_cand= Math.tanh(W.h.wh*(r*h_prev) + W.h.wx*x_t + W.h.b);
+  const h_new = (1-z)*h_prev + z*h_cand;
+  return { r, z, h:h_cand, h_new };
+}
+
+// ── drawNode (identical to lstm) ──────────────────────────────────────────────
+function drawNode(svg,x,y,r,val,label,color,labelBelow) {
+  const fill = color||colorScale(val!=null?val:0);
+  svg.append('circle').attr('cx',x).attr('cy',y).attr('r',r)
+    .attr('fill',val!=null?fill:'#1e2230')
+    .attr('stroke',val!=null?d3.color(fill).brighter(0.3):'rgba(255,255,255,0.1)')
+    .attr('stroke-width',1.2);
+  if (val!=null) {
+    svg.append('text').attr('x',x).attr('y',y)
+      .attr('text-anchor','middle').attr('dominant-baseline','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',r>16?9:8)
+      .attr('fill','rgba(255,255,255,0.85)')
+      .text(typeof val==='number'?val.toFixed(2):val);
+  }
+  if (label) {
+    svg.append('text').attr('x',x).attr('y',labelBelow?y+r+11:y-r-5)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',color||'var(--muted)').text(label);
+  }
+}
+
+function addMarker(svg,id) {
+  svg.selectAll('defs:not(.anim-defs)').remove();
+  svg.insert('defs',':first-child').append('marker').attr('id',id)
+    .attr('markerWidth',6).attr('markerHeight',6)
+    .attr('refX',4).attr('refY',3).attr('orient','auto')
+    .append('path').attr('d','M0,0 L0,6 L6,3 z').attr('fill','rgba(255,255,255,0.25)');
+}
+
+function drawEdge(svg,x1,y1,x2,y2,w,wLabel,markerId) {
+  svg.append('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2)
+    .attr('stroke',wColor(w)).attr('stroke-width',wWidth(w))
+    .attr('marker-end',`url(#${markerId})`);
+}
+
+// ── sequence (identical to lstm) ─────────────────────────────────────────────
+function drawSequence() {
+  seqSvg.selectAll('*').remove();
+  const W_S=600,H=80;
+  seqSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+  const barW=W_S/SEQ_LEN,midY=H/2,scale=28;
+  seqSvg.append('line').attr('x1',0).attr('x2',W_S).attr('y1',midY).attr('y2',midY)
+    .attr('stroke','rgba(255,255,255,0.06)').attr('stroke-width',1);
+  sequence.forEach((v,i)=>{
+    const cx=barW*i+barW/2,barH=Math.abs(v)*scale;
+    const isCur=i===t-1,isPast=i<t-1;
+    seqSvg.append('rect').attr('x',cx-barW*0.3).attr('y',v>=0?midY-barH:midY)
+      .attr('width',barW*0.6).attr('height',barH||2)
+      .attr('fill',isCur?colorScale(v):isPast?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.18)').attr('rx',2);
+    seqSvg.append('text').attr('x',cx).attr('y',H-4).attr('text-anchor','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',isCur?'#e8824a':'var(--muted)').text(`x${i+1}`);
+    seqSvg.append('text').attr('x',cx).attr('y',v>=0?midY-barH-5:midY+barH+12)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',isCur?colorScale(v):'rgba(255,255,255,0.25)').text(v.toFixed(2));
+    if(isCur) seqSvg.append('rect').attr('x',barW*i+2).attr('y',1)
+      .attr('width',barW-4).attr('height',H-2).attr('fill','none')
+      .attr('stroke','var(--accent)').attr('stroke-width',1).attr('rx',3).attr('opacity',0.5);
+  });
+}
+
+// ── computation graph ─────────────────────────────────────────────────────────
+function drawGraph() {
+  graphSvg.selectAll('*').remove();
+  const W_S=700, H=270;
+  graphSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+  addMarker(graphSvg,'garr');
+
+  const iX=48, aX=165, cX=258, rhX=335, hcX=420;
+  const op1X=258, op2X=460, res1X=528, res2X=528;
+  const addX=605, hX=660;
+  const topY=70, midY=140, botY=210;
+  const dim='rgba(255,255,255,0.1)';
+
+  const latest=gateHistory.length>0?gateHistory[gateHistory.length-1]:null;
+  const h_prev=t>0?hiddenState:0;
+  const xIdx=t<SEQ_LEN?t:SEQ_LEN-1;
+  const x_cur=sequence[xIdx];
+  const act=!!latest && showTransientState;
+
+  function ln(x1,y1,x2,y2,col,sag){
+    if(sag!==undefined){
+      const cpX=(x1+x2)/2, cpY=(y1+y2)/2+sag;
+      graphSvg.append('path').attr('d',`M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}`)
+        .attr('fill','none').attr('stroke',col||dim).attr('stroke-width',1)
+        .attr('marker-end','url(#garr)');
+    } else {
+      graphSvg.append('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2)
+        .attr('stroke',col||dim).attr('stroke-width',1).attr('marker-end','url(#garr)');
+    }
+  }
+  function opLabel(x,y,sym,col){
+    graphSvg.append('text').attr('x',x).attr('y',y)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
+      .attr('font-size',9).attr('fill',col||'rgba(255,255,255,0.5)').text(sym);
+  }
+  function edgeLbl(x,y,txt){
+    graphSvg.append('text').attr('x',x).attr('y',y)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace')
+      .attr('font-size',7).attr('fill','rgba(255,255,255,0.45)').text(txt);
+  }
+  function perim(cx,cy,r,tx,ty){
+    const dx=tx-cx, dy=ty-cy, d=Math.sqrt(dx*dx+dy*dy);
+    return [cx+dx/d*r, cy+dy/d*r];
+  }
+
+  // inputs
+  drawNode(graphSvg,iX,topY,14,x_cur,        `x${xIdx+1}`,null,true);
+  drawNode(graphSvg,iX,botY,14,t>0?h_prev:0, 'hₜ₋₁',      null,true);
+
+  // gate nodes — radius 14 matching inputs
+  drawEdge(graphSvg,iX+14,topY, aX-14,topY, W.r.wx,true,'garr');
+  drawEdge(graphSvg,iX+14,botY, aX-14,topY, W.r.wh,true,'garr');
+  drawNode(graphSvg,aX,topY,14,act?latest.r:null,'r',GC.r,false);
+
+  drawEdge(graphSvg,iX+14,topY, aX-14,botY, W.z.wx,true,'garr');
+  drawEdge(graphSvg,iX+14,botY, aX-14,botY, W.z.wh,true,'garr');
+  drawNode(graphSvg,aX,botY,14,act?latest.z:null,'z',GC.z,false);
+
+  // r ⊙ hₜ₋₁ → r·h
+  ln(aX+14, topY, cX,     topY, dim);
+  ln(iX+14, botY, cX,     topY, dim);
+  opLabel(cX, topY-12, '⊙', GC.r);
+  ln(cX, topY, rhX-13, topY, dim);
+  drawNode(graphSvg,rhX,topY,13,act?latest.r*h_prev:null,'r·h',null,false);
+
+  // h̃ candidate — arrows hit perimeter
+  const [rhEx,rhEy] = perim(hcX,midY,15,rhX+13,topY);
+  ln(rhX+13, topY, rhEx, rhEy, dim);
+  const [xEx,xEy] = perim(hcX,midY,15,iX+14,topY);
+  ln(iX+14, topY, xEx, xEy, dim, 18);   // gentle downward bow
+  drawNode(graphSvg,hcX,midY,15,act?latest.h:null,'h̃',GC.h,false);
+
+  // (1−z) ⊙ hₜ₋₁  — ⊙ at midY, same height as h̃
+  ln(aX+14, botY, op1X, midY, dim,-18);  // z → ⊙: small upward curve
+  // 1-z label at quadratic bezier midpoint (t=0.5)
+  { const cpX=(aX+14+op1X)/2, cpY=(botY+midY)/2-18;
+    const mx=0.25*(aX+14)+0.5*cpX+0.25*op1X;
+    const my=0.25*botY+0.5*cpY+0.25*midY;
+    edgeLbl(mx-8, my-8, '1−z'); }
+  ln(iX+14, botY, op1X, midY, dim,-12);  // h → ⊙: small upward curve
+  opLabel(op1X, midY-12, '⊙', GC.z);
+  ln(op1X, midY, res1X-13, topY, dim);   // ⊙ → result: diagonal up to topY
+  drawNode(graphSvg,res1X,topY,13,act?(1-latest.z)*h_prev:null,'(1−z)·h',null,false);
+
+  // z ⊙ h̃ — no label on z→⊙ line
+  ln(aX+14, botY, op2X, botY, dim); // z → ⊙: small downward curve
+  const [hcEx,hcEy] = perim(hcX,midY,15,op2X,botY);
+  ln(hcEx, hcEy, op2X, botY, dim);       // h̃ → ⊙: from perimeter, straight
+  opLabel(op2X, botY-12, '⊙', GC.z);
+  ln(op2X, botY, res2X-13, botY, dim);
+  drawNode(graphSvg,res2X,botY,13,act?latest.z*latest.h:null,'z·h̃',null,false);
+  ln(res1X+13, topY, addX, midY, dim);
+  ln(res2X+13, botY, addX, midY, dim);
+  opLabel(addX, midY-10, '+', H_COLOR);
+  ln(addX+6, midY, hX-15, midY, dim);
+  drawNode(graphSvg,hX,midY,15,(t>0&&showCurrentState)?hiddenState:null,'hₜ',null,true);
+}
+
+
+
+// ── trail ─────────────────────────────────────────────────────────────────────
+function drawTrail() {
+  trailSvg.selectAll('*').remove();
+  const W_S=600,H=120;
+  trailSvg.attr('viewBox',`0 0 ${W_S} ${H}`);
+  const cols=SEQ_LEN+1,colW=W_S/cols,rowH=(H-30);
+  hHistory.forEach((val,step)=>{
+    const isLast=step===hHistory.length-1;
+    const x=step*colW, y=14;
+    trailSvg.append('rect').attr('x',x+2).attr('y',y).attr('width',colW-4).attr('height',rowH-4)
+      .attr('fill',colorScale(val)).attr('rx',2).attr('opacity',isLast?1:0.65);
+    trailSvg.append('text').attr('x',x+colW/2).attr('y',y+rowH/2-2)
+      .attr('text-anchor','middle').attr('dominant-baseline','middle')
+      .attr('font-family','JetBrains Mono, monospace').attr('font-size',8)
+      .attr('fill','rgba(255,255,255,0.65)').text(val.toFixed(2));
+  });
+  trailSvg.append('text').attr('x',hHistory.length*colW+4).attr('y',14+rowH/2-2)
+    .attr('dominant-baseline','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+    .attr('fill',H_COLOR).text('hₜ');
+  hHistory.forEach((_,step)=>{
+    const isLast=step===hHistory.length-1;
+    trailSvg.append('text').attr('x',step*colW+colW/2).attr('y',H-4)
+      .attr('text-anchor','middle').attr('font-family','JetBrains Mono, monospace').attr('font-size',9)
+      .attr('fill',isLast?'var(--accent)':'var(--muted)').text(`t=${step}`);
+  });
+}
+
+// ── narrative ─────────────────────────────────────────────────────────────────
+function updateNarrative() {
+  const el=document.getElementById('narrative');
+  if(t===0){el.innerHTML='Hidden state <span class="dim">h=0</span>. Press step → to begin.';return;}
+  const gates=gateHistory[gateHistory.length-1];
+  const h_prev=hHistory[hHistory.length-2];
+  const kept=((1-gates.z)*h_prev).toFixed(3);
+  const written=(gates.z*gates.h).toFixed(3);
+  el.innerHTML=
+    `t=${t} &nbsp; xₜ=<span class="hi">${sequence[t-1].toFixed(2)}</span> &nbsp; `+
+    `<span class="nr">reset ${gates.r.toFixed(2)}</span> masked hₜ₋₁ for candidate &nbsp; `+
+    `<span class="nz">update ${gates.z.toFixed(2)}</span>: kept <span class="${+kept>0?'hi':'lo'}">${kept}</span> of old &nbsp; `+
+    `wrote <span class="${+written>0?'hi':'lo'}">${written}</span> from <span class="nh">h̃ ${gates.h.toFixed(2)}</span> &nbsp; `+
+    `hₜ=<span class="${hiddenState>0?'hi':'lo'}">${hiddenState.toFixed(3)}</span>`+
+    (t===SEQ_LEN?' &nbsp; <span class="dim">— sequence complete</span>':'');
+}
+
+// ── redraw ────────────────────────────────────────────────────────────────────
+function redraw(){
+  document.getElementById('t-display').textContent=t;
+  document.getElementById('btn-step').disabled=t>=SEQ_LEN;
+  drawSequence(); drawGraph(); drawTrail(); updateNarrative();
+}
+
+function resetAndRedraw(){
+  t=0; hiddenState=0;
+  hHistory=[0]; gateHistory=[];
+  showCurrentState=false; showTransientState=false;
+  redraw();
+}
+
+// ── step animation ────────────────────────────────────────────────────────────
+document.getElementById('btn-step').addEventListener('click', () => {
+  if (t >= SEQ_LEN) return;
+
+  const x_t    = sequence[t];
+  const h_prev = hiddenState;
+  const r      = stepGRU(x_t, h_prev);
+
+  const svgEl = document.getElementById('graph-svg');
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // positions — must match drawGraph exactly
+  const iX=48, aX=165, cX=258, rhX=335, hcX=420;
+  const op1X=258, op2X=460, res1X=528, res2X=528;
+  const addX=605, hX=660;
+  const topY=70, midY=140, botY=210;
+
+  const T  = 1.1;
+  const G  = 0.3;
+  const T_COPY = 0.95;
+  const HOLD_AFTER_COPY = 0.9;
+
+  const animEls = [];
+  const timers  = [];
+
+  function schedule(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+  function setAnimating(on) {
+    ['btn-step'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = on || (id==='btn-step' && !on && t>=SEQ_LEN);
+    });
+    document.querySelectorAll('.act-btn, .reset-btn').forEach(el => el.disabled = on);
+    document.getElementById('controls').querySelectorAll('input').forEach(el => el.disabled = on);
+  }
+
+  let defsEl = svgEl.querySelector('defs.anim-defs');
+  if (!defsEl) {
+    defsEl = document.createElementNS(NS, 'defs');
+    defsEl.classList.add('anim-defs');
+    svgEl.insertBefore(defsEl, svgEl.firstChild);
+  }
+  animEls.push(defsEl);
+
+  function mkPath(id, x1,y1, x2,y2, curve) {
+    const existing = defsEl.querySelector(`#${id}`);
+    if (existing) existing.remove();
+    const p = document.createElementNS(NS,'path');
+    p.setAttribute('id', id);
+    if (curve) {
+      const cpX=(x1+x2)/2, cpY=(y1+y2)/2+60;
+      p.setAttribute('d', `M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}`);
+    } else {
+      p.setAttribute('d', `M${x1},${y1} L${x2},${y2}`);
+    }
+    p.setAttribute('fill','none'); p.setAttribute('stroke','none');
+    defsEl.appendChild(p);
+  }
+
+  function revealNode(x, y, val, color) {
+    let best = null, bestD = Infinity;
+    svgEl.querySelectorAll('circle:not(.anim-dot):not(.anim-glow)').forEach(c => {
+      const d = Math.abs((+c.getAttribute('cx'))-x) + Math.abs((+c.getAttribute('cy'))-y);
+      if (d < bestD) { bestD=d; best=c; }
+    });
+    if (!best || bestD > 25) return;
+    const fill = color || colorScale(val);
+    best.setAttribute('fill', fill);
+    best.setAttribute('stroke', d3.color(fill).brighter(0.3));
+    const px = +best.getAttribute('cx'), py = +best.getAttribute('cy');
+    const existing = [...svgEl.querySelectorAll('text')].find(t =>
+      Math.abs(+t.getAttribute('x')-px)<3 && Math.abs(+t.getAttribute('y')-py)<3
+    );
+    const txt = typeof val==='number' ? val.toFixed(2) : String(val);
+    if (existing) { existing.textContent = txt; }
+    else {
+      const t = document.createElementNS(NS,'text');
+      t.setAttribute('x',px); t.setAttribute('y',py);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('font-family','JetBrains Mono, monospace'); t.setAttribute('font-size','9');
+      t.setAttribute('fill','rgba(255,255,255,0.85)');
+      t.textContent = txt;
+      svgEl.appendChild(t); animEls.push(t);
+    }
+  }
+
+  function clearNode(x, y) {
+    let best = null, bestD = Infinity;
+    svgEl.querySelectorAll('circle:not(.anim-dot):not(.anim-glow)').forEach(c => {
+      const d = Math.abs((+c.getAttribute('cx'))-x) + Math.abs((+c.getAttribute('cy'))-y);
+      if (d < bestD) { bestD=d; best=c; }
+    });
+    if (!best || bestD > 25) return;
+    best.setAttribute('fill', '#1e2230');
+    best.setAttribute('stroke', 'rgba(255,255,255,0.1)');
+    const px = +best.getAttribute('cx'), py = +best.getAttribute('cy');
+    const existing = [...svgEl.querySelectorAll('text')].find(t =>
+      Math.abs(+t.getAttribute('x')-px)<3 && Math.abs(+t.getAttribute('y')-py)<3
+    );
+    if (existing) existing.textContent = '';
+  }
+
+  function mkDot(color, pathId, delay, dur, pathD, timing) {
+    dur = dur || T;
+    timing = timing || 'cubic-bezier(0.37,0,0.63,1)';
+
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('r', 5);
+    c.setAttribute('fill', color);
+    c.classList.add('anim-dot');
+
+    if (pathD) {
+      c.style.offsetPath = `path('${pathD}')`;
+    } else {
+      c.style.offsetPath = `url(#${pathId})`;
+    }
+
+    c.style.animationDuration = dur + 's';
+    c.style.animationDelay = delay + 's';
+    c.style.animationTimingFunction = timing;
+
+    svgEl.appendChild(c);
+    animEls.push(c);
+  }
+
+  function mkGlow(x, y, color, delay, radius) {
+    radius = radius || 18;
+    const c = document.createElementNS(NS,'circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',radius);
+    c.setAttribute('fill',color); c.classList.add('anim-glow');
+    c.style.animationDuration = '0.55s';
+    c.style.animationDelay = delay + 's';
+    svgEl.appendChild(c); animEls.push(c);
+  }
+
+  function mkPulse(x, y, color, delay) {
+    const styleEl = document.createElement('style');
+    document.head.appendChild(styleEl); animEls.push(styleEl);
+    const uid = `lp-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
+    styleEl.sheet.insertRule(`
+      @keyframes ${uid} {
+        0%   { r: 15px; opacity: 0; }
+        12%  { r: 17px; opacity: 0.9; }
+        100% { r: 34px; opacity: 0; }
+      }
+    `, 0);
+    const ring = document.createElementNS(NS,'circle');
+    ring.setAttribute('cx',x); ring.setAttribute('cy',y); ring.setAttribute('r',15);
+    ring.setAttribute('fill','none');
+    ring.setAttribute('stroke',color); ring.setAttribute('stroke-width','2');
+    ring.style.opacity = '0';
+    ring.style.animationName = uid;
+    ring.style.animationDuration = '0.6s';
+    ring.style.animationDelay = delay + 's';
+    ring.style.animationTimingFunction = 'ease-out';
+    ring.style.animationFillMode = 'forwards';
+    svgEl.appendChild(ring); animEls.push(ring);
+  }
+
+  function mkGhostCopy(x1, y1, x2, y2, color, delay, dur, radius) {
+    radius = radius || 15;
+    const styleEl = document.createElement('style');
+    document.head.appendChild(styleEl); animEls.push(styleEl);
+    const uid = `lcopy-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+    const dx = x2 - x1, dy = y2 - y1;
+    styleEl.sheet.insertRule(`
+      @keyframes ${uid} {
+        0%   { opacity: 0;    transform: translate(0px, 0px); }
+        10%  { opacity: 0.95; transform: translate(0px, 0px); }
+        82%  { opacity: 0.85; transform: translate(${dx}px, ${dy}px); }
+        100% { opacity: 0;   transform: translate(${dx}px, ${dy}px); }
+      }
+    `, 0);
+    const ring = document.createElementNS(NS,'circle');
+    ring.setAttribute('cx', x1); ring.setAttribute('cy', y1);
+    ring.setAttribute('r', radius);
+    ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', color); ring.setAttribute('stroke-width', '2.4');
+    ring.style.opacity = '0';
+    ring.style.animationName = uid;
+    ring.style.animationDuration = dur + 's';
+    ring.style.animationDelay = delay + 's';
+    ring.style.animationTimingFunction = 'cubic-bezier(0.4,0,0.2,1)';
+    ring.style.animationFillMode = 'both';
+    svgEl.appendChild(ring); animEls.push(ring);
+  }
+
+  setAnimating(true);
+  showTransientState = true;
+
+  // ── register paths ────────────────────────────────────────────────────────────
+  // phase 1: inputs → r and z gate nodes
+  mkPath('lp1x-r', iX+14, topY, aX-15, topY);   // x → r (horizontal)
+  mkPath('lp1h-r', iX+14, botY, aX-15, topY);   // h → r (diagonal)
+  mkPath('lp1x-z', iX+14, topY, aX-15, botY);   // x → z (diagonal)
+  mkPath('lp1h-z', iX+14, botY, aX-15, botY);   // h → z (horizontal)
+
+  // phase 2: r → r⊙h merge label → r·h circle
+  mkPath('lp2-r-cx',  aX+15, topY, cX,    topY);   // r → ⊙ label
+  mkPath('lp2-cx-rh', cX,    topY, rhX-14, topY);  // ⊙ → r·h
+  // h → r⊙h label (diagonal straight, departs at 0, dur=2T+G)
+  const hpRhD = `M${iX+14},${botY} L${cX},${topY}`;
+
+  // z → (1-z)⊙h label (small upward curve, inline path)
+  const zM1D = `M${aX+14},${botY} Q${(aX+14+op1X)/2},${(botY+midY)/2-18} ${op1X},${midY}`;
+
+  // h → (1-z)⊙h label (small upward curve)
+  const hM1D = `M${iX+14},${botY} Q${(iX+14+op1X)/2},${(botY+midY)/2-12} ${op1X},${midY}`;
+
+  function lineLen(x1,y1,x2,y2) {
+    return Math.hypot(x2-x1, y2-y1);
+  }
+
+  function quadPoint(x1,y1,cx,cy,x2,y2,u) {
+    const a = (1-u)*(1-u);
+    const b = 2*(1-u)*u;
+    const c = u*u;
+    return {
+      x: a*x1 + b*cx + c*x2,
+      y: a*y1 + b*cy + c*y2
+    };
+  }
+
+  function quadLen(x1,y1,cx,cy,x2,y2,n=50) {
+    let len = 0;
+    let prev = quadPoint(x1,y1,cx,cy,x2,y2,0);
+
+    for (let i=1; i<=n; i++) {
+      const p = quadPoint(x1,y1,cx,cy,x2,y2,i/n);
+      len += Math.hypot(p.x-prev.x, p.y-prev.y);
+      prev = p;
+    }
+
+    return len;
+  }
+
+  // Uniform-speed timing for:
+  // hₜ₋₁ → ⊙ → (1−z)·h
+  // z    → ⊙
+  const m1ResultReadyTarget = 6*T + 3*G;
+
+  const hM1Len = quadLen(
+    iX+14, botY,
+    (iX+14+op1X)/2, (botY+midY)/2-12,
+    op1X, midY
+  );
+
+  const zM1Len = quadLen(
+    aX+14, botY,
+    (aX+14+op1X)/2, (botY+midY)/2-18,
+    op1X, midY
+  );
+
+  const op1R1Len = lineLen(op1X, midY, res1X-13, topY);
+
+  // Choose one visual speed so that hₜ₋₁ reaches the result
+  // at approximately the old reveal time.
+  const m1Speed = (hM1Len + op1R1Len) / m1ResultReadyTarget;
+
+  const hM1Dur   = hM1Len   / m1Speed;
+  const zM1Dur   = zM1Len   / m1Speed;
+  const op1R1Dur = op1R1Len / m1Speed;
+
+  const m1JoinTime    = hM1Dur;
+  const zM1Delay      = Math.max(0, m1JoinTime - zM1Dur);
+  const m1ResultReady = m1JoinTime + op1R1Dur;
+
+  // xₜ → h̃ animation path — curved, ends at perimeter
+  // perimeter of hcX,midY,r=15 from iX+14,topY: dir=(358,70), unit=(0.981,0.192)
+  const xHcEx = Math.round(hcX - 15*((hcX-(iX+14))/Math.hypot(hcX-(iX+14),midY-topY)));
+  const xHcEy = Math.round(midY - 15*((midY-topY)/Math.hypot(hcX-(iX+14),midY-topY)));
+  const xHcD = `M${iX+14},${topY} Q${(iX+14+xHcEx)/2},${(topY+xHcEy)/2+18} ${xHcEx},${xHcEy}`;
+
+  // phase 3: r·h + xₜ → h̃ candidate
+  mkPath('lp3-rh-hc', rhX+13, topY, hcX-15, midY);  // r·h → h̃ perimeter
+  // lp3-x-hc uses inline curved path xHcD (set in dot call)
+
+  // phase 4: h̃ → z⊙h̃ ⊙ label; z → z⊙h̃ ⊙ label
+  const hcOp2Dist = Math.hypot(op2X - hcX, botY - midY);
+  const hcOp2StartX = hcX + 15 * (op2X - hcX) / hcOp2Dist;
+  const hcOp2StartY = midY + 15 * (botY - midY) / hcOp2Dist;
+
+  mkPath('lp4-hc-op2', hcOp2StartX, hcOp2StartY, op2X, botY);
+  mkPath('lp4-z-op2',  aX+14,  botY, op2X,    botY);
+  // ⊙ label → result circles
+  mkPath('lp4-op2-r2', op2X,   botY, res2X-13, botY);
+
+  // z → (1-z)⊙h ⊙ label (curves up — inline path used)
+  // h → (1-z)⊙h ⊙ label (curves up — inline path used)
+  // ⊙ label → result circle
+  mkPath('lp4-op1-r1', op1X,   midY, res1X-13, topY);
+
+  // phase 5: result circles → + → hₜ
+  mkPath('lp5-r1-add', res1X+13, topY, addX,   midY);
+  mkPath('lp5-r2-add', res2X+13, botY, addX,   midY);
+  mkPath('lp5-add-ht', addX+6,   midY, hX-15,  midY);
+
+  // ── Phase 1: inputs → r and z ────────────────────────────────────────────────
+  mkDot('#e8824a', 'lp1x-r', 0); mkDot('#378ADD', 'lp1h-r', 0);
+  mkDot('#e8824a', 'lp1x-z', 0); mkDot('#378ADD', 'lp1h-z', 0);
+
+  mkGlow(aX, topY, GC.r, T-0.05, 17);
+  mkGlow(aX, botY, GC.z, T-0.05, 17);
+  schedule(T*1000, () => {
+    revealNode(aX, topY, r.r, null);
+    revealNode(aX, botY, r.z, null);
+  });
+
+  // ── Phase 2: r→⊙; h→⊙ (departs 0, dur=2T+G); ⊙→r·h ────────────────────────
+  const T_hp = 2*T + G;
+  mkDot('#378ADD', 'lp2-r-cx', 0, T_hp, hpRhD);   // h → r⊙h label (departs now)
+  mkDot(GC.r,      'lp2-r-cx', T+G);              // r → r⊙h label
+
+  mkDot(GC.r, 'lp2-cx-rh', 2*T+G);                // ⊙ → r·h
+
+  mkGlow(rhX, topY, GC.r, 3*T+G-0.05, 16);
+  schedule((3*T+G)*1000, () => revealNode(rhX, topY, r.r*h_prev, null));
+
+  // ── z departs toward both ⊙ merges ──────────────────────────────────────────
+  const T_z = 4*T + 2*G;
+  mkDot(GC.z, 'lp4-z-op2', T+G, T_z);             // z → z⊙h̃ ⊙ label
+
+  // z → (1−z)⊙h, same approximate visual speed as hₜ₋₁ branch
+  mkDot(GC.z, 'lp5-r1-add', zM1Delay, zM1Dur, zM1D, 'linear');
+
+  // ── Phase 3: r·h + xₜ → h̃ ───────────────────────────────────────────────────
+  mkDot(GC.r,      'lp3-rh-hc', 3*T+2*G);
+  mkDot('#e8824a', 'lp3-x-hc',  3*T+2*G, T, xHcD);  // curved to h̃ perimeter
+
+  mkGlow(hcX, midY, GC.h, 4*T+2*G-0.05, 17);
+  schedule((4*T+2*G)*1000, () => revealNode(hcX, midY, r.h, null));
+
+  // ── Phase 4: h̃→op2; h→op1 ───────────────────────────────────────────────────
+  mkDot('#378ADD', 'lp5-r1-add', 0, hM1Dur, hM1D, 'linear');  // h → (1−z)⊙h
+
+  mkDot(GC.h, 'lp4-hc-op2', 4*T+3*G);              // h̃ → z⊙h̃ ⊙ label
+
+  // ⊙ labels → result circles
+  mkDot(GC.z, 'lp4-op2-r2', 5*T+3*G);
+
+  // ⊙ → (1−z)·h, continuing with the same approximate visual speed
+  mkDot(GC.z, 'lp4-op1-r1', m1JoinTime, op1R1Dur, null, 'linear');
+
+  mkGlow(res1X, topY, GC.z, m1ResultReady-0.05, 16);
+  schedule(m1ResultReady*1000, () => {
+    revealNode(res1X, topY, (1-r.z)*h_prev, null);
+  });
+
+  mkGlow(res2X, botY, GC.z, 6*T+3*G-0.05, 16);
+  schedule((6*T+3*G)*1000, () => {
+    revealNode(res2X, botY, r.z*r.h, null);
+  });
+
+  // ── Phase 5a: result circles → + ─────────────────────────────────────────────
+  mkDot(H_COLOR, 'lp5-r1-add', 6*T+4*G);
+  mkDot(H_COLOR, 'lp5-r2-add', 6*T+4*G);
+  mkGlow(addX, midY, H_COLOR, 7*T+4*G-0.05, 14);
+
+  // ── Phase 5b: + → hₜ ─────────────────────────────────────────────────────────
+  mkDot(H_COLOR, 'lp5-add-ht', 7*T+5*G);
+  mkPulse(hX, midY, H_COLOR, 8*T+5*G-0.05);
+  schedule((8*T+5*G)*1000, () => revealNode(hX, midY, r.h_new, null));
+
+  // ── Phase 6: ghost copy hₜ → hₜ₋₁ ───────────────────────────────────────────
+  const p6 = 8*T + 6*G;
+  mkGhostCopy(hX, midY, iX, botY, H_COLOR, p6, T_COPY, 15);
+  mkGlow(iX, botY, H_COLOR, p6 + T_COPY*0.8, 16);
+  schedule((p6 + T_COPY*0.82)*1000, () => revealNode(iX, botY, r.h_new, null));
+  schedule((p6 + T_COPY*0.82 + HOLD_AFTER_COPY)*1000, () => clearNode(hX, midY));
+
+  const totalMs = (p6 + T_COPY + HOLD_AFTER_COPY + 0.35) * 1000;
+  schedule(totalMs, () => {
+    animEls.forEach(e => { try { e.remove(); } catch(_){} });
+    t++; hiddenState=r.h_new;
+    hHistory.push(hiddenState);
+    gateHistory.push({r:r.r, z:r.z, h:r.h});
+    showCurrentState=false; showTransientState=false;
+    redraw();
+    setAnimating(false);
+  });
+});
+
+// ── controls ──────────────────────────────────────────────────────────────────
+function buildControls(){
+  const ctrl=d3.select('#controls');
+  ctrl.selectAll('*').remove();
+
+  [{key:'r',label:'Wr  reset',color:GC.r},{key:'z',label:'Wz  update',color:GC.z},
+   {key:'h',label:'Wh  candidate',color:GC.h}]
+  .forEach(({key,label,color})=>{
+    const col=ctrl.append('div').style('display','flex').style('flex-direction','column');
+    col.append('div').attr('class','ctrl-col-title').style('color',color).text(label);
+    [{param:'wh',display:'Wh'},{param:'wx',display:'Wx'},{param:'b',display:'bias'}]
+    .forEach(({param,display})=>{
+      const row=col.append('div').attr('class','ctrl-row');
+      row.append('span').attr('class','ctrl-label').text(display);
+      const sl=row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',W[key][param]);
+      const vl=row.append('span').attr('class','ctrl-val').text(W[key][param].toFixed(2));
+      sl.on('input',function(){W[key][param]=+this.value;vl.text(W[key][param].toFixed(2));resetAndRedraw();});
+    });
+  });
+
+  // sequence column
+  const seqCol=ctrl.append('div').style('display','flex').style('flex-direction','column');
+  seqCol.append('div').attr('class','ctrl-col-title').style('color','var(--muted)').text('sequence');
+  sequence.forEach((v,i)=>{
+    const row=seqCol.append('div').attr('class','ctrl-row');
+    row.append('span').attr('class','ctrl-label').text(`x${i+1}`);
+    const sl=row.append('input').attr('type','range').attr('min',-1).attr('max',1).attr('step',0.01).attr('value',v);
+    const vl=row.append('span').attr('class','ctrl-val').text(v.toFixed(2));
+    sl.on('input',function(){sequence[i]=+this.value;vl.text(sequence[i].toFixed(2));resetAndRedraw();});
+  });
+
+  // reset column
+  const resetCol=ctrl.append('div').style('display','flex').style('flex-direction','column').style('gap','0.3rem');
+  resetCol.append('div').attr('class','ctrl-col-title').style('color','var(--muted)').text('reset');
+  resetCol.append('button').attr('class','reset-btn').attr('id','btn-zero')
+    .text('zero all weights')
+    .on('click', () => {
+      ['r','z','h'].forEach(k => { W[k].wh=0; W[k].wx=0; W[k].b=0; });
+      t=0; hiddenState=0; hHistory=[0]; gateHistory=[];
+      showCurrentState=false; showTransientState=false;
+      buildControls(); redraw();
+    });
+  resetCol.append('button').attr('class','reset-btn').attr('id','btn-rand-weights')
+    .text('randomise weights')
+    .on('click', () => {
+      ['r','z','h'].forEach(k => {
+        W[k].wh=Math.round((Math.random()*2-1)*100)/100;
+        W[k].wx=Math.round((Math.random()*2-1)*100)/100;
+        W[k].b =Math.round((Math.random()*2-1)*100)/100;
+      });
+      t=0; hiddenState=0; hHistory=[0]; gateHistory=[];
+      showCurrentState=false; showTransientState=false;
+      buildControls(); redraw();
+    });
+}
+
+buildControls();
+redraw();
+</script>
+</body>
+</html>

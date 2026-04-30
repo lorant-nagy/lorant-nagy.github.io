@@ -165,6 +165,17 @@
   .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
   .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
   .lstm-hw    {animation:lstm-hw     5s ease-in-out infinite}
+  /* GRU */
+  @keyframes gru-r { 0%,100%{fill:#1e2230} 10%,25%{fill:#378ADD} }
+  @keyframes gru-z { 0%,100%{fill:#1e2230} 30%,50%{fill:#1D9E75} }
+  @keyframes gru-h { 0%,100%{fill:#1e2230} 55%,72%{fill:#aa701e} }
+  @keyframes gru-ht{ 0%,100%{fill:#1e2230} 75%,90%{fill:#e8824a} }
+  @keyframes gru-interp { 0%,100%{stroke-opacity:0.12} 60%,85%{stroke-opacity:0.55} }
+  .gru-r { animation: gru-r 5s ease-in-out infinite }
+  .gru-z { animation: gru-z 5s ease-in-out infinite }
+  .gru-h { animation: gru-h 5s ease-in-out infinite }
+  .gru-ht{ animation: gru-ht 5s ease-in-out infinite }
+  .gru-interp { animation: gru-interp 5s ease-in-out infinite }
 </style>
 </head>
 <body>
@@ -285,10 +296,56 @@
   </a>
 
   <!-- Coming soon placeholders -->
-  <div class="card-soon">
-    <div class="card-soon-title">GRU</div>
-    <div class="card-soon-label">coming soon</div>
-  </div>
+  <a class="card" href="/networks/gru.html">
+    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="220" height="150" fill="#0d0f14"/>
+      <!-- inputs -->
+      <circle cx="22" cy="45" r="10" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <circle cx="22" cy="105" r="10" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="22" y="45"  text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.4)">x</text>
+      <text x="22" y="105" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.4)">h</text>
+      <!-- edges to gates -->
+      <line x1="32" y1="45"  x2="56" y2="45"  stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <line x1="32" y1="45"  x2="56" y2="105" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
+      <line x1="32" y1="105" x2="56" y2="45"  stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
+      <line x1="32" y1="105" x2="56" y2="105" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <!-- r and z gates -->
+      <circle class="gru-r" cx="66" cy="45"  r="11" stroke="#378ADD" stroke-width="1"/>
+      <circle class="gru-z" cx="66" cy="105" r="11" stroke="#1D9E75" stroke-width="1"/>
+      <text x="66" y="45"  text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="#378ADD">r</text>
+      <text x="66" y="105" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="#1D9E75">z</text>
+      <!-- r·h merge -->
+      <line x1="77" y1="45"  x2="96" y2="60"  stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <line x1="32" y1="105" x2="96" y2="60"  stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
+      <text x="96" y="60" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.35)">⊙</text>
+      <!-- h̃ candidate -->
+      <line x1="104" y1="60" x2="116" y2="75" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <line x1="32"  y1="45" x2="116" y2="75" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
+      <circle class="gru-h" cx="126" cy="75" r="11" stroke="#aa701e" stroke-width="1"/>
+      <text x="126" y="75" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="#aa701e">h̃</text>
+      <!-- interpolation ⊙ symbols -->
+      <text x="162" y="48" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.35)">⊙</text>
+      <text x="162" y="102" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.35)">⊙</text>
+      <!-- z to both ⊙ -->
+      <line class="gru-interp" x1="77" y1="105" x2="154" y2="50"  stroke="#1D9E75" stroke-width="0.8"/>
+      <line class="gru-interp" x1="77" y1="105" x2="154" y2="100" stroke="#1D9E75" stroke-width="0.8"/>
+      <!-- h → upper ⊙, h̃ → lower ⊙ -->
+      <line x1="32"  y1="105" x2="154" y2="50"  stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
+      <line x1="137" y1="75"  x2="154" y2="100" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
+      <!-- + and hₜ -->
+      <text x="178" y="75" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.4)">+</text>
+      <line x1="162" y1="50"  x2="170" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
+      <line x1="162" y1="102" x2="170" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
+      <circle class="gru-ht" cx="198" cy="75" r="11" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="198" y="75" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.5)">hₜ</text>
+      <line x1="186" y1="75" x2="188" y2="75" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">GRU</div>
+      <div class="card-question"></div>
+      <div class="card-link">explore →</div>
+    </div>
+  </a>
 
   <div class="card-soon">
     <div class="card-soon-title">transformer</div>
