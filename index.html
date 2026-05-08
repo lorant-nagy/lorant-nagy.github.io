@@ -55,6 +55,14 @@
     .gru-h{animation:gru-h 5s ease-in-out infinite}
     .gru-ht{animation:gru-ht 5s ease-in-out infinite}
     .gru-interp{animation:gru-interp 5s ease-in-out infinite}
+    @keyframes attn-cell{0%,100%{opacity:0.08}50%{opacity:0.65}}
+    @keyframes attn-cell2{0%,100%{opacity:0.08}30%,80%{opacity:0.45}}
+    @keyframes attn-cell3{0%,100%{opacity:0.08}60%{opacity:0.8}}
+    @keyframes attn-flow{0%,100%{opacity:0.05}40%,70%{opacity:0.3}}
+    .ac1{animation:attn-cell  4s ease-in-out infinite}
+    .ac2{animation:attn-cell2 4s ease-in-out infinite}
+    .ac3{animation:attn-cell3 4s ease-in-out infinite}
+    .af{animation:attn-flow   4s ease-in-out infinite}
   </style>
 </head>
 <body>
@@ -251,6 +259,56 @@
           <circle class="gru-ht" cx="198" cy="65" r="11" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
           <text x="198" y="65" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.45)">hₜ</text>
           <text x="110" y="116" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">GRU</text>
+        </svg>
+      </div>
+
+      <!-- attention card -->
+      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+        <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+          <rect width="220" height="130" fill="#0d0f14"/>
+          <!-- X matrix 4x4 small cells -->
+          <g opacity="0.5">
+            <rect x="10" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="21" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="32" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="43" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="10" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="21" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="32" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="43" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="10" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="21" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="32" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="43" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="10" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="21" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="32" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="43" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+          </g>
+          <text x="30" y="64" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.2)">X</text>
+          <!-- attention heatmap 4x4 -->
+          <rect class="ac3" x="140" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac2" x="159" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="178" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="197" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="140" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac3" x="159" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac2" x="178" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="197" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac2" x="140" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="159" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac3" x="178" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="197" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="140" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac2" x="159" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac1" x="178" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <rect class="ac3" x="197" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
+          <text x="170" y="90" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.2)">A</text>
+          <!-- flow arrows -->
+          <line class="af" x1="56" y1="38" x2="130" y2="38" stroke="rgba(196,181,253,0.4)" stroke-width="0.8" stroke-dasharray="3,2"/>
+          <line class="af" x1="130" y1="38" x2="138" y2="50" stroke="rgba(196,181,253,0.4)" stroke-width="0.8"/>
+          <text x="92" y="34" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(196,181,253,0.35)">Q·Kᵀ</text>
+          <text x="110" y="116" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">attention</text>
         </svg>
       </div>
 

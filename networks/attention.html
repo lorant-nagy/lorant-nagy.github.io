@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attention</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:    #0d0f14;
+    --surf:  #13161d;
+    --bord:  rgba(255,255,255,0.07);
+    --text:  #c8cdd8;
+    --muted: #565c6e;
+    --cq:    #7B5EA7;
+    --ck:    #7B5EA7;
+    --ca:    #7B5EA7;
+    --pos:   #D946EF;
+    --neg:   #6366F1;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    min-height: 100dvh;
+    display: flex; flex-direction: column;
+    padding: 1.1rem 1.6rem 1.2rem;
+    gap: 0.5rem;
+  }
+
+  a.back {
+    position: fixed; top:1rem; left:1.25rem;
+    font-size:11px; color:var(--muted);
+    text-decoration:none; letter-spacing:0.05em; z-index:10;
+  }
+  a.back:hover { color:var(--text); }
+
+  h1 {
+    font-family:'Spectral',serif; font-weight:300;
+    font-size:1.4rem; color:#e8e4dc; letter-spacing:0.02em;
+    padding-top:1.3rem;
+  }
+
+  .eq {
+    font-size:11px; color:var(--muted); font-style:italic; line-height:1.9;
+  }
+
+  /* ── two-row layout ── */
+  .section {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    margin-top: 1rem;
+  }
+  .section + .section { margin-top: 18px; }
+
+  .section-lbl {
+    font-size: 9px; letter-spacing: 0.1em; color: var(--muted);
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    align-self: center; flex-shrink: 0; opacity: 0.55;
+    text-transform: uppercase;
+  }
+
+  /* thin separator */
+  .sep {
+    width: 1px; background: var(--bord);
+    align-self: stretch; flex-shrink: 0; margin: 0 2px;
+  }
+
+  /* ── matrix block ── */
+  .mb { display:flex; flex-direction:column; align-items:flex-start; gap:4px; flex-shrink:0; }
+
+  .mb-title {
+    font-size:10px; letter-spacing:0.07em; align-self:center;
+    line-height:1.5; white-space:nowrap; text-align:center;
+  }
+  .mb-title .dim { font-size:8px; color:var(--muted); display:block; text-align:center; }
+
+  .mb-inner { display:flex; align-items:flex-start; gap:2px; }
+
+  /* row axis */
+  .axr { display:flex; flex-direction:column; }
+  .axr-item {
+    display:flex; align-items:center; justify-content:flex-end;
+    font-size:8px; color:var(--muted); padding-right:3px; width:16px;
+  }
+
+  /* col axis + grid wrapper */
+  .mbr { display:flex; flex-direction:column; gap:3px; }
+  .axc { display:flex; }
+  .axc-item { text-align:center; font-size:8px; color:var(--muted); }
+
+  .grid { display:grid; }
+
+  /* ── cell ── */
+  .cell {
+    border:0.5px solid var(--bord); border-radius:3px;
+    background:var(--surf);
+    display:flex; align-items:center; justify-content:center;
+    font-size:9px; color:var(--muted);
+    user-select:none; transition:border-color 0.12s;
+  }
+  .cell.ed  { cursor:ns-resize; }
+  .cell.ed:hover { border-color:rgba(255,255,255,0.22); }
+  .cell.drag { border-color:rgba(255,255,255,0.5) !important; }
+
+  /* ── preset buttons ── */
+  .presets {
+    display: flex; gap: 7px; flex-wrap: wrap;
+    align-items: center; margin-top: 0.1rem;
+  }
+  .presets-lbl {
+    font-size: 9px; letter-spacing: 0.08em;
+    color: var(--muted); opacity: 0.6; margin-right: 3px;
+    text-transform: uppercase;
+  }
+  .pbtn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; padding: 3px 10px;
+    border-radius: 3px; cursor: pointer;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    background: none; color: var(--muted);
+    letter-spacing: 0.04em;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .pbtn:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+  .pbtn.active { color: #c4b5fd; border-color: rgba(196,181,253,0.4); }
+</style>
+</head>
+<body>
+
+<a class="back" href="/networks/">← networks</a>
+<h1>Attention</h1>
+<div class="eq">
+  <b style="color:#fbb6d6">Q</b> = X · W<sub>Q</sub>
+  &nbsp;·&nbsp;
+  <b style="color:#6ee7d4">K</b> = X · W<sub>K</sub>
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <b style="color:#c4b5fd">A</b> = softmax( <b style="color:#fbb6d6">Q</b><b style="color:#6ee7d4">K</b><sup>T</sup> / √d<sub>h</sub> )
+  &nbsp;&nbsp;·&nbsp;&nbsp;
+  <span style="font-size:10px">drag ↕ to edit &nbsp;·&nbsp; N=4 &nbsp;d=4 &nbsp;h=2</span>
+</div>
+
+<div class="presets" id="presets">
+  <span class="presets-lbl">X presets</span>
+  <button class="pbtn" onclick="setPreset('identity')">identity</button>
+  <button class="pbtn" onclick="setPreset('similar')">similar</button>
+  <button class="pbtn" onclick="setPreset('clusters')">two clusters</button>
+  <button class="pbtn" onclick="setPreset('outlier')">one outlier</button>
+  <button class="pbtn" onclick="setPreset('opposite')">opposite pairs</button>
+</div>
+
+<div class="section" id="top-row">
+  <div class="section-lbl">set</div>
+</div>
+<div class="section" id="bot-row">
+  <div class="section-lbl">computed</div>
+</div>
+
+<script>
+const N=4, DM=4, DH=2;
+const CQ='#a78bfa', CK='#a78bfa', CA='#7B5EA7', CX='var(--text)';
+const TL=['t₁','t₂','t₃','t₄'], DL=['d₁','d₂','d₃','d₄'], HL=['h₁','h₂'];
+
+let X=[[ 1.00, 0.20,-0.30, 0.50],[ 0.10, 0.90, 0.40,-0.20],[-0.40, 0.30, 0.80, 0.10],[ 0.60,-0.50, 0.20, 0.70]];
+let WQ=[[ 0.80, 0.30],[-0.30, 0.70],[ 0.50,-0.40],[ 0.10, 0.60]];
+let WK=[[ 0.60,-0.40],[ 0.40, 0.80],[-0.50, 0.30],[ 0.30,-0.60]];
+
+const PRESETS = {
+  identity: [
+    [ 1.00, 0.00, 0.00, 0.00],
+    [ 0.00, 1.00, 0.00, 0.00],
+    [ 0.00, 0.00, 1.00, 0.00],
+    [ 0.00, 0.00, 0.00, 1.00]
+  ],
+  similar: [
+    [ 0.80, 0.75, 0.70, 0.72],
+    [ 0.78, 0.80, 0.68, 0.74],
+    [ 0.76, 0.72, 0.82, 0.70],
+    [ 0.74, 0.78, 0.66, 0.80]
+  ],
+  clusters: [
+    [ 0.90, 0.85,-0.70,-0.65],
+    [ 0.88, 0.90,-0.68,-0.72],
+    [-0.72,-0.68, 0.90, 0.85],
+    [-0.65,-0.70, 0.88, 0.90]
+  ],
+  outlier: [
+    [ 0.80, 0.78, 0.75, 0.00],
+    [ 0.76, 0.80, 0.78, 0.00],
+    [ 0.78, 0.76, 0.80, 0.00],
+    [ 0.00, 0.00, 0.00, 1.80]
+  ],
+  opposite: [
+    [ 1.00, 0.60,-1.00,-0.60],
+    [ 0.60, 1.00,-0.60,-1.00],
+    [-1.00,-0.60, 1.00, 0.60],
+    [-0.60,-1.00, 0.60, 1.00]
+  ]
+};
+
+let activePreset = null;
+
+function setPreset(name) {
+  const p = PRESETS[name];
+  for(let i=0;i<N;i++) for(let j=0;j<DM;j++) X[i][j] = p[i][j];
+  activePreset = name;
+  document.querySelectorAll('.pbtn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(`'${name}'`));
+  });
+  build();
+}
+
+function mm(A,B,ra,ca,cb){
+  const C=Array.from({length:ra},()=>new Array(cb).fill(0));
+  for(let i=0;i<ra;i++)for(let j=0;j<cb;j++)for(let k=0;k<ca;k++) C[i][j]+=A[i][k]*B[k][j];
+  return C;
+}
+function sfx(r){const mx=Math.max(...r),e=r.map(v=>Math.exp(v-mx)),s=e.reduce((a,b)=>a+b,0);return e.map(v=>v/s);}
+function compute(){
+  const Q=mm(X,WQ,N,DM,DH), K=mm(X,WK,N,DM,DH), sc=Math.sqrt(DH);
+  const S=Array.from({length:N},(_,i)=>Array.from({length:N},(_,j)=>Q[i].reduce((s,v,k)=>s+v*K[j][k],0)/sc));
+  return {Q,K,A:S.map(sfx)};
+}
+
+function cellSize(){
+  // each row has 8 data cols (top: 4+2+2, bot: 2+2+4)
+  // plus 2 seps, row-labels, group gaps
+  const W = window.innerWidth - 120;
+  const cw = Math.max(28, Math.min(54, Math.floor((W - 2*10 - 3*14 - 3*16) / 8)));
+  // two matrix rows, each 4 cells tall, plus row gap + headers
+  const H = window.innerHeight - 180;
+  const ch = Math.max(20, Math.min(42, Math.floor((H - 18 - 2*14 - 2*14) / 8)));
+  return {w:cw, h:ch, gap:3};
+}
+
+function fmt(v){return(v>=0?'\u2009':'')+v.toFixed(2);}
+
+function signedStyleTop(v,mx){
+  // rose pink (positive) / teal cyan (negative) — pastel
+  const a=Math.min(Math.abs(v)/Math.max(mx,0.01),1);
+  const al=(0.06+a*0.42).toFixed(3);
+  if(v> 0.005) return {bg:`rgba(251,207,232,${al})`, tc:a>0.22?'#f9a8d4':'var(--muted)'};
+  if(v<-0.005) return {bg:`rgba(153,246,228,${al})`, tc:a>0.22?'#6ee7d4':'var(--muted)'};
+  return {bg:'transparent',tc:'var(--muted)'};
+}
+function signedStyleBot(v,mx){
+  // soft lilac (positive) / periwinkle (negative) — pastel purple family
+  const a=Math.min(Math.abs(v)/Math.max(mx,0.01),1);
+  const al=(0.06+a*0.42).toFixed(3);
+  if(v> 0.005) return {bg:`rgba(216,180,254,${al})`, tc:a>0.22?'#c4b5fd':'var(--muted)'};
+  if(v<-0.005) return {bg:`rgba(165,180,252,${al})`, tc:a>0.22?'#a5b4fc':'var(--muted)'};
+  return {bg:'transparent',tc:'var(--muted)'};
+}
+function heatStyle(v){
+  // soft purple heatmap — lighter than before
+  const a=(0.03+v*0.72).toFixed(3), bc=(0.06+v*0.45).toFixed(3);
+  return {bg:`rgba(139,92,246,${a})`,bord:`rgba(139,92,246,${bc})`,tc:v>0.32?'rgba(255,255,255,0.88)':'rgba(196,181,253,0.8)'};
+}
+
+function applyCell(el,v,mx,heat,top){
+  if(heat){
+    const s=heatStyle(v);
+    el.style.background=s.bg; el.style.borderColor=s.bord; el.style.color=s.tc;
+    el.textContent=v.toFixed(2);
+  } else {
+    const s=top?signedStyleTop(v,mx):signedStyleBot(v,mx);
+    el.style.background=s.bg; el.style.borderColor=''; el.style.color=s.tc;
+    el.textContent=fmt(v);
+  }
+}
+
+function scrub(el,mat,i,j){
+  let sy,sv,on=false;
+  function dn(e){e.preventDefault();sy=e.touches?e.touches[0].clientY:e.clientY;sv=mat[i][j];on=true;el.classList.add('drag');document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);document.addEventListener('touchmove',mv,{passive:false});document.addEventListener('touchend',up);}
+  function mv(e){if(!on)return;e.preventDefault();const y=e.touches?e.touches[0].clientY:e.clientY;mat[i][j]=parseFloat(Math.max(-2,Math.min(2,sv+(sy-y)*0.025)).toFixed(2));refresh();}
+  function up(){on=false;el.classList.remove('drag');document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);document.removeEventListener('touchmove',mv);document.removeEventListener('touchend',up);}
+  el.addEventListener('mousedown',dn);
+  el.addEventListener('touchstart',dn,{passive:false});
+}
+
+function makeMB({id,title,color,dimLabel,rows,cols,rowL,colL,editable,heat,mat,cs}){
+  const wrap=document.createElement('div'); wrap.className='mb';
+
+  const ttl=document.createElement('div'); ttl.className='mb-title'+(editable?' editable-hint':'');
+  ttl.style.color=color;
+  ttl.innerHTML=title+(dimLabel?`<span class="dim">${dimLabel}</span>`:'');
+  wrap.appendChild(ttl);
+
+  const inner=document.createElement('div'); inner.className='mb-inner';
+
+  if(rowL){
+    const axr=document.createElement('div'); axr.className='axr';
+    const topPad=colL?14+3:0;
+    axr.style.paddingTop=topPad+'px';
+    rowL.forEach(l=>{
+      const d=document.createElement('div'); d.className='axr-item';
+      d.style.cssText=`height:${cs.h}px;color:${color};`; d.textContent=l; axr.appendChild(d);
+    });
+    inner.appendChild(axr);
+  }
+
+  const mbr=document.createElement('div'); mbr.className='mbr'; mbr.style.gap=cs.gap+'px';
+
+  if(colL){
+    const axc=document.createElement('div'); axc.className='axc'; axc.style.gap=cs.gap+'px';
+    colL.forEach(l=>{
+      const d=document.createElement('div'); d.className='axc-item';
+      d.style.cssText=`width:${cs.w}px;color:${color};`; d.textContent=l; axc.appendChild(d);
+    });
+    mbr.appendChild(axc);
+  }
+
+  const grid=document.createElement('div'); grid.className='grid'; grid.id=id;
+  grid.style.cssText=`grid-template-columns:repeat(${cols},${cs.w}px);gap:${cs.gap}px;`;
+  mbr.appendChild(grid);
+  inner.appendChild(mbr);
+  wrap.appendChild(inner);
+  return wrap;
+}
+
+function fillMB(id,data,rows,cols,{editable,heat,mat,cs,top}){
+  const grid=document.getElementById(id); if(!grid)return;
+  grid.innerHTML='';
+  let mx=0;
+  if(!heat) for(let i=0;i<rows;i++)for(let j=0;j<cols;j++) mx=Math.max(mx,Math.abs(data[i][j]));
+  for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){
+    const el=document.createElement('div');
+    el.className='cell'+(editable?' ed':'');
+    el.id=`${id}-${i}-${j}`;
+    el.style.cssText=`width:${cs.w}px;height:${cs.h}px;`;
+    applyCell(el,data[i][j],mx,heat,top);
+    if(editable&&mat) scrub(el,mat,i,j);
+    grid.appendChild(el);
+  }
+}
+
+function refresh(){
+  const {Q,K,A}=compute();
+  function rs(id,data,r,c,top){
+    let mx=0;for(let i=0;i<r;i++)for(let j=0;j<c;j++) mx=Math.max(mx,Math.abs(data[i][j]));
+    for(let i=0;i<r;i++)for(let j=0;j<c;j++){const el=document.getElementById(`${id}-${i}-${j}`);if(el)applyCell(el,data[i][j],mx,false,top);}
+  }
+  function rh(id,data,n){
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++){const el=document.getElementById(`${id}-${i}-${j}`);if(el)applyCell(el,data[i][j],0,true,false);}
+  }
+  rs('mx',X,N,DM,true); rs('mwq',WQ,DM,DH,true); rs('mwk',WK,DM,DH,true);
+  rs('mq',Q,N,DH,false); rs('mk',K,N,DH,false); rh('ma',A,N);
+}
+
+function sep(){const d=document.createElement('div');d.className='sep';return d;}
+
+function build(){
+  const cs=cellSize();
+  const {Q,K,A}=compute();
+
+  const top=document.getElementById('top-row');
+  const bot=document.getElementById('bot-row');
+  // clear everything after the section-lbl
+  while(top.children.length>1) top.removeChild(top.lastChild);
+  while(bot.children.length>1) bot.removeChild(bot.lastChild);
+
+  // ── top: X | WQ | WK ──
+  const wx=makeMB({id:'mx',title:'X',color:'var(--text)',dimLabel:'N×d',rows:N,cols:DM,rowL:TL,colL:DL,editable:true,mat:X,cs});
+  top.appendChild(wx); fillMB('mx',X,N,DM,{editable:true,mat:X,cs,top:true});
+
+  top.appendChild(sep());
+
+  const wwq=makeMB({id:'mwq',title:'W<sub>Q</sub>',color:'#fbb6d6',dimLabel:'d×h',rows:DM,cols:DH,rowL:DL,colL:HL,editable:true,mat:WQ,cs});
+  top.appendChild(wwq); fillMB('mwq',WQ,DM,DH,{editable:true,mat:WQ,cs,top:true});
+
+  top.appendChild(sep());
+
+  const wwk=makeMB({id:'mwk',title:'W<sub>K</sub>',color:'#6ee7d4',dimLabel:'d×h',rows:DM,cols:DH,rowL:DL,colL:HL,editable:true,mat:WK,cs});
+  top.appendChild(wwk); fillMB('mwk',WK,DM,DH,{editable:true,mat:WK,cs,top:true});
+
+  // ── bot: Q | K | A ──
+  const wq=makeMB({id:'mq',title:'Q',color:'#c4b5fd',dimLabel:'N×h',rows:N,cols:DH,rowL:TL,colL:HL,cs});
+  bot.appendChild(wq); fillMB('mq',Q,N,DH,{cs,top:false});
+
+  bot.appendChild(sep());
+
+  const wk=makeMB({id:'mk',title:'K',color:'#a5b4fc',dimLabel:'N×h',rows:N,cols:DH,rowL:TL,colL:HL,cs});
+  bot.appendChild(wk); fillMB('mk',K,N,DH,{cs,top:false});
+
+  bot.appendChild(sep());
+
+  const wa=makeMB({id:'ma',title:'A',color:'#c4b5fd',dimLabel:'N×N',rows:N,cols:N,rowL:TL,colL:TL,heat:true,cs});
+  bot.appendChild(wa); fillMB('ma',A,N,N,{heat:true,cs,top:false});
+}
+
+build();
+window.addEventListener('resize', build);
+</script>
+</body>
+</html>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Neural Network Architectures</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
 
   :root {
     --bg:      #0d0f14;
@@ -16,122 +16,70 @@
     --accent:  #aa701e;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 1.5rem 5rem;
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    min-height: 100dvh;
+    padding: 3rem 1.6rem 3rem;
   }
 
-  .back-link {
-    align-self: flex-start;
-    font-size: 11px; color: var(--muted);
-    text-decoration: none; letter-spacing: 0.05em; margin-bottom: 2.5rem;
+  a.back {
+    position: fixed; top:1rem; left:1.25rem;
+    font-size:11px; color:var(--muted);
+    text-decoration:none; letter-spacing:0.05em; z-index:10;
   }
-  .back-link:hover { color: var(--text); }
+  a.back:hover { color:var(--text); }
 
   h1 {
-    font-family: 'Spectral', serif; font-weight: 300;
-    font-size: 2rem; color: #e8e4dc;
-    letter-spacing: 0.02em; margin-bottom: 0.4rem;
-    text-align: center;
+    font-family:'Spectral',serif; font-weight:300;
+    font-size:1.45rem; color:#e8e4dc; letter-spacing:0.02em;
+    margin-bottom:0.35rem;
+  }
+  .sub {
+    font-size:11px; color:var(--muted); font-style:italic;
+    margin-bottom:2.5rem; line-height:1.7;
   }
 
-  .subtitle {
-    font-size: 11px; color: var(--muted);
-    letter-spacing: 0.1em; text-transform: uppercase;
-    margin-bottom: 3rem; text-align: center;
-  }
-
-  /* ── Section headers ── */
-  .section-label {
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 1.25rem;
-    border-bottom: 0.5px solid rgba(255,255,255,0.06);
-    padding-bottom: 0.4rem; width: 100%; max-width: 820px;
-  }
-
-  /* ── Card grid ── */
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.25rem;
-    width: 100%; max-width: 820px;
-    margin-bottom: 3rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 200px));
+    gap: 1.1rem;
   }
 
-  /* ── Card ── */
   .card {
     background: var(--surface);
     border: 0.5px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
-    transition: border-color 0.2s, transform 0.2s;
+    border-radius: 8px; overflow: hidden;
+    text-decoration: none; color: inherit;
+    display: flex; flex-direction: column;
+    transition: border-color 0.2s;
   }
-  .card:hover {
-    border-color: rgba(170,112,30,0.5);
-    transform: translateY(-2px);
-  }
+  .card:hover { border-color: rgba(255,255,255,0.18); }
 
-  .thumb { width: 100%; height: 150px; display: block; }
+  .card svg { width:100%; height:120px; display:block; }
 
   .card-body {
-    padding: 0.9rem 1rem 1rem;
-    border-top: 0.5px solid rgba(255,255,255,0.06);
+    padding: 10px 12px 12px;
+    display: flex; flex-direction: column; gap: 4px;
   }
-
   .card-title {
-    font-family: 'Spectral', serif; font-weight: 300;
-    font-size: 1rem; color: #e8e4dc; margin-bottom: 0.3rem;
+    font-size: 11px; color: var(--text); letter-spacing: 0.04em;
+  }
+  .card-desc {
+    font-size: 9.5px; color: var(--muted); line-height: 1.55;
+    font-style: italic;
   }
 
-  .card-question {
-    font-size: 10px; color: var(--muted);
-    line-height: 1.55; margin-bottom: 0.7rem;
-  }
-
-  .card-link {
-    font-size: 10px; color: var(--accent); letter-spacing: 0.05em;
-  }
-
-  /* ── Coming soon card ── */
-  .card-soon {
-    background: var(--surface);
-    border: 0.5px dashed rgba(255,255,255,0.08);
-    border-radius: 8px;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    height: 220px; gap: 0.4rem;
-  }
-  .card-soon-title {
-    font-family: 'Spectral', serif; font-weight: 300;
-    font-size: 0.95rem; color: rgba(255,255,255,0.2);
-  }
-  .card-soon-label {
-    font-size: 9px; color: rgba(255,255,255,0.12);
-    letter-spacing: 0.1em; text-transform: uppercase;
-  }
-
-  /* ── Animations ── */
-
-  /* feedforward */
-  @keyframes ff-pulse-i1 { 0%,100%{fill:#1e2230} 10%,20%{fill:#378ADD} 40%,50%{fill:#e8824a} }
-  @keyframes ff-pulse-i2 { 0%,100%{fill:#1e2230} 15%,25%{fill:#e8824a} 45%,55%{fill:#378ADD} }
-  @keyframes ff-pulse-h1 { 0%,100%{fill:#1e2230} 30%,40%{fill:#e8824a} }
-  @keyframes ff-pulse-h2 { 0%,100%{fill:#1e2230} 35%,45%{fill:#378ADD} }
-  @keyframes ff-pulse-h3 { 0%,100%{fill:#1e2230} 32%,42%{fill:#e8824a} }
-  @keyframes ff-pulse-o  { 0%,100%{fill:#1e2230} 55%,70%{fill:#e8824a} }
-  @keyframes edge-flow   { 0%,100%{opacity:0.12} 30%,60%{opacity:0.35} }
+  /* ── animations ── */
+  @keyframes ff-pulse-i1{0%,100%{fill:#1e2230}10%,20%{fill:#378ADD}40%,50%{fill:#e8824a}}
+  @keyframes ff-pulse-i2{0%,100%{fill:#1e2230}15%,25%{fill:#e8824a}45%,55%{fill:#378ADD}}
+  @keyframes ff-pulse-h1{0%,100%{fill:#1e2230}30%,40%{fill:#e8824a}}
+  @keyframes ff-pulse-h2{0%,100%{fill:#1e2230}35%,45%{fill:#378ADD}}
+  @keyframes ff-pulse-h3{0%,100%{fill:#1e2230}32%,42%{fill:#e8824a}}
+  @keyframes ff-pulse-o {0%,100%{fill:#1e2230}55%,70%{fill:#e8824a}}
+  @keyframes edge-flow  {0%,100%{opacity:0.12}30%,60%{opacity:0.35}}
   .ff-i1{animation:ff-pulse-i1 3s ease-in-out infinite}
   .ff-i2{animation:ff-pulse-i2 3s ease-in-out infinite}
   .ff-h1{animation:ff-pulse-h1 3s ease-in-out infinite}
@@ -140,222 +88,231 @@
   .ff-o {animation:ff-pulse-o  3s ease-in-out infinite}
   .ff-edge{animation:edge-flow 3s ease-in-out infinite}
 
-  /* RNN */
-  @keyframes rnn-h1 { 0%,100%{fill:#1e2230} 20%,35%{fill:#378ADD} 55%,70%{fill:#e8824a} }
-  @keyframes rnn-h2 { 0%,100%{fill:#1e2230} 25%,40%{fill:#e8824a} 60%,75%{fill:#378ADD} }
-  @keyframes rnn-x  { 0%,8%{fill:#1e2230} 9%,18%{fill:#378ADD} 19%,28%{fill:#e8824a} 29%,38%{fill:#378ADD} 39%,48%{fill:#1e2230} 49%,58%{fill:#e8824a} 59%,68%{fill:#378ADD} 69%,78%{fill:#e8824a} 79%,100%{fill:#1e2230} }
-  @keyframes rnn-arc { 0%,100%{stroke-opacity:0.1} 40%,65%{stroke-opacity:0.6} }
-  @keyframes rnn-seq { 0%{transform:translateX(0);opacity:0.5} 14%{transform:translateX(18px);opacity:0.9} 28%{transform:translateX(36px);opacity:0.9} 42%{transform:translateX(54px);opacity:0.9} 56%{transform:translateX(72px);opacity:0.9} 70%{transform:translateX(90px);opacity:0.9} 84%{transform:translateX(108px);opacity:0.9} 99%{transform:translateX(108px);opacity:0.3} 100%{transform:translateX(0);opacity:0.5} }
+  @keyframes rnn-h1{0%,100%{fill:#1e2230}20%,35%{fill:#378ADD}55%,70%{fill:#e8824a}}
+  @keyframes rnn-h2{0%,100%{fill:#1e2230}25%,40%{fill:#e8824a}60%,75%{fill:#378ADD}}
+  @keyframes rnn-x{0%,8%{fill:#1e2230}9%,18%{fill:#378ADD}19%,28%{fill:#e8824a}29%,38%{fill:#378ADD}39%,48%{fill:#1e2230}49%,58%{fill:#e8824a}59%,68%{fill:#378ADD}69%,78%{fill:#e8824a}79%,100%{fill:#1e2230}}
+  @keyframes rnn-arc{0%,100%{stroke-opacity:0.1}40%,65%{stroke-opacity:0.6}}
+  @keyframes rnn-seq{0%{transform:translateX(0);opacity:0.5}14%{transform:translateX(18px);opacity:0.9}28%{transform:translateX(36px);opacity:0.9}42%{transform:translateX(54px);opacity:0.9}56%{transform:translateX(72px);opacity:0.9}70%{transform:translateX(90px);opacity:0.9}84%{transform:translateX(108px);opacity:0.9}99%{transform:translateX(108px);opacity:0.3}100%{transform:translateX(0);opacity:0.5}}
   .rnn-h1{animation:rnn-h1 4s ease-in-out infinite}
   .rnn-h2{animation:rnn-h2 4s ease-in-out infinite}
-  .rnn-x {animation:rnn-x  4s steps(1) infinite}
+  .rnn-x{animation:rnn-x 4s steps(1) infinite}
   .rnn-arc{animation:rnn-arc 4s ease-in-out infinite}
   .rnn-seq-dot{animation:rnn-seq 4s linear infinite}
 
-  /* LSTM */
-  @keyframes lstm-cell  { 0%,100%{fill:#1a1e2a} 20%,35%{fill:#0f3a2a} 50%,65%{fill:#2a1a0a} 80%,90%{fill:#1a2a3a} }
-  @keyframes lstm-gate-f{ 0%,100%{fill:#378ADD;opacity:0.3} 15%,30%{fill:#378ADD;opacity:0.9} }
-  @keyframes lstm-gate-i{ 0%,100%{fill:#1D9E75;opacity:0.3} 30%,45%{fill:#1D9E75;opacity:0.9} }
-  @keyframes lstm-gate-g{ 0%,100%{fill:#aa701e;opacity:0.3} 45%,60%{fill:#aa701e;opacity:0.9} }
-  @keyframes lstm-gate-o{ 0%,100%{fill:#e8824a;opacity:0.3} 60%,75%{fill:#e8824a;opacity:0.9} }
-  @keyframes lstm-hw    { 0%,100%{stroke-opacity:0.15} 20%,80%{stroke-opacity:0.55} }
-  .lstm-cell  {animation:lstm-cell   5s ease-in-out infinite}
+  @keyframes lstm-cell{0%,100%{fill:#1a1e2a}20%,35%{fill:#0f3a2a}50%,65%{fill:#2a1a0a}80%,90%{fill:#1a2a3a}}
+  @keyframes lstm-gate-f{0%,100%{fill:#378ADD;opacity:0.3}15%,30%{fill:#378ADD;opacity:0.9}}
+  @keyframes lstm-gate-i{0%,100%{fill:#1D9E75;opacity:0.3}30%,45%{fill:#1D9E75;opacity:0.9}}
+  @keyframes lstm-gate-g{0%,100%{fill:#aa701e;opacity:0.3}45%,60%{fill:#aa701e;opacity:0.9}}
+  @keyframes lstm-gate-o{0%,100%{fill:#e8824a;opacity:0.3}60%,75%{fill:#e8824a;opacity:0.9}}
+  @keyframes lstm-hw{0%,100%{stroke-opacity:0.15}20%,80%{stroke-opacity:0.55}}
+  .lstm-cell{animation:lstm-cell 5s ease-in-out infinite}
   .lstm-gate-f{animation:lstm-gate-f 5s ease-in-out infinite}
   .lstm-gate-i{animation:lstm-gate-i 5s ease-in-out infinite}
   .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
   .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
-  .lstm-hw    {animation:lstm-hw     5s ease-in-out infinite}
-  /* GRU */
-  @keyframes gru-r { 0%,100%{fill:#1e2230} 10%,25%{fill:#378ADD} }
-  @keyframes gru-z { 0%,100%{fill:#1e2230} 30%,50%{fill:#1D9E75} }
-  @keyframes gru-h { 0%,100%{fill:#1e2230} 55%,72%{fill:#aa701e} }
-  @keyframes gru-ht{ 0%,100%{fill:#1e2230} 75%,90%{fill:#e8824a} }
-  @keyframes gru-interp { 0%,100%{stroke-opacity:0.12} 60%,85%{stroke-opacity:0.55} }
-  .gru-r { animation: gru-r 5s ease-in-out infinite }
-  .gru-z { animation: gru-z 5s ease-in-out infinite }
-  .gru-h { animation: gru-h 5s ease-in-out infinite }
-  .gru-ht{ animation: gru-ht 5s ease-in-out infinite }
-  .gru-interp { animation: gru-interp 5s ease-in-out infinite }
+  .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
+
+  @keyframes gru-r{0%,100%{fill:#1e2230}10%,25%{fill:#378ADD}}
+  @keyframes gru-z{0%,100%{fill:#1e2230}30%,50%{fill:#1D9E75}}
+  @keyframes gru-h{0%,100%{fill:#1e2230}55%,72%{fill:#aa701e}}
+  @keyframes gru-ht{0%,100%{fill:#1e2230}75%,90%{fill:#e8824a}}
+  @keyframes gru-interp{0%,100%{stroke-opacity:0.12}60%,85%{stroke-opacity:0.55}}
+  .gru-r{animation:gru-r 5s ease-in-out infinite}
+  .gru-z{animation:gru-z 5s ease-in-out infinite}
+  .gru-h{animation:gru-h 5s ease-in-out infinite}
+  .gru-ht{animation:gru-ht 5s ease-in-out infinite}
+  .gru-interp{animation:gru-interp 5s ease-in-out infinite}
+
+  @keyframes attn-c1{0%,100%{opacity:0.08}50%{opacity:0.7}}
+  @keyframes attn-c2{0%,100%{opacity:0.08}30%,80%{opacity:0.42}}
+  @keyframes attn-c3{0%,100%{opacity:0.08}65%{opacity:0.85}}
+  @keyframes attn-f{0%,100%{opacity:0.05}40%,70%{opacity:0.35}}
+  .ac1{animation:attn-c1 4s ease-in-out infinite}
+  .ac2{animation:attn-c2 4s ease-in-out infinite}
+  .ac3{animation:attn-c3 4s ease-in-out infinite}
+  .af{animation:attn-f   4s ease-in-out infinite}
 </style>
 </head>
 <body>
 
-<a class="back-link" href="/">← home</a>
+<a class="back" href="/">← home</a>
 
-<h1>neural network architectures</h1>
-<p class="subtitle">an interactive lab</p>
+<h1>Neural Network Architectures</h1>
+<p class="sub">interactive illustrations · drag, step through, observe</p>
 
 <div class="grid">
 
-  <!-- Feedforward -->
+  <!-- feedforward -->
   <a class="card" href="/networks/feedforward.html">
-    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
-      <rect width="220" height="150" fill="#0d0f14"/>
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
       <g class="ff-edge" stroke="rgba(255,255,255,1)" stroke-width="0.6" fill="none">
-        <line x1="52" y1="48" x2="110" y2="40"/>
-        <line x1="52" y1="48" x2="110" y2="75"/>
-        <line x1="52" y1="48" x2="110" y2="110"/>
-        <line x1="52" y1="102" x2="110" y2="40"/>
-        <line x1="52" y1="102" x2="110" y2="75"/>
-        <line x1="52" y1="102" x2="110" y2="110"/>
-        <line x1="110" y1="40"  x2="168" y2="75"/>
-        <line x1="110" y1="75"  x2="168" y2="75"/>
-        <line x1="110" y1="110" x2="168" y2="75"/>
+        <line x1="42" y1="36" x2="100" y2="28"/><line x1="42" y1="36" x2="100" y2="60"/><line x1="42" y1="36" x2="100" y2="92"/>
+        <line x1="42" y1="84" x2="100" y2="28"/><line x1="42" y1="84" x2="100" y2="60"/><line x1="42" y1="84" x2="100" y2="92"/>
+        <line x1="100" y1="28" x2="158" y2="60"/><line x1="100" y1="60" x2="158" y2="60"/><line x1="100" y1="92" x2="158" y2="60"/>
       </g>
-      <circle class="ff-i1" cx="52" cy="48"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <circle class="ff-i2" cx="52" cy="102" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <circle class="ff-h1" cx="110" cy="40"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <circle class="ff-h2" cx="110" cy="75"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <circle class="ff-h3" cx="110" cy="110" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <circle class="ff-o"  cx="168" cy="75"  r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <text x="52"  y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.2)">input</text>
-      <text x="110" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.2)">hidden</text>
-      <text x="168" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.2)">output</text>
+      <circle class="ff-i1" cx="42" cy="36" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-i2" cx="42" cy="84" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-h1" cx="100" cy="28" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-h2" cx="100" cy="60" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-h3" cx="100" cy="92" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="ff-o"  cx="158" cy="60" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
     </svg>
     <div class="card-body">
       <div class="card-title">feedforward</div>
-      <div class="card-question"></div>
-      <div class="card-link">explore →</div>
+      <div class="card-desc">layers, weights, activations — the base of all networks</div>
     </div>
   </a>
 
-  <!-- Vanilla RNN -->
+  <!-- vanilla RNN -->
   <a class="card" href="/networks/rnn.html">
-    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
-      <rect width="220" height="150" fill="#0d0f14"/>
-      <defs>
-        <marker id="arr2" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto">
-          <path d="M0,0 L0,5 L5,2.5 z" fill="rgba(255,255,255,0.2)"/>
-        </marker>
-      </defs>
-      <g font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.25)" text-anchor="middle">
-        <text x="30"  y="138">x₁</text><text x="48"  y="138">x₂</text>
-        <text x="66"  y="138">x₃</text><text x="84"  y="138">x₄</text>
-        <text x="102" y="138">x₅</text><text x="120" y="138">x₆</text>
-        <text x="138" y="138">x₇</text>
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <defs><marker id="arr-n" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="rgba(255,255,255,0.2)"/></marker></defs>
+      <g font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)" text-anchor="middle">
+        <text x="20" y="108">x₁</text><text x="38" y="108">x₂</text><text x="56" y="108">x₃</text>
+        <text x="74" y="108">x₄</text><text x="92" y="108">x₅</text><text x="110" y="108">x₆</text><text x="128" y="108">x₇</text>
       </g>
-      <circle class="rnn-seq-dot" cx="30" cy="127" r="4" fill="#aa701e" opacity="0.7"/>
-      <line x1="110" y1="122" x2="110" y2="102" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arr2)"/>
-      <circle class="rnn-x" cx="110" cy="88" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <text x="110" y="88" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.4)">xₜ</text>
-      <line x1="96" y1="82" x2="68" y2="55" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-      <line x1="96" y1="94" x2="68" y2="110" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-      <circle class="rnn-h1" cx="54" cy="46"  r="16" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <circle class="rnn-h2" cx="54" cy="108" r="16" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-      <text x="54" y="46"  text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.4)">h₁</text>
-      <text x="54" y="108" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.4)">h₂</text>
-      <path class="rnn-arc" d="M 46 30 C 20 14, 20 14, 46 30" fill="none" stroke="#378ADD" stroke-width="1.5"/>
-      <path class="rnn-arc" d="M 46 124 C 20 140, 20 140, 46 124" fill="none" stroke="#e8824a" stroke-width="1.5" style="animation-delay:0.4s"/>
-      <path d="M 54 62 Q 30 77 54 92" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <path d="M 54 92 Q 78 77 54 62" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="70" y1="77" x2="170" y2="77" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-      <circle cx="180" cy="77" r="10" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
-      <text x="180" y="77" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.25)">hₜ</text>
+      <circle class="rnn-seq-dot" cx="20" cy="98" r="4" fill="#aa701e" opacity="0.7"/>
+      <line x1="100" y1="96" x2="100" y2="80" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arr-n)"/>
+      <circle class="rnn-x" cx="100" cy="66" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <line x1="88" y1="60" x2="60" y2="38" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+      <line x1="88" y1="72" x2="60" y2="90" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+      <circle class="rnn-h1" cx="46" cy="30" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <circle class="rnn-h2" cx="46" cy="90" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <path class="rnn-arc" d="M 38 16 C 14 2, 14 2, 38 16" fill="none" stroke="#378ADD" stroke-width="1.5"/>
+      <path class="rnn-arc" d="M 38 104 C 14 118, 14 118, 38 104" fill="none" stroke="#e8824a" stroke-width="1.5"/>
+      <path d="M 46 44 Q 24 60 46 76" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="60" y1="60" x2="175" y2="60" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <circle cx="183" cy="60" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
     </svg>
     <div class="card-body">
       <div class="card-title">vanilla RNN</div>
-      <div class="card-question"></div>
-      <div class="card-link">explore →</div>
+      <div class="card-desc">recurrent hidden state across a sequence</div>
     </div>
   </a>
 
   <!-- LSTM -->
   <a class="card" href="/networks/lstm.html">
-    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
-      <rect width="220" height="150" fill="#0d0f14"/>
-      <rect class="lstm-cell" x="10" y="26" width="200" height="12" rx="2" fill="#1e2230" opacity="0.5"/>
-      <line class="lstm-hw" x1="15" y1="32" x2="205" y2="32" stroke="white" stroke-width="2"/>
-      <text x="110" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.25)">cell state  cₜ</text>
-      <rect class="lstm-gate-f" x="22"  y="55" width="30" height="30" rx="4" stroke="#378ADD" stroke-width="1"/>
-      <rect class="lstm-gate-i" x="64"  y="55" width="30" height="30" rx="4" stroke="#1D9E75" stroke-width="1"/>
-      <rect class="lstm-gate-g" x="106" y="55" width="30" height="30" rx="4" stroke="#aa701e" stroke-width="1"/>
-      <rect class="lstm-gate-o" x="148" y="55" width="30" height="30" rx="4" stroke="#e8824a" stroke-width="1"/>
-      <text x="37"  y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">f</text>
-      <text x="79"  y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
-      <text x="121" y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
-      <text x="163" y="71" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
-      <text x="37"  y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">forget</text>
-      <text x="79"  y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">input</text>
-      <text x="121" y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">cand.</text>
-      <text x="163" y="95" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.2)">output</text>
-      <line x1="37"  y1="55" x2="37"  y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="79"  y1="55" x2="79"  y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="121" y1="55" x2="121" y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="163" y1="55" x2="163" y2="32" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="20"  y1="130" x2="20"  y2="110" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="200" y1="130" x2="200" y2="110" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="20"  y1="110" x2="200" y2="110" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-      <text x="20"  y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.25)">xₜ</text>
-      <text x="200" y="142" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.25)">hₜ₋₁</text>
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <rect class="lstm-cell" x="8" y="18" width="184" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
+      <line class="lstm-hw" x1="12" y1="23" x2="190" y2="23" stroke="white" stroke-width="2"/>
+      <text x="100" y="14" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)">cell state</text>
+      <rect class="lstm-gate-f" x="16"  y="40" width="28" height="28" rx="4" stroke="#378ADD" stroke-width="1"/>
+      <rect class="lstm-gate-i" x="56"  y="40" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
+      <rect class="lstm-gate-g" x="96"  y="40" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
+      <rect class="lstm-gate-o" x="136" y="40" width="28" height="28" rx="4" stroke="#e8824a" stroke-width="1"/>
+      <text x="30"  y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">f</text>
+      <text x="70"  y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
+      <text x="110" y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
+      <text x="150" y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
+      <line x1="30"  y1="40" x2="30"  y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="70"  y1="40" x2="70"  y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="110" y1="40" x2="110" y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="150" y1="40" x2="150" y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="14"  y1="108" x2="14"  y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="186" y1="108" x2="186" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="14"  y1="90" x2="186" y2="90" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
     </svg>
     <div class="card-body">
       <div class="card-title">LSTM</div>
-      <div class="card-question"></div>
-      <div class="card-link">explore →</div>
+      <div class="card-desc">gated memory cell — forget, input, candidate, output</div>
     </div>
   </a>
 
-  <!-- Coming soon placeholders -->
+  <!-- GRU -->
   <a class="card" href="/networks/gru.html">
-    <svg class="thumb" viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
-      <rect width="220" height="150" fill="#0d0f14"/>
-      <!-- inputs -->
-      <circle cx="22" cy="45" r="10" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-      <circle cx="22" cy="105" r="10" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-      <text x="22" y="45"  text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.4)">x</text>
-      <text x="22" y="105" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.4)">h</text>
-      <!-- edges to gates -->
-      <line x1="32" y1="45"  x2="56" y2="45"  stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <line x1="32" y1="45"  x2="56" y2="105" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
-      <line x1="32" y1="105" x2="56" y2="45"  stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
-      <line x1="32" y1="105" x2="56" y2="105" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <!-- r and z gates -->
-      <circle class="gru-r" cx="66" cy="45"  r="11" stroke="#378ADD" stroke-width="1"/>
-      <circle class="gru-z" cx="66" cy="105" r="11" stroke="#1D9E75" stroke-width="1"/>
-      <text x="66" y="45"  text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="#378ADD">r</text>
-      <text x="66" y="105" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="#1D9E75">z</text>
-      <!-- r·h merge -->
-      <line x1="77" y1="45"  x2="96" y2="60"  stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <line x1="32" y1="105" x2="96" y2="60"  stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
-      <text x="96" y="60" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.35)">⊙</text>
-      <!-- h̃ candidate -->
-      <line x1="104" y1="60" x2="116" y2="75" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <line x1="32"  y1="45" x2="116" y2="75" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
-      <circle class="gru-h" cx="126" cy="75" r="11" stroke="#aa701e" stroke-width="1"/>
-      <text x="126" y="75" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="#aa701e">h̃</text>
-      <!-- interpolation ⊙ symbols -->
-      <text x="162" y="48" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.35)">⊙</text>
-      <text x="162" y="102" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(255,255,255,0.35)">⊙</text>
-      <!-- z to both ⊙ -->
-      <line class="gru-interp" x1="77" y1="105" x2="154" y2="50"  stroke="#1D9E75" stroke-width="0.8"/>
-      <line class="gru-interp" x1="77" y1="105" x2="154" y2="100" stroke="#1D9E75" stroke-width="0.8"/>
-      <!-- h → upper ⊙, h̃ → lower ⊙ -->
-      <line x1="32"  y1="105" x2="154" y2="50"  stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
-      <line x1="137" y1="75"  x2="154" y2="100" stroke="rgba(255,255,255,0.08)" stroke-width="0.7"/>
-      <!-- + and hₜ -->
-      <text x="178" y="75" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(255,255,255,0.4)">+</text>
-      <line x1="162" y1="50"  x2="170" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
-      <line x1="162" y1="102" x2="170" y2="80" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
-      <circle class="gru-ht" cx="198" cy="75" r="11" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-      <text x="198" y="75" text-anchor="middle" dominant-baseline="middle" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.5)">hₜ</text>
-      <line x1="186" y1="75" x2="188" y2="75" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <circle cx="18" cy="35" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <circle cx="18" cy="85" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="18" y="35" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.4)">x</text>
+      <text x="18" y="85" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.4)">h</text>
+      <line x1="27" y1="35" x2="50" y2="35" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <line x1="27" y1="35" x2="50" y2="85" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+      <line x1="27" y1="85" x2="50" y2="35" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+      <line x1="27" y1="85" x2="50" y2="85" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <circle class="gru-r" cx="60" cy="35" r="10" stroke="#378ADD" stroke-width="1"/>
+      <circle class="gru-z" cx="60" cy="85" r="10" stroke="#1D9E75" stroke-width="1"/>
+      <text x="60" y="35" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="#378ADD">r</text>
+      <text x="60" y="85" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="#1D9E75">z</text>
+      <line x1="70" y1="35" x2="88" y2="46" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <line x1="27" y1="85" x2="88" y2="46" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+      <text x="88" y="46" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">⊙</text>
+      <line x1="96" y1="46" x2="108" y2="60" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
+      <line x1="27" y1="35" x2="108" y2="60" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+      <circle class="gru-h" cx="118" cy="60" r="10" stroke="#aa701e" stroke-width="1"/>
+      <text x="118" y="60" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="#aa701e">h̃</text>
+      <text x="148" y="37" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">⊙</text>
+      <text x="148" y="83" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">⊙</text>
+      <line class="gru-interp" x1="70" y1="85" x2="141" y2="40" stroke="#1D9E75" stroke-width="0.8"/>
+      <line class="gru-interp" x1="70" y1="85" x2="141" y2="81" stroke="#1D9E75" stroke-width="0.8"/>
+      <line x1="27"  y1="85" x2="141" y2="40" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+      <line x1="128" y1="60" x2="141" y2="81" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
+      <text x="163" y="60" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.35)">+</text>
+      <line x1="148" y1="39" x2="156" y2="56" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
+      <line x1="148" y1="81" x2="156" y2="64" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
+      <circle class="gru-ht" cx="183" cy="60" r="10" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+      <text x="183" y="60" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.45)">hₜ</text>
     </svg>
     <div class="card-body">
       <div class="card-title">GRU</div>
-      <div class="card-question"></div>
-      <div class="card-link">explore →</div>
+      <div class="card-desc">reset and update gates — a lighter alternative to LSTM</div>
     </div>
   </a>
 
-  <div class="card-soon">
-    <div class="card-soon-title">transformer</div>
-    <div class="card-soon-label">coming soon</div>
-  </div>
-
-  <div class="card-soon">
-    <div class="card-soon-title">convolutional</div>
-    <div class="card-soon-label">coming soon</div>
-  </div>
+  <!-- attention -->
+  <a class="card" href="/networks/attention.html">
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <!-- X mini grid -->
+      <g opacity="0.55">
+        <rect x="8"  y="18" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="18" y="18" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="28" y="18" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="38" y="18" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="8"  y="26" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="18" y="26" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="28" y="26" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="38" y="26" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="8"  y="34" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="18" y="34" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="28" y="34" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="38" y="34" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="8"  y="42" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="18" y="42" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="28" y="42" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        <rect x="38" y="42" width="8" height="6" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+      </g>
+      <text x="26" y="58" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.25)">X</text>
+      <!-- flow arrow -->
+      <line class="af" x1="50" y1="35" x2="108" y2="35" stroke="rgba(196,181,253,0.35)" stroke-width="0.8" stroke-dasharray="3,2"/>
+      <text x="78" y="30" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(196,181,253,0.3)">Q·Kᵀ</text>
+      <!-- attention heatmap 4x4 -->
+      <rect class="ac3" x="110" y="18" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac2" x="128" y="18" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="146" y="18" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="164" y="18" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="110" y="32" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac3" x="128" y="32" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac2" x="146" y="32" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="164" y="32" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac2" x="110" y="46" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="128" y="46" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac3" x="146" y="46" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="164" y="46" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="110" y="60" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac2" x="128" y="60" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac1" x="146" y="60" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <rect class="ac3" x="164" y="60" width="16" height="12" rx="1" fill="#7B5EA7"/>
+      <text x="145" y="85" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.25)">A = softmax(QKᵀ/√d)</text>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">attention</div>
+      <div class="card-desc">learned bilinear form on token pairs — the core of transformers</div>
+    </div>
+  </a>
 
 </div>
 
