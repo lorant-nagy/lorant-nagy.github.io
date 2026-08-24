@@ -145,10 +145,25 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .welcome-line {
-    animation: none;
-    opacity: 1;
-    transform: none;
+  /* Keep the timed text reveal even when motion reduction is enabled.
+     Only remove the vertical movement; opacity still fades normally. */
+  .welcome-copy-left .welcome-line {
+    animation: welcome-line-arrive-reduced 0.9s ease-out forwards;
+  }
+
+  .welcome-copy-right .welcome-line {
+    animation: welcome-line-life-reduced 15.9s linear forwards;
+  }
+
+  @keyframes welcome-line-arrive-reduced {
+    0% { opacity: 0; transform: none; }
+    100% { opacity: 1; transform: none; }
+  }
+
+  @keyframes welcome-line-life-reduced {
+    0% { opacity: 0; transform: none; }
+    5.66% { opacity: 1; transform: none; }
+    100% { opacity: 0; transform: none; }
   }
 }
 
@@ -664,10 +679,4 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .welcome-line {
-    opacity: 1;
-    transform: none;
-    animation: none;
-  }
-}
+
