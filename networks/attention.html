@@ -141,7 +141,7 @@
   &nbsp;&nbsp;·&nbsp;&nbsp;
   <b style="color:#c4b5fd">A</b> = softmax( <b style="color:#fbb6d6">Q</b><b style="color:#6ee7d4">K</b><sup>T</sup> / √d<sub>h</sub> )
   &nbsp;&nbsp;·&nbsp;&nbsp;
-  <span style="font-size:10px">drag ↕ to edit &nbsp;·&nbsp; N=4 &nbsp;d=4 &nbsp;h=2</span>
+  <span style="font-size:10px">drag ↕ to edit &nbsp;·&nbsp; N=5 &nbsp;d=4 &nbsp;h=2</span>
 </div>
 
 <div class="presets" id="presets">
@@ -161,11 +161,11 @@
 </div>
 
 <script>
-const N=4, DM=4, DH=2;
+const N=5, DM=4, DH=2;
 const CQ='#a78bfa', CK='#a78bfa', CA='#7B5EA7', CX='var(--text)';
-const TL=['t₁','t₂','t₃','t₄'], DL=['d₁','d₂','d₃','d₄'], HL=['h₁','h₂'];
+const TL=['t₁','t₂','t₃','t₄','t₅'], DL=['d₁','d₂','d₃','d₄'], HL=['h₁','h₂'];
 
-let X=[[ 1.00, 0.20,-0.30, 0.50],[ 0.10, 0.90, 0.40,-0.20],[-0.40, 0.30, 0.80, 0.10],[ 0.60,-0.50, 0.20, 0.70]];
+let X=[[ 1.00, 0.20,-0.30, 0.50],[ 0.10, 0.90, 0.40,-0.20],[-0.40, 0.30, 0.80, 0.10],[ 0.60,-0.50, 0.20, 0.70],[-0.20, 0.55,-0.65, 0.85]];
 let WQ=[[ 0.80, 0.30],[-0.30, 0.70],[ 0.50,-0.40],[ 0.10, 0.60]];
 let WK=[[ 0.60,-0.40],[ 0.40, 0.80],[-0.50, 0.30],[ 0.30,-0.60]];
 
@@ -174,31 +174,36 @@ const PRESETS = {
     [ 1.00, 0.00, 0.00, 0.00],
     [ 0.00, 1.00, 0.00, 0.00],
     [ 0.00, 0.00, 1.00, 0.00],
-    [ 0.00, 0.00, 0.00, 1.00]
+    [ 0.00, 0.00, 0.00, 1.00],
+    [ 0.50, 0.50, 0.50, 0.50]
   ],
   similar: [
     [ 0.80, 0.75, 0.70, 0.72],
     [ 0.78, 0.80, 0.68, 0.74],
     [ 0.76, 0.72, 0.82, 0.70],
-    [ 0.74, 0.78, 0.66, 0.80]
+    [ 0.74, 0.78, 0.66, 0.80],
+    [ 0.79, 0.73, 0.76, 0.71]
   ],
   clusters: [
     [ 0.90, 0.85,-0.70,-0.65],
     [ 0.88, 0.90,-0.68,-0.72],
     [-0.72,-0.68, 0.90, 0.85],
-    [-0.65,-0.70, 0.88, 0.90]
+    [-0.65,-0.70, 0.88, 0.90],
+    [-0.69,-0.66, 0.84, 0.92]
   ],
   outlier: [
     [ 0.80, 0.78, 0.75, 0.00],
     [ 0.76, 0.80, 0.78, 0.00],
     [ 0.78, 0.76, 0.80, 0.00],
+    [ 0.79, 0.77, 0.74, 0.00],
     [ 0.00, 0.00, 0.00, 1.80]
   ],
   opposite: [
     [ 1.00, 0.60,-1.00,-0.60],
     [ 0.60, 1.00,-0.60,-1.00],
     [-1.00,-0.60, 1.00, 0.60],
-    [-0.60,-1.00, 0.60, 1.00]
+    [-0.60,-1.00, 0.60, 1.00],
+    [ 0.85,-0.85,-0.85, 0.85]
   ]
 };
 
@@ -227,13 +232,19 @@ function compute(){
 }
 
 function cellSize(){
-  // each row has 8 data cols (top: 4+2+2, bot: 2+2+4)
-  // plus 2 seps, row-labels, group gaps
+  // Size from the widest matrix row. With N=5 the computed row has
+  // Q (2 cols) + K (2 cols) + A (5 cols) = 9 data columns.
+  const topCols = DM + DH + DH;
+  const botCols = DH + DH + N;
+  const dataCols = Math.max(topCols, botCols);
   const W = window.innerWidth - 120;
-  const cw = Math.max(28, Math.min(54, Math.floor((W - 2*10 - 3*14 - 3*16) / 8)));
-  // two matrix rows, each 4 cells tall, plus row gap + headers
+  const cw = Math.max(28, Math.min(54, Math.floor((W - 2*10 - 3*14 - 3*16) / dataCols)));
+
+  // The tallest matrix in each row is now N=5 cells high.
+  const topRows = Math.max(N, DM);
+  const botRows = N;
   const H = window.innerHeight - 180;
-  const ch = Math.max(20, Math.min(42, Math.floor((H - 18 - 2*14 - 2*14) / 8)));
+  const ch = Math.max(20, Math.min(42, Math.floor((H - 18 - 2*14 - 2*14) / (topRows + botRows))));
   return {w:cw, h:ch, gap:3};
 }
 
