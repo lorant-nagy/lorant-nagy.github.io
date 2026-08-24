@@ -80,74 +80,49 @@
 
 <!-- Welcome / shader -->
 <div class="welcome-section" id="welcome-section">
-  <a href="/assets/pdf/CV.pdf" class="cv-link" target="_blank" rel="noopener">CV</a>
-</div>
-
-<!-- Transient price impact — white -->
-<div class="game-section">
-  <div class="section-header">
-    <h2>A note on transient price impact</h2>
-    Trading moves the market against the trader, but what is the temporal nature of this effect? In price impact models, large traders are often modeled as generating permanent impact, whereas small traders are typically modeled as having only instantaneous impact. In reality, however, the truth likely lies somewhere in between. Price impact may be better described as transient: after a trade moves the price, the effect gradually decays, with the price reverting toward its original level over time.
-  </div>
-  <div class="split-container">
-    <div class="publication-info">
-      <div class="citation">
-        Nagy, L. &amp; Rásonyi, M. (2025).
-        <em>On the utility problem in a market where price impact is transient</em>.
-        arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank" rel="noopener">arxiv</a>]
-      </div>
-      <div class="comic-container" onclick="openModal()">
-        <img src="/assets/images/comic0.png" alt="Trading Game Comic" id="comicImg">
-      </div>
+  <div class="welcome-layout">
+    <div class="welcome-copy">
+      <p class="welcome-line welcome-line-1">Hi, I’m Lóránt. I have a PhD in mathematics.</p>
+      <p class="welcome-line welcome-line-2">This is my little place on the internet.</p>
+      <p class="welcome-line welcome-line-3">Here you’ll find some projects, notes, experiments, and other things I’ve made.</p>
     </div>
-    <div class="game-wrapper">
-      <div id="game-container">
-        <!-- p5 canvas will be inserted here -->
-      </div>
-    </div>
+    <a href="/assets/pdf/CV.pdf" class="cv-link welcome-cv" target="_blank" rel="noopener">CV →</a>
+    <div class="welcome-balance" aria-hidden="true"></div>
   </div>
 </div>
 
-<!-- Stochastic volatility — grey -->
-<div class="next-section">
-  <div class="next-section-inner">
-    <div style="flex: 1;">
-      <div class="section-header">
-        <h2>Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
-        <p>
-          Take two fair coins, and add a third character: an oracle that reports only one thing —
-          whether the two coins landed on the same face or on different faces. At first sight,
-          the three objects seem perfectly innocent: whichever pair we pick, one does not reveal anything about the other.
-          But this is deceptive: independence holds at the level of pairs, yet the moment any two are known,
-          the third is fixed with certainty. This somewhat paradoxical example is often cited to show that
-          full independence in a probabilistic structure is a subtle property.
-        </p>
-        <p>
-          One may then naturally ask whether a similar hiding of dependence can emerge in more complex
-          and evolving structures such as time series.
-        </p>
-        <p>
-          The answer is yes. In finance, one important example appears in stochastic-volatility models,
-          beginning with Hull and White (1987) and continuing, in a long-memory direction,
-          with the work of Comte and Renault (1998). When volatility is governed by a long-memory driver,
-          the alternating signs of returns can mask the underlying persistence. Ordinary autocorrelation may then
-          suggest a world of independent shocks, while persistence quietly survives in return magnitudes,
-          local energy, or squared values. In this sense, what looks like noise at the level of raw returns
-          may still conceal persistent dependence in volatility, return magnitudes, or squared returns.
-        </p>
-      </div>
-      <a href="/read-on-hiddendep.html" class="read-on-link">read on →</a>
+<main class="home-grid">
+  <!-- PageIt -->
+  <section class="home-card pageit-card">
+    <a class="pageit-visual" href="https://pageit.me" target="_blank" rel="noopener" aria-label="Open PageIt">
+      <img src="/assets/images/projects/pageit.webp" alt="PageIt interface arranging colourful images into PDF pages">
+    </a>
+    <div class="pageit-copy">
+      <h2>PageIt</h2>
+      <p>PageIt turns photos into clean, printable PDFs. I built the browser interface and a Dockerised FastAPI service on Azure that generates the finished document, with GitHub Actions handling deployment.</p>
+      <a class="project-link" href="https://pageit.me" target="_blank" rel="noopener">visit pageit.me →</a>
     </div>
-    <div id="coin-oracle-container"></div>
-  </div>
-</div>
+  </section>
 
-<!-- ArXiv stats — white -->
-<!-- Neural Networks Section — white -->
-<div style="background-color:#ffffff;padding:6em 2em;">
-  <div style="max-width:1600px;margin:0 auto;">
-    <div class="section-header"><h2>neural network architectures</h2></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,220px));gap:1.25rem;margin-bottom:1.5rem;">
+  <!-- Crowburn Films -->
+  <section class="home-card crowburn-card">
+    <a class="crowburn-grid" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener" aria-label="Open Crowburn Films on YouTube">
+      <img src="/assets/images/projects/crowburn-neptune.webp" alt="Crowburn Films Neptune thumbnail" loading="lazy">
+      <img src="/assets/images/projects/crowburn-mercury.webp" alt="Crowburn Films Mercury thumbnail" loading="lazy">
+      <img src="/assets/images/projects/crowburn-jupiter.webp" alt="Crowburn Films Jupiter thumbnail" loading="lazy">
+      <img src="/assets/images/projects/crowburn-life.webp" alt="Crowburn Films How Life Began thumbnail" loading="lazy">
+    </a>
+    <div class="compact-card-copy">
+      <h2>Crowburn Films</h2>
+      <p>Crowburn Films is a personal science-filmmaking project about astronomy, Earth, and the history of life. I write and assemble the films myself, using animation and generative-video tools such as ComfyUI, WAN 2.2, and Runpod along the way.</p>
+      <a class="project-link" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener">watch on YouTube →</a>
+    </div>
+  </section>
+
+  <section class="home-card neural-card">
+  <div class="neural-inner">
+    <div class="section-header"><h2>note to self — neural network architectures</h2></div>
+    <div class="neural-grid">
 
       <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
@@ -313,15 +288,63 @@
       </div>
 
     </div>
-    <a href="/networks/" style="font-size:0.85em;color:#aa701e;text-decoration:none;letter-spacing:0.05em;">explore →</a>
+    <a href="/networks/" class="project-link neural-link">explore →</a>
   </div>
-</div>
+</section>
 
-<div class="arxiv-section">
-  <div class="arxiv-section-inner">
-    <div id="arxiv-stats-container"></div>
+  <section class="home-card research-card game-section">
+  <div class="section-header">
+    <h2>A note on transient price impact</h2>
+    Trading moves the market against the trader, but what is the temporal nature of this effect? In price impact models, large traders are often modeled as generating permanent impact, whereas small traders are typically modeled as having only instantaneous impact. In reality, however, the truth likely lies somewhere in between. Price impact may be better described as transient: after a trade moves the price, the effect gradually decays, with the price reverting toward its original level over time.
   </div>
-</div>
+  <div class="split-container">
+    <div class="publication-info">
+      <div class="citation">
+        Nagy, L. &amp; Rásonyi, M. (2025).
+        <em>On the utility problem in a market where price impact is transient</em>.
+        arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank" rel="noopener">arxiv</a>]
+      </div>
+      <div class="comic-container" onclick="openModal()">
+        <img src="/assets/images/comic0.png" alt="Trading Game Comic" id="comicImg">
+      </div>
+      <a href="game/" class="project-link game-link">try a little game →</a>
+    </div>
+  </div>
+</section>
+
+  <section class="home-card research-card next-section">
+  <div class="next-section-inner">
+    <div style="flex: 1;">
+      <div class="section-header">
+        <h2>Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
+        <p>
+          Take two fair coins, and add a third character: an oracle that reports only one thing —
+          whether the two coins landed on the same face or on different faces. At first sight,
+          the three objects seem perfectly innocent: whichever pair we pick, one does not reveal anything about the other.
+          But this is deceptive: independence holds at the level of pairs, yet the moment any two are known,
+          the third is fixed with certainty. This somewhat paradoxical example is often cited to show that
+          full independence in a probabilistic structure is a subtle property.
+        </p>
+        <p>
+          One may then naturally ask whether a similar hiding of dependence can emerge in more complex
+          and evolving structures such as time series.
+        </p>
+        <p>
+          The answer is yes. In finance, one important example appears in stochastic-volatility models,
+          beginning with Hull and White (1987) and continuing, in a long-memory direction,
+          with the work of Comte and Renault (1998). When volatility is governed by a long-memory driver,
+          the alternating signs of returns can mask the underlying persistence. Ordinary autocorrelation may then
+          suggest a world of independent shocks, while persistence quietly survives in return magnitudes,
+          local energy, or squared values. In this sense, what looks like noise at the level of raw returns
+          may still conceal persistent dependence in volatility, return magnitudes, or squared returns.
+        </p>
+      </div>
+      <a href="/read-on-hiddendep.html" class="read-on-link">read on →</a>
+    </div>
+    <div id="coin-oracle-container"></div>
+  </div>
+</section>
+</main>
 
 <!-- Energy prices — grey -->
  <!--
@@ -358,14 +381,9 @@
 <script src="/assets/js/background-shader.js"></script>
 <script>BackgroundShader.init('welcome-section');</script>
 
-<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
-<script src="/assets/js/game-single-file.js"></script>
-
 <script src="/assets/js/coin-oracle.js"></script>
 <script>CoinOracle.init('coin-oracle-container');</script>
 
-<script src="/assets/js/arxiv-stats.js"></script>
-<script>ArxivStats.init('arxiv-stats-container');</script>
 
 <!-- <script src="/assets/js/energy-prices.js"></script>
 <script>EnergyPrices.init('energy-prices-container');</script> -->

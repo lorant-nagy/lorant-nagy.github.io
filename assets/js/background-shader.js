@@ -155,7 +155,7 @@ void main() {
     const warpSlider = document.createElement('input');
     warpSlider.type = 'range'; warpSlider.min = 0; warpSlider.max = 280;
     warpSlider.value = Math.round(C.warp * 100); warpSlider.title = 'warp';
-    warpSlider.style.cssText = 'width:360px;accent-color:rgba(255,255,255,0.35);opacity:0.45;cursor:pointer;';
+    warpSlider.style.cssText = 'width:min(360px,70vw);accent-color:rgba(255,255,255,0.35);opacity:0.45;cursor:pointer;';
 
     ui.appendChild(warpSlider);
     container.appendChild(ui);

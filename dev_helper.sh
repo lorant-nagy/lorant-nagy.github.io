@@ -5,5 +5,5 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 echo "Serving from: $SCRIPT_DIR"
-echo "Open: http://localhost:8000/index.html"
-python3 -m http.server 8000
+echo "Open: http://localhost:9000/index.html"
+python3 -m http.server 9000

@@ -6,7 +6,7 @@
 
 const CoinOracle = (() => {
 
-  const UNIT = Math.min(190, Math.floor((window.innerWidth - 32) / 3)); // responsive, max 190px
+  const MAX_UNIT = 190;
 
   const VERT = `attribute vec2 p; void main(){ gl_Position=vec4(p,0,1); }`;
 
@@ -100,6 +100,8 @@ void main(){
   function init(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    const UNIT = Math.min(MAX_UNIT, Math.max(72, Math.floor(container.clientWidth / 3)));
 
     container.innerHTML = '';
     container.style.display = 'inline-flex';

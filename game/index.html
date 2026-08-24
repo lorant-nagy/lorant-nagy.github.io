@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A little trading game — Lóránt Nagy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap">
+  <link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+  <div class="custom-header">
+    <a class="site-title-custom" href="../">Lóránt Nagy, PhD</a>
+    <div class="header-contact">
+      HUN-REN Rényi Institute of Mathematics<br>
+      Budapest, Reáltanoda utca 13-15, 1053<br>
+      <br>
+      lorantnagy at renyi hu
+    </div>
+  </div>
+
+  <main class="game-page">
+    <div class="game-page-top">
+      <a class="game-page-back" href="../">← back home</a>
+      <h1>A little trading game</h1>
+      <p class="game-page-intro">Trade in a market where your own orders widen the spread and the effect gradually fades. A simple rule-based trader plays alongside you.</p>
+    </div>
+
+    <div class="game-page-stage">
+      <div id="game-container" aria-label="Interactive transient price impact trading game"></div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="../assets/js/game-single-file.js"></script>
+</body>
+</html>

@@ -89,7 +89,7 @@
 
 const CONFIG = {
   // Data source
-  csvPath: 'assets/data/market_primitives.csv?v=' + Date.now(),  // Cache-busting
+  csvPath: new URL('../assets/data/market_primitives.csv', window.location.href).href + '?v=' + Date.now(),  // Works from /game/ locally and when hosted in a subdirectory
   
   // Time & market
   initialTerminalTime: 200,
