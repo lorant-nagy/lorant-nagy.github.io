@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditional Variational Autoencoder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --neg:     #378ADD;
+    --pos:     #e8824a;
+    --accent:  #aa701e;
+    --prior:   #7F77DD;
+    --recog:   #1D9E75;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    height: 100dvh;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    padding: 1.1rem 1.4rem 0.9rem;
+    gap: 0.55rem;
+    overflow: hidden;
+  }
+
+  a.back {
+    position: fixed; top:1rem; left:1.25rem;
+    font-size:11px; color:var(--muted);
+    text-decoration:none; letter-spacing:0.05em; z-index:10;
+  }
+  a.back:hover { color:var(--text); }
+
+  h1 {
+    font-family:'Spectral',serif; font-weight:300;
+    font-size:1.45rem; color:#e8e4dc; letter-spacing:0.02em;
+    padding-top: 1.4rem;
+  }
+
+  .meta { font-size:12px; color:var(--muted); line-height:1.85; font-style:italic; }
+  .meta .name { font-style:normal; color:var(--text); }
+  .meta .cite { font-style:normal; }
+
+  .page { display:flex; flex-direction:column; min-height:0; }
+
+  .mode-row {
+    display:flex; gap:0.35rem; align-items:center;
+    margin-bottom:0.5rem; flex-shrink:0;
+  }
+  .mode-btn {
+    background:none; border:0.5px solid var(--border);
+    border-radius:3px; color:var(--muted);
+    font-family:'JetBrains Mono', monospace; font-size:9px;
+    letter-spacing:0.06em; padding:4px 12px; cursor:pointer;
+    transition: all 0.15s;
+  }
+  .mode-btn.active {
+    border-color:var(--accent); color:var(--accent);
+    background:rgba(170,112,30,0.08);
+  }
+  .mode-btn:hover:not(.active) { border-color:rgba(255,255,255,0.2); color:var(--text); }
+
+  .card-title {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.28rem;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  #cvae-svg { width:100%; flex:1; display:block; min-height:0; }
+
+  .flow-dot {
+    offset-rotate: 0deg;
+    animation-duration: 7s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+  }
+
+  @media (max-width: 600px) {
+    body {
+      height: auto; overflow: auto;
+      padding: 2.5rem 1rem 2rem;
+      grid-template-rows: auto auto auto;
+    }
+    #cvae-svg { flex: none; min-height: 320px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back" href="/networks/">← networks</a>
+
+<h1>CVAE</h1>
+
+<div class="meta">
+  <span class="name">Conditional Variational Autoencoder</span><br>
+  <span class="cite">Sohn, Lee &amp; Yan — Learning Structured Output Representation using Deep Conditional Generative Models, NIPS 2015</span>
+</div>
+
+<div class="page">
+
+  <div class="mode-row">
+    <button class="mode-btn active" id="btn-train">training</button>
+    <button class="mode-btn" id="btn-infer">inference</button>
+  </div>
+
+  <div class="card-title">computation graph</div>
+
+  <svg id="cvae-svg" viewBox="0 -30 700 292" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ar-live" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.3)"/>
+      </marker>
+      <marker id="ar-dim" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.09)"/>
+      </marker>
+    </defs>
+
+    <g id="edges" fill="none">
+      <path id="e-x-gen"   d="M 54,65 C 140,-24 350,-20 452,110" stroke="rgba(255,255,255,0.18)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-x-prior" d="M 66,68 Q 108,42 146,46" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-x-recog" d="M 64,96 Q 106,152 146,186" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-y-recog" d="M 68,196 Q 108,204 146,204" stroke="#1D9E75" stroke-width="1.3" marker-end="url(#ar-live)"/>
+      <path id="e-prior-z" d="M 290,64 Q 340,84 352,106" stroke="rgba(255,255,255,0.09)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ar-dim)"/>
+      <path id="e-recog-z" d="M 290,196 Q 340,166 352,142" stroke="#1D9E75" stroke-width="1.3" marker-end="url(#ar-live)"/>
+      <path id="e-z-gen"   d="M 389,124 L 446,124" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-gen-yh"  d="M 600,124 L 628,124" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="kl-link"   d="M 220,170 L 220,94" stroke="#1D9E75" stroke-width="1" stroke-dasharray="2,3"/>
+    </g>
+
+    <g id="nodes">
+      <circle cx="44" cy="82" r="18" fill="#1e2230" stroke="#e8824a" stroke-width="1"/>
+      <text x="44" y="82" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e8824a">x</text>
+
+      <circle id="node-y" cx="44" cy="196" r="18" fill="#1e2230" stroke="#1D9E75" stroke-width="1.4"/>
+      <text id="label-y" x="44" y="196" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#1D9E75">y</text>
+
+      <rect x="150" y="28" width="140" height="64" rx="4" fill="none" stroke="#7F77DD" stroke-width="1.1"/>
+      <text x="220" y="46" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#7F77DD">p<tspan font-size="8" dy="2">θ</tspan><tspan font-size="11" dy="-2">(z|x)</tspan></text>
+      <path d="M 170,85.92 L 180,85.19 L 190,82.22 L 195,79.03 L 200,74.49 L 205,69.02 L 210,63.57 L 215,59.51 L 220,58 L 225,59.51 L 230,63.57 L 235,69.02 L 240,74.49 L 245,79.03 L 250,82.22 L 260,85.19 L 270,85.92" fill="rgba(127,119,221,0.13)" stroke="#7F77DD" stroke-width="1.1"/>
+
+      <rect id="box-recog" x="150" y="170" width="140" height="64" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.3"/>
+      <text id="label-recog" x="220" y="188" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1D9E75">q<tspan font-size="8" dy="2">φ</tspan><tspan font-size="11" dy="-2">(z|x,y)</tspan></text>
+      <path id="bell-recog" d="M 170,227.92 L 180,227.19 L 190,224.22 L 195,221.03 L 200,216.49 L 205,211.02 L 210,205.57 L 215,201.51 L 220,200 L 225,201.51 L 230,205.57 L 235,211.02 L 240,216.49 L 245,221.03 L 250,224.22 L 260,227.19 L 270,227.92" fill="rgba(29,158,117,0.13)" stroke="#1D9E75" stroke-width="1.1"/>
+
+      <text id="kl-label" x="234" y="135" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1D9E75">KL</text>
+
+      <circle cx="370" cy="124" r="19" fill="#1e2230" stroke="#aa701e" stroke-width="1.4"/>
+      <text x="370" y="124" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#aa701e">z</text>
+
+      <rect x="450" y="92" width="150" height="64" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
+      <text x="525" y="110" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#378ADD">p<tspan font-size="8" dy="2">θ</tspan><tspan font-size="11" dy="-2">(y|x,z)</tspan></text>
+      <path d="M 472,149.92 L 482.6,149.19 L 493.2,146.22 L 498.5,143.03 L 503.8,138.49 L 509.1,133.02 L 514.4,127.57 L 519.7,123.51 L 525,122 L 530.3,123.51 L 535.6,127.57 L 540.9,133.02 L 546.2,138.49 L 551.5,143.03 L 556.8,146.22 L 567.4,149.19 L 578,149.92" fill="rgba(55,138,221,0.13)" stroke="#378ADD" stroke-width="1.1"/>
+
+      <circle cx="648" cy="124" r="19" fill="#1e2230" stroke="#378ADD" stroke-width="1.2"/>
+      <text x="648" y="124" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#378ADD">ŷ</text>
+    </g>
+
+    <g id="dots"></g>
+  </svg>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SPEED = 14.6, MIN_W = 6, MAX_W = 18, FADE = 1.4;
+  var DIM = 'rgba(255,255,255,0.09)';
+
+  var EDGES = [
+    { id:'e-x-prior', grp:1, dot:'#7F77DD', mode:'both',  live:'rgba(255,255,255,0.3)',  lw:1,   early:true },
+    { id:'e-x-recog', grp:1, dot:'#c8cdd8', mode:'train', live:'rgba(255,255,255,0.3)',  lw:1,   early:true },
+    { id:'e-y-recog', grp:1, dot:'#1D9E75', mode:'train', live:'#1D9E75',                lw:1.3, early:true },
+    { id:'e-recog-z', grp:2, dot:'#aa701e', mode:'train', live:'#1D9E75',                lw:1.3 },
+    { id:'e-prior-z', grp:2, dot:'#aa701e', mode:'infer', live:'#7F77DD',                lw:1.3 },
+    { id:'e-x-gen',   grp:3, dot:'#e8824a', mode:'both',  live:'rgba(255,255,255,0.18)', lw:1, early:true },
+    { id:'e-z-gen',   grp:3, dot:'#aa701e', mode:'both',  live:'rgba(255,255,255,0.3)',  lw:1   },
+    { id:'e-gen-yh',  grp:4, dot:'#378ADD', mode:'both',  live:'rgba(255,255,255,0.3)',  lw:1   }
+  ];
+
+  var GROUP_END = { 1:16, 2:40, 3:66, 4:88 };
+
+  var svg      = document.getElementById('cvae-svg');
+  var dotLayer = document.getElementById('dots');
+  var kf       = document.createElement('style');
+  document.head.appendChild(kf);
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var mode = 'train';
+
+  function active(e) { return e.mode === 'both' || e.mode === mode; }
+
+  function styleEdge(e) {
+    var el = document.getElementById(e.id);
+    if (!el) return;
+    var on = active(e);
+    el.setAttribute('stroke', on ? e.live : DIM);
+    el.setAttribute('stroke-width', on ? e.lw : 1);
+    el.setAttribute('marker-end', on ? 'url(#ar-live)' : 'url(#ar-dim)');
+    if (on) el.removeAttribute('stroke-dasharray');
+    else el.setAttribute('stroke-dasharray', '4,3');
+  }
+
+  function styleNodes() {
+    var train = mode === 'train';
+
+    var box = document.getElementById('box-recog');
+    box.setAttribute('stroke', train ? '#1D9E75' : DIM);
+    box.setAttribute('stroke-width', train ? 1.3 : 1);
+    document.getElementById('label-recog').setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.16)');
+
+    var bell = document.getElementById('bell-recog');
+    bell.setAttribute('stroke', train ? '#1D9E75' : DIM);
+    bell.setAttribute('fill', train ? 'rgba(29,158,117,0.13)' : 'none');
+
+    var ny = document.getElementById('node-y');
+    ny.setAttribute('stroke', train ? '#1D9E75' : 'rgba(255,255,255,0.12)');
+    ny.setAttribute('stroke-width', train ? 1.4 : 1);
+    document.getElementById('label-y').setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.16)');
+
+    document.getElementById('kl-link').setAttribute('stroke', train ? '#1D9E75' : DIM);
+    document.getElementById('kl-label').setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.16)');
+  }
+
+  function buildDots() {
+    while (dotLayer.firstChild) dotLayer.removeChild(dotLayer.firstChild);
+
+    var live = [];
+    EDGES.forEach(function (e) {
+      if (!active(e)) return;
+      var el = document.getElementById(e.id);
+      if (!el) return;
+      live.push({ cfg: e, d: el.getAttribute('d'), len: el.getTotalLength() });
+    });
+
+    var byGroup = {};
+    live.forEach(function (o) {
+      var g = o.cfg.grp;
+      (byGroup[g] = byGroup[g] || []).push(o);
+    });
+
+    var rules = [];
+    Object.keys(byGroup).forEach(function (g) {
+      var items = byGroup[g];
+      var end = GROUP_END[g];
+      var paced = items.filter(function (o) { return !o.cfg.early; });
+      if (!paced.length) paced = items;
+      var maxLen = paced.reduce(function (m, o) { return Math.max(m, o.len); }, 1);
+
+      var w = maxLen / SPEED;
+      if (w < MIN_W) w = MIN_W;
+      if (w > MAX_W) w = MAX_W;
+      if (w > end) w = end;
+
+      items.forEach(function (o, i) {
+        var start = o.cfg.early ? 0 : end - w * (o.len / maxLen);
+        if (start < 0) start = 0;
+        var name = 'flow-' + g + '-' + i;
+        var fadeIn = Math.min(start + FADE, end - 0.5);
+        var hold   = Math.max(end - 1, fadeIn);
+
+        rules.push(
+          '@keyframes ' + name + '{' +
+          '0%,' + start.toFixed(2) + '%{offset-distance:0%;opacity:0}' +
+          fadeIn.toFixed(2) + '%{opacity:1}' +
+          hold.toFixed(2) + '%{opacity:1}' +
+          end.toFixed(2) + '%,100%{offset-distance:100%;opacity:0}}'
+        );
+
+        var dot = document.createElementNS(SVG_NS, 'circle');
+        dot.setAttribute('class', 'flow-dot');
+        dot.setAttribute('r', o.cfg.grp === 2 ? 4.5 : 4);
+        dot.setAttribute('fill', o.cfg.dot);
+        dot.style.offsetPath = "path('" + o.d + "')";
+        dot.style.animationName = name;
+        dotLayer.appendChild(dot);
+      });
+    });
+
+    var link = document.getElementById('kl-link');
+    if (mode === 'train') {
+      rules.push('@keyframes kl-pulse{0%,18%{stroke-opacity:0.3}26%{stroke-opacity:1}34%{stroke-opacity:1}42%,100%{stroke-opacity:0.3}}');
+      kf.textContent = rules.join('\n');
+      link.style.animation = 'none';
+      void svg.getBoundingClientRect();
+      link.style.animation = 'kl-pulse 7s linear infinite';
+    } else {
+      kf.textContent = rules.join('\n');
+      link.style.animation = 'none';
+    }
+  }
+
+  function setMode(m) {
+    mode = m;
+    EDGES.forEach(styleEdge);
+    styleNodes();
+    buildDots();
+    document.getElementById('btn-train').classList.toggle('active', m === 'train');
+    document.getElementById('btn-infer').classList.toggle('active', m === 'infer');
+  }
+
+  document.getElementById('btn-train').addEventListener('click', function () { setMode('train'); });
+  document.getElementById('btn-infer').addEventListener('click', function () { setMode('infer'); });
+
+  setMode('train');
+})();
+</script>
+
+</body>
+</html>

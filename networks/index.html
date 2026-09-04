@@ -131,6 +131,25 @@
   .ac2{animation:attn-c2 4s ease-in-out infinite}
   .ac3{animation:attn-c3 4s ease-in-out infinite}
   .af{animation:attn-f   4s ease-in-out infinite}
+
+  @keyframes cvae-x{0%,100%{fill:#1e2230}4%,16%{fill:#e8824a}}
+  @keyframes cvae-y{0%,100%{fill:#1e2230}6%,18%{fill:#1D9E75}}
+  @keyframes cvae-pri{0%,100%{fill-opacity:0.06}22%,38%{fill-opacity:0.3}}
+  @keyframes cvae-pos{0%,100%{fill-opacity:0.06}22%,40%{fill-opacity:0.5}}
+  @keyframes cvae-kl{0%,100%{stroke-opacity:0.15}26%,42%{stroke-opacity:0.85}}
+  @keyframes cvae-z{0%,100%{fill:#1e2230}50%,64%{fill:#aa701e}}
+  @keyframes cvae-yh{0%,100%{fill:#1e2230}72%,86%{fill:#378ADD}}
+  @keyframes cvae-d1{0%,36%{offset-distance:0%;opacity:0}40%{opacity:1}50%{opacity:1}53%,100%{offset-distance:100%;opacity:0}}
+  @keyframes cvae-d2{0%,60%{offset-distance:0%;opacity:0}64%{opacity:1}72%{opacity:1}75%,100%{offset-distance:100%;opacity:0}}
+  .cvae-x{animation:cvae-x 5s ease-in-out infinite}
+  .cvae-y{animation:cvae-y 5s ease-in-out infinite}
+  .cvae-pri{animation:cvae-pri 5s ease-in-out infinite}
+  .cvae-pos{animation:cvae-pos 5s ease-in-out infinite}
+  .cvae-kl{animation:cvae-kl 5s ease-in-out infinite}
+  .cvae-z{animation:cvae-z 5s ease-in-out infinite}
+  .cvae-yh{animation:cvae-yh 5s ease-in-out infinite}
+  .cvae-d1{offset-rotate:0deg;animation:cvae-d1 5s linear infinite}
+  .cvae-d2{offset-rotate:0deg;animation:cvae-d2 5s linear infinite}
 </style>
 </head>
 <body>
@@ -311,6 +330,41 @@
     <div class="card-body">
       <div class="card-title">attention</div>
       <div class="card-desc">learned bilinear form on token pairs — the core of transformers</div>
+    </div>
+  </a>
+
+  <!-- conditional VAE -->
+  <a class="card" href="/networks/cvae.html">
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <path d="M 30,38 Q 38,16 44,14" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.7"/>
+      <path d="M 30,52 Q 38,76 44,82" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.7"/>
+      <path d="M 31,92 Q 38,90 44,88" fill="none" stroke="#1D9E75" stroke-width="0.9"/>
+      <path d="M 100,26 Q 120,38 122,45" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.7" stroke-dasharray="3,2"/>
+      <path d="M 100,80 Q 120,68 122,61" fill="none" stroke="#1D9E75" stroke-width="0.9"/>
+      <line x1="138" y1="53" x2="162" y2="53" stroke="rgba(255,255,255,0.13)" stroke-width="0.7"/>
+      <line class="cvae-kl" x1="73" y1="68" x2="73" y2="38" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="2,3"/>
+      <text x="78" y="56" font-family="monospace" font-size="6" fill="#1D9E75">KL</text>
+      <circle class="cvae-x" cx="22" cy="44" r="9" stroke="#e8824a" stroke-width="1"/>
+      <text x="22" y="44" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#e8824a">x</text>
+      <circle class="cvae-y" cx="22" cy="92" r="9" stroke="#1D9E75" stroke-width="1"/>
+      <text x="22" y="92" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#1D9E75">y</text>
+      <rect x="46" y="6" width="54" height="30" rx="3" fill="none" stroke="#7F77DD" stroke-width="0.9"/>
+      <text x="73" y="16" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#7F77DD">p(z|x)</text>
+      <path class="cvae-pri" d="M 51,33.97 L 55.4,33.65 L 59.8,32.38 L 62,31.01 L 64.2,29.07 L 66.4,26.72 L 68.6,24.39 L 70.8,22.65 L 73,22 L 75.2,22.65 L 77.4,24.39 L 79.6,26.72 L 81.8,29.07 L 84,31.01 L 86.2,32.38 L 90.6,33.65 L 95,33.97" fill="#7F77DD" stroke="#7F77DD" stroke-width="0.9"/>
+      <rect x="46" y="70" width="54" height="30" rx="3" fill="none" stroke="#1D9E75" stroke-width="0.9"/>
+      <text x="73" y="80" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#1D9E75">q(z|x,y)</text>
+      <path class="cvae-pos" d="M 51,97.97 L 55.4,97.65 L 59.8,96.38 L 62,95.01 L 64.2,93.07 L 66.4,90.72 L 68.6,88.39 L 70.8,86.65 L 73,86 L 75.2,86.65 L 77.4,88.39 L 79.6,90.72 L 81.8,93.07 L 84,95.01 L 86.2,96.38 L 90.6,97.65 L 95,97.97" fill="#1D9E75" stroke="#1D9E75" stroke-width="0.9"/>
+      <circle class="cvae-z" cx="128" cy="53" r="10" stroke="#aa701e" stroke-width="1"/>
+      <text x="128" y="53" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#aa701e">z</text>
+      <circle class="cvae-yh" cx="172" cy="53" r="10" stroke="#378ADD" stroke-width="1"/>
+      <text x="172" y="53" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#378ADD">ŷ</text>
+      <circle class="cvae-d1" r="3" fill="#aa701e" style="offset-path:path('M 100,80 Q 120,68 122,61')"/>
+      <circle class="cvae-d2" r="3" fill="#378ADD" style="offset-path:path('M 138,53 L 162,53')"/>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">conditional VAE</div>
+      <div class="card-desc">the recognition net sees the target, the prior only the input</div>
     </div>
   </a>
 
