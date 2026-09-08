@@ -9,7 +9,6 @@
 
   :root {
     --bg:      #0d0f14;
-    --surface: #13161d;
     --border:  rgba(255,255,255,0.07);
     --text:    #c8cdd8;
     --muted:   #565c6e;
@@ -18,7 +17,7 @@
     --rgate:   #378ADD;
     --zgate:   #1D9E75;
     --cand:    #aa701e;
-    --cycle:   5.5s;
+    --cycle:   6.6s;
   }
 
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -30,7 +29,7 @@
     display: grid;
     grid-template-rows: auto auto 1fr;
     padding: 1.1rem 1.4rem 0.9rem;
-    gap: 0.55rem;
+    gap: 0.5rem;
     overflow: hidden;
   }
 
@@ -47,35 +46,20 @@
     padding-top: 1.4rem;
   }
 
-  .meta { font-size:12px; color:var(--muted); line-height:1.85; font-style:italic; }
+  .meta { font-size:12px; color:var(--muted); line-height:1.8; font-style:italic; }
   .meta .name { font-style:normal; color:var(--text); }
   .meta .cite { font-style:normal; }
 
   .page { display:flex; flex-direction:column; min-height:0; }
 
-  .card-title {
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.28rem;
-    margin-bottom: 0.5rem;
-    flex-shrink: 0;
-  }
-
-  #gru-svg { width:100%; flex:1; display:block; min-height:0; }
-
   .speed-row {
     display:flex; align-items:center; gap:0.6rem;
-    margin-bottom:0.55rem; flex-shrink:0;
+    margin-bottom:0.5rem; flex-shrink:0;
   }
   .speed-row .lbl {
     font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);
   }
-  .speed-row .val {
-    font-size:9px; color:var(--muted); width:2.6rem;
-  }
+  .speed-row .val { font-size:9px; color:var(--muted); width:2.6rem; }
   #speed {
     -webkit-appearance:none; appearance:none;
     width:170px; height:2px; border-radius:1px;
@@ -91,21 +75,36 @@
     background:var(--cand); cursor:pointer;
   }
 
-  .flow-dot {
-    offset-rotate: 0deg;
-    animation-duration: var(--cycle);
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
+  .card-title {
+    font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.28rem; margin-bottom: 0.4rem; flex-shrink: 0;
   }
 
-  @media (max-width: 600px) {
-    body {
-      height: auto; overflow: auto;
-      padding: 2.5rem 1rem 2rem;
-      grid-template-rows: auto auto auto;
-    }
-    #gru-svg { flex: none; min-height: 300px; }
+  #gru-svg { width:100%; flex:1; display:block; min-height:0; }
+
+  .formulae {
+    flex-shrink:0; margin-top:0.5rem;
+    border-top:0.5px solid var(--border); padding-top:0.55rem;
+  }
+  .formulae .col-title {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:0.35rem;
+  }
+  .eq  { font-size:11px; line-height:2.05; color:var(--text); white-space:nowrap; }
+  .eq sub { font-size:0.72em; }
+  .eq sup { font-size:0.72em; }
+  .s  { color:var(--state); }
+  .xi { color:var(--xin); }
+  .rg { color:var(--rgate); }
+  .zg { color:var(--zgate); }
+  .cd { color:var(--cand); }
+  .op { color:var(--text); }
+
+  @media (max-width: 780px) {
+    body { height:auto; overflow:auto; padding:2.5rem 1rem 2rem; grid-template-rows:auto auto auto; }
+    #gru-svg { flex:none; min-height:300px; }
+    .eq { font-size:10px; white-space:normal; }
   }
 </style>
 </head>
@@ -130,7 +129,7 @@
 
   <div class="card-title">computation graph</div>
 
-  <svg id="gru-svg" viewBox="0 -10 700 320" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <svg id="gru-svg" viewBox="0 15 700 275" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
         <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.3)"/>
@@ -141,63 +140,84 @@
     </defs>
 
     <g id="edges" fill="none">
-      <path id="e-h-o1"  d="M 58,60 L 383,60"                              stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-h-r"   d="M 44,78 C 44,120 80,150 118,166"               stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
-      <path id="e-x-r"   d="M 48,235 C 60,210 85,192 118,182"              stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
-      <path id="e-h-z"   d="M 55,72 C 130,120 190,148 248,167"             stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
-      <path id="e-x-z"   d="M 52,240 C 130,250 210,215 248,190"            stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
-      <path id="e-r-orh" d="M 158,152 L 158,117"                           stroke="#378ADD"                stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-h-orh" d="M 57,55 C 100,50 132,68 149,86"                stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-orh-t" d="M 172,108 C 260,124 340,142 388,166"           stroke="#378ADD"                stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-x-t"   d="M 57,255 C 200,288 320,242 392,197"            stroke="rgba(232,130,74,0.45)"  stroke-width="1"   marker-end="url(#ar)"/>
-      <path id="e-z-o1"  d="M 326,163 C 352,140 370,95 388,66"             stroke="#1D9E75"                stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-z-o2"  d="M 320,190 C 420,270 520,250 534,135"           stroke="#1D9E75"                stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-t-o2"  d="M 478,180 C 505,168 522,148 528,132"           stroke="#aa701e"                stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-o1-p"  d="M 415,60 L 575,60"                             stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-o2-p"  d="M 546,106 C 570,92 583,78 588,74"              stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-p-h"   d="M 607,60 L 635,60"                             stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-loop"  d="M 655,42 C 655,2 300,-4 46,42"                 stroke="rgba(255,255,255,0.16)" stroke-width="1"   stroke-dasharray="3,4" marker-end="url(#ar-dim)"/>
+      <path id="e-h-o1"  d="M 60,110 L 453,110"                          stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-h-z"   d="M 59,102 C 80,92 100,82 116,78"              stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
+      <path id="e-x-z"   d="M 53,175 C 72,143 96,106 116,90"             stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
+      <path id="e-h-r"   d="M 53,125 C 72,157 96,194 116,210"            stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
+      <path id="e-x-r"   d="M 59,198 C 80,208 100,217 116,222"           stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
+      <path id="e-r-orh" d="M 190,225 L 233,225"                         stroke="#378ADD"                stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-h-orh" d="M 55,122 C 130,152 200,196 237,218"          stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-orh-t" d="M 265,225 L 298,225"                         stroke="#378ADD"                stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-x-t"   d="M 50,206 C 130,296 240,290 300,244"          stroke="rgba(232,130,74,0.45)"  stroke-width="1"   marker-end="url(#ar)"/>
+      <path id="e-z-o1"  d="M 190,66 C 280,46 400,70 456,101"            stroke="#1D9E75"                stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-z-o2"  d="M 190,88 C 290,126 400,164 456,182"          stroke="#1D9E75"                stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-t-o2"  d="M 388,216 C 420,210 445,199 456,193"         stroke="#aa701e"                stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-o1-p"  d="M 483,120 C 505,130 528,140 534,143"         stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-o2-p"  d="M 483,180 C 505,170 528,160 534,157"         stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-p-h"   d="M 560,150 L 596,150"                         stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-loop"  d="M 615,132 C 615,10 100,-6 44,93"             stroke="rgba(255,255,255,0.16)" stroke-width="1"   stroke-dasharray="3,4" marker-end="url(#ar-dim)"/>
     </g>
 
     <g id="nodes" font-family="'JetBrains Mono',monospace">
-      <circle cx="40" cy="60" r="18" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
-      <text x="40" y="60" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t−1</tspan></text>
+      <circle cx="42" cy="110" r="18" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
+      <text x="42" y="110" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t−1</tspan></text>
 
-      <circle cx="40" cy="250" r="18" fill="#1e2230" stroke="#e8824a" stroke-width="1.2"/>
-      <text x="40" y="250" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#e8824a">x<tspan font-size="8" dy="2">t</tspan></text>
+      <circle cx="42" cy="190" r="18" fill="#1e2230" stroke="#e8824a" stroke-width="1.2"/>
+      <text x="42" y="190" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#e8824a">x<tspan font-size="8" dy="2">t</tspan></text>
 
-      <rect x="120" y="152" width="76" height="46" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
-      <text x="158" y="175" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#378ADD">σ</text>
-      <text x="158" y="144" text-anchor="middle" font-size="11" fill="#378ADD">r<tspan font-size="8" dy="2">t</tspan></text>
+      <rect x="118" y="52" width="72" height="46" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1"/>
+      <rect id="glow-sig_z" class="node-glow" x="118" y="52" width="72" height="46" rx="4" fill="#1D9E75" opacity="0"/>
+      <text x="154" y="75" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#1D9E75">σ</text>
+      <text x="154" y="44" text-anchor="middle" font-size="11" fill="#1D9E75">z<tspan font-size="8" dy="2">t</tspan></text>
 
-      <rect x="250" y="152" width="76" height="46" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1"/>
-      <text x="288" y="175" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#1D9E75">σ</text>
-      <text x="288" y="144" text-anchor="middle" font-size="11" fill="#1D9E75">z<tspan font-size="8" dy="2">t</tspan></text>
+      <rect x="118" y="202" width="72" height="46" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
+      <rect id="glow-sig_r" class="node-glow" x="118" y="202" width="72" height="46" rx="4" fill="#378ADD" opacity="0"/>
+      <text x="154" y="225" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#378ADD">σ</text>
+      <text x="154" y="264" text-anchor="middle" font-size="11" fill="#378ADD">r<tspan font-size="8" dy="2">t</tspan></text>
 
-      <rect x="390" y="152" width="88" height="46" rx="4" fill="none" stroke="#aa701e" stroke-width="1.1"/>
-      <text x="434" y="175" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#aa701e">tanh</text>
-      <text x="434" y="144" text-anchor="middle" font-size="11" fill="#aa701e">h̃<tspan font-size="8" dy="2">t</tspan></text>
+      <circle cx="250" cy="225" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
+      <circle id="glow-orh" class="node-glow" cx="250" cy="225" r="15" fill="#378ADD" opacity="0"/>
+      <text x="250" y="225" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
-      <circle cx="158" cy="100" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <text x="158" y="100" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="var(--text)">⊙</text>
+      <rect x="300" y="202" width="88" height="46" rx="4" fill="none" stroke="#aa701e" stroke-width="1.1"/>
+      <rect id="glow-tanh" class="node-glow" x="300" y="202" width="88" height="46" rx="4" fill="#aa701e" opacity="0"/>
+      <text x="344" y="225" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#aa701e">tanh</text>
+      <text x="344" y="264" text-anchor="middle" font-size="11" fill="#aa701e">h̃<tspan font-size="8" dy="2">t</tspan></text>
 
-      <circle cx="400" cy="60" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <text x="400" y="60" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="var(--text)">⊙</text>
+      <circle cx="470" cy="110" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
+      <circle id="glow-o1" class="node-glow" cx="470" cy="110" r="15" fill="#7F77DD" opacity="0"/>
+      <text x="470" y="110" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
-      <circle cx="534" cy="118" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <text x="534" y="118" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="var(--text)">⊙</text>
+      <circle cx="470" cy="190" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
+      <circle id="glow-o2" class="node-glow" cx="470" cy="190" r="15" fill="#aa701e" opacity="0"/>
+      <text x="470" y="190" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
-      <circle cx="592" cy="60" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <text x="592" y="60" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="var(--text)">+</text>
+      <circle cx="545" cy="150" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
+      <circle id="glow-plus" class="node-glow" cx="545" cy="150" r="15" fill="#7F77DD" opacity="0"/>
+      <text x="545" y="150" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#c8cdd8">+</text>
 
-      <circle cx="655" cy="60" r="18" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
-      <text x="655" y="60" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t</tspan></text>
+      <circle cx="615" cy="150" r="18" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
+      <circle id="glow-h_t" class="node-glow" cx="615" cy="150" r="18" fill="#7F77DD" opacity="0"/>
+      <text x="615" y="150" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t</tspan></text>
 
-      <text x="356" y="104" text-anchor="middle" font-size="10" fill="#1D9E75">1−z<tspan font-size="7" dy="2">t</tspan></text>
+      <text x="330" y="80" text-anchor="middle" font-size="10" fill="#1D9E75">1−z<tspan font-size="7" dy="2">t</tspan></text>
     </g>
 
     <g id="dots"></g>
   </svg>
+
+  <div class="formulae">
+    <div>
+      <div class="col-title">equations</div>
+      <div class="eq">
+        <span class="rg">r<sub>t</sub></span> = σ(W<sub>r</sub> <span class="xi">x<sub>t</sub></span> + U<sub>r</sub> <span class="s">h<sub>t−1</sub></span> + b<sub>r</sub>)<br>
+        <span class="zg">z<sub>t</sub></span> = σ(W<sub>z</sub> <span class="xi">x<sub>t</sub></span> + U<sub>z</sub> <span class="s">h<sub>t−1</sub></span> + b<sub>z</sub>)<br>
+        <span class="cd">h̃<sub>t</sub></span> = tanh(W <span class="xi">x<sub>t</sub></span> + U (<span class="rg">r<sub>t</sub></span> <span class="op">⊙</span> <span class="s">h<sub>t−1</sub></span>) + b)<br>
+        <span class="s">h<sub>t</sub></span> = (1 − <span class="zg">z<sub>t</sub></span>) <span class="op">⊙</span> <span class="s">h<sub>t−1</sub></span> <span class="op">+</span> <span class="zg">z<sub>t</sub></span> <span class="op">⊙</span> <span class="cd">h̃<sub>t</sub></span>
+      </div>
+    </div>
+    </div>
+  </div>
 
 </div>
 
@@ -207,8 +227,18 @@
 
   // Dataflow schedule: a dot departs a node the instant that node is ready,
   // and every input to a node is timed to arrive together. Nothing waits.
-  var DAG_END = 78;   // % of the cycle at which h_t is ready
+  var DAG_END = 78;   // % of the cycle at which h_t has finished
   var FADE    = 1.0;
+
+  // Dwell: how long a node holds its inputs before emitting, in the same
+  // px-equivalent units as edge length, so it scales with everything else.
+  // Boxes do real work (matmul + nonlinearity); ⊙ and + are elementwise.
+  var DWELL_BOX = 80, DWELL_OP = 34;
+  var DWELL = {
+    sig_r: DWELL_BOX, sig_z: DWELL_BOX, tanh: DWELL_BOX,
+    orh: DWELL_OP, o1: DWELL_OP, o2: DWELL_OP, plus: DWELL_OP, h_t: DWELL_OP
+  };
+  var GLOW_PEAK = { sig_r:0.20, sig_z:0.20, tanh:0.20, orh:0.24, o1:0.24, o2:0.24, plus:0.24, h_t:0.28 };
 
   var EDGES = [
     { id:'e-h-r',   from:'h_prev', to:'sig_r', dot:'#7F77DD' },
@@ -243,27 +273,32 @@
     if (el) live.push({ cfg: e, d: el.getAttribute('d'), len: el.getTotalLength() });
   });
 
-  // longest-path relaxation over the acyclic part
-  var ready = {};
-  live.forEach(function (o) { ready[o.cfg.from] = 0; ready[o.cfg.to] = 0; });
-  SOURCES.forEach(function (n) { ready[n] = 0; });
+  // longest-path relaxation. arrive[v] = all inputs land; ready[v] = outputs leave.
+  var arrive = {}, ready = {};
+  live.forEach(function (o) {
+    arrive[o.cfg.from] = 0; ready[o.cfg.from] = 0;
+    arrive[o.cfg.to]   = 0; ready[o.cfg.to]   = 0;
+  });
   for (var pass = 0; pass < live.length + 2; pass++) {
     live.forEach(function (o) {
       if (o.cfg.back) return;
       var cand = ready[o.cfg.from] + o.len;
-      if (cand > ready[o.cfg.to]) ready[o.cfg.to] = cand;
+      if (cand > arrive[o.cfg.to]) {
+        arrive[o.cfg.to] = cand;
+        ready[o.cfg.to]  = cand + (DWELL[o.cfg.to] || 0);
+      }
     });
   }
+  SOURCES.forEach(function (n) { arrive[n] = 0; ready[n] = 0; });
 
-  // scale so the sink lands at DAG_END
   var scale = DAG_END / (ready[SINK] || 1);
-  Object.keys(ready).forEach(function (n) { ready[n] *= scale; });
+  Object.keys(ready).forEach(function (n) { ready[n] *= scale; arrive[n] *= scale; });
 
   var rules = [];
   var dotEls = [];
   live.forEach(function (o, i) {
     var start = o.cfg.back ? DAG_END : ready[o.cfg.from];
-    var end   = o.cfg.back ? 100     : ready[o.cfg.to];
+    var end   = o.cfg.back ? 100     : arrive[o.cfg.to];
     var name  = 'gru-flow-' + i;
     var fadeIn = Math.min(start + FADE, end - 0.4);
     var hold   = Math.max(end - 0.8, fadeIn);
@@ -286,12 +321,32 @@
     dotEls.push(dot);
   });
 
+  // node glows: on as the inputs land, held through the dwell, off as output departs
+  Object.keys(DWELL).forEach(function (n) {
+    var el = document.getElementById('glow-' + n);
+    if (!el || !(n in arrive)) return;
+    var a = arrive[n], r = ready[n], peak = GLOW_PEAK[n] || 0.25;
+    var d = r - a;
+    var mid  = a + 0.55 * d;             // slow start
+    var full = a + 0.90 * d;             // at full strength just before it emits
+    var off  = Math.min(r + 0.35 * d, 99.5);  // release, ~2.6x quicker than the rise
+    var name = 'gru-glow-' + n;
+    rules.push(
+      '@keyframes ' + name + '{' +
+      '0%,' + a.toFixed(2) + '%{opacity:0}' +
+      mid.toFixed(2) + '%{opacity:' + (peak * 0.32).toFixed(3) + '}' +
+      full.toFixed(2) + '%{opacity:' + peak + '}' +
+      r.toFixed(2) + '%{opacity:' + peak + '}' +
+      off.toFixed(2) + '%,100%{opacity:0}}'
+    );
+    el.style.animationName = name;
+    dotEls.push(el);
+  });
+
   kf.textContent = rules.join(String.fromCharCode(10));
 
-  // Overall speed. Driven by playbackRate rather than animation-duration:
-  // changing the duration keeps elapsed time and rescales progress, which makes
-  // the dots snap. playbackRate preserves the current position and only alters
-  // the rate from here on, so dragging is continuous.
+  // Overall speed via playbackRate: preserves each dot's current position and
+  // only changes the rate from here on, so dragging never snaps.
   var RANGE = 2.8;
   var slider  = document.getElementById('speed');
   var readout = document.getElementById('speed-val');
@@ -316,6 +371,23 @@
   requestAnimationFrame(applySpeed);
 })();
 </script>
+
+<style>
+  .node-glow {
+    pointer-events: none;
+    animation-duration: var(--cycle);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+  }
+  .flow-dot {
+    offset-rotate: 0deg;
+    animation-duration: var(--cycle);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+  }
+</style>
 
 </body>
 </html>
