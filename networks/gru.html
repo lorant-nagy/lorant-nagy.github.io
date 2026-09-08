@@ -137,6 +137,28 @@
       <marker id="ar-dim" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
         <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.16)"/>
       </marker>
+
+      <!-- Internal illumination: brightest at the centre, almost gone at the edge. -->
+      <radialGradient id="fill-z" cx="50%" cy="48%" r="68%">
+        <stop offset="0%"   stop-color="#1D9E75" stop-opacity="1"/>
+        <stop offset="58%"  stop-color="#1D9E75" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#1D9E75" stop-opacity="0.22"/>
+      </radialGradient>
+      <radialGradient id="fill-r" cx="50%" cy="48%" r="68%">
+        <stop offset="0%"   stop-color="#378ADD" stop-opacity="1"/>
+        <stop offset="58%"  stop-color="#378ADD" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#378ADD" stop-opacity="0.22"/>
+      </radialGradient>
+      <radialGradient id="fill-cand" cx="50%" cy="48%" r="68%">
+        <stop offset="0%"   stop-color="#aa701e" stop-opacity="1"/>
+        <stop offset="58%"  stop-color="#aa701e" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#aa701e" stop-opacity="0.22"/>
+      </radialGradient>
+      <radialGradient id="fill-state" cx="50%" cy="48%" r="68%">
+        <stop offset="0%"   stop-color="#7F77DD" stop-opacity="1"/>
+        <stop offset="58%"  stop-color="#7F77DD" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#7F77DD" stop-opacity="0.22"/>
+      </radialGradient>
     </defs>
 
     <g id="edges" fill="none">
@@ -166,38 +188,46 @@
       <text x="42" y="190" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#e8824a">x<tspan font-size="8" dy="2">t</tspan></text>
 
       <rect x="118" y="52" width="72" height="46" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1"/>
-      <rect id="glow-sig_z" class="node-glow" x="118" y="52" width="72" height="46" rx="4" fill="#1D9E75" opacity="0"/>
+      <rect id="glow-sig_z" class="node-glow" x="118" y="52" width="72" height="46" rx="4" fill="url(#fill-z)" opacity="0"/>
+      <rect id="impact-sig_z" class="node-impact" x="118" y="52" width="72" height="46" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1" opacity="0"/>
       <text x="154" y="75" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#1D9E75">σ</text>
       <text x="154" y="44" text-anchor="middle" font-size="11" fill="#1D9E75">z<tspan font-size="8" dy="2">t</tspan></text>
 
       <rect x="118" y="202" width="72" height="46" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
-      <rect id="glow-sig_r" class="node-glow" x="118" y="202" width="72" height="46" rx="4" fill="#378ADD" opacity="0"/>
+      <rect id="glow-sig_r" class="node-glow" x="118" y="202" width="72" height="46" rx="4" fill="url(#fill-r)" opacity="0"/>
+      <rect id="impact-sig_r" class="node-impact" x="118" y="202" width="72" height="46" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1" opacity="0"/>
       <text x="154" y="225" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#378ADD">σ</text>
       <text x="154" y="264" text-anchor="middle" font-size="11" fill="#378ADD">r<tspan font-size="8" dy="2">t</tspan></text>
 
       <circle cx="250" cy="225" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <circle id="glow-orh" class="node-glow" cx="250" cy="225" r="15" fill="#378ADD" opacity="0"/>
+      <circle id="glow-orh" class="node-glow" cx="250" cy="225" r="15" fill="url(#fill-r)" opacity="0"/>
+      <circle id="impact-orh" class="node-impact" cx="250" cy="225" r="15" fill="none" stroke="#378ADD" stroke-width="1" opacity="0"/>
       <text x="250" y="225" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
       <rect x="300" y="202" width="88" height="46" rx="4" fill="none" stroke="#aa701e" stroke-width="1.1"/>
-      <rect id="glow-tanh" class="node-glow" x="300" y="202" width="88" height="46" rx="4" fill="#aa701e" opacity="0"/>
+      <rect id="glow-tanh" class="node-glow" x="300" y="202" width="88" height="46" rx="4" fill="url(#fill-cand)" opacity="0"/>
+      <rect id="impact-tanh" class="node-impact" x="300" y="202" width="88" height="46" rx="4" fill="none" stroke="#aa701e" stroke-width="1.1" opacity="0"/>
       <text x="344" y="225" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#aa701e">tanh</text>
       <text x="344" y="264" text-anchor="middle" font-size="11" fill="#aa701e">h̃<tspan font-size="8" dy="2">t</tspan></text>
 
       <circle cx="470" cy="110" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <circle id="glow-o1" class="node-glow" cx="470" cy="110" r="15" fill="#7F77DD" opacity="0"/>
+      <circle id="glow-o1" class="node-glow" cx="470" cy="110" r="15" fill="url(#fill-state)" opacity="0"/>
+      <circle id="impact-o1" class="node-impact" cx="470" cy="110" r="15" fill="none" stroke="#7F77DD" stroke-width="1" opacity="0"/>
       <text x="470" y="110" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
       <circle cx="470" cy="190" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <circle id="glow-o2" class="node-glow" cx="470" cy="190" r="15" fill="#aa701e" opacity="0"/>
+      <circle id="glow-o2" class="node-glow" cx="470" cy="190" r="15" fill="url(#fill-cand)" opacity="0"/>
+      <circle id="impact-o2" class="node-impact" cx="470" cy="190" r="15" fill="none" stroke="#aa701e" stroke-width="1" opacity="0"/>
       <text x="470" y="190" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
       <circle cx="545" cy="150" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <circle id="glow-plus" class="node-glow" cx="545" cy="150" r="15" fill="#7F77DD" opacity="0"/>
+      <circle id="glow-plus" class="node-glow" cx="545" cy="150" r="15" fill="url(#fill-state)" opacity="0"/>
+      <circle id="impact-plus" class="node-impact" cx="545" cy="150" r="15" fill="none" stroke="#7F77DD" stroke-width="1" opacity="0"/>
       <text x="545" y="150" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#c8cdd8">+</text>
 
       <circle cx="615" cy="150" r="18" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
-      <circle id="glow-h_t" class="node-glow" cx="615" cy="150" r="18" fill="#7F77DD" opacity="0"/>
+      <circle id="glow-h_t" class="node-glow" cx="615" cy="150" r="18" fill="url(#fill-state)" opacity="0"/>
+      <circle id="impact-h_t" class="node-impact" cx="615" cy="150" r="18" fill="none" stroke="#7F77DD" stroke-width="1.2" opacity="0"/>
       <text x="615" y="150" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t</tspan></text>
 
       <text x="330" y="80" text-anchor="middle" font-size="10" fill="#1D9E75">1−z<tspan font-size="7" dy="2">t</tspan></text>
@@ -238,7 +268,7 @@
     sig_r: DWELL_BOX, sig_z: DWELL_BOX, tanh: DWELL_BOX,
     orh: DWELL_OP, o1: DWELL_OP, o2: DWELL_OP, plus: DWELL_OP, h_t: DWELL_OP
   };
-  var GLOW_PEAK = { sig_r:0.20, sig_z:0.20, tanh:0.20, orh:0.24, o1:0.24, o2:0.24, plus:0.24, h_t:0.28 };
+  var FILL_PEAK = { sig_r:0.50, sig_z:0.50, tanh:0.50, orh:0.54, o1:0.54, o2:0.54, plus:0.54, h_t:0.58 };
 
   var EDGES = [
     { id:'e-h-r',   from:'h_prev', to:'sig_r', dot:'#7F77DD' },
@@ -301,13 +331,13 @@
     var end   = o.cfg.back ? 100     : arrive[o.cfg.to];
     var name  = 'gru-flow-' + i;
     var fadeIn = Math.min(start + FADE, end - 0.4);
-    var hold   = Math.max(end - 0.8, fadeIn);
+    var contact = Math.max(end - 0.06, fadeIn);
 
     rules.push(
       '@keyframes ' + name + '{' +
       '0%,' + start.toFixed(2) + '%{offset-distance:0%;opacity:0}' +
       fadeIn.toFixed(2) + '%{opacity:1}' +
-      hold.toFixed(2) + '%{opacity:1}' +
+      contact.toFixed(2) + '%{opacity:1}' +
       end.toFixed(2) + '%,100%{offset-distance:100%;opacity:0}}'
     );
 
@@ -321,26 +351,64 @@
     dotEls.push(dot);
   });
 
-  // node glows: on as the inputs land, held through the dwell, off as output departs
+  // Node response: contact is a crisp event, then the node visibly computes.
+  // Timing is unchanged: a = input arrival, r = output departure. Only the
+  // visual envelope inside that existing dwell interval is different.
   Object.keys(DWELL).forEach(function (n) {
-    var el = document.getElementById('glow-' + n);
-    if (!el || !(n in arrive)) return;
-    var a = arrive[n], r = ready[n], peak = GLOW_PEAK[n] || 0.25;
-    var d = r - a;
-    var mid  = a + 0.55 * d;             // slow start
-    var full = a + 0.90 * d;             // at full strength just before it emits
-    var off  = Math.min(r + 0.35 * d, 99.5);  // release, ~2.6x quicker than the rise
-    var name = 'gru-glow-' + n;
-    rules.push(
-      '@keyframes ' + name + '{' +
-      '0%,' + a.toFixed(2) + '%{opacity:0}' +
-      mid.toFixed(2) + '%{opacity:' + (peak * 0.32).toFixed(3) + '}' +
-      full.toFixed(2) + '%{opacity:' + peak + '}' +
-      r.toFixed(2) + '%{opacity:' + peak + '}' +
-      off.toFixed(2) + '%,100%{opacity:0}}'
-    );
-    el.style.animationName = name;
-    dotEls.push(el);
+    var fill = document.getElementById('glow-' + n);
+    var impact = document.getElementById('impact-' + n);
+    if ((!fill && !impact) || !(n in arrive)) return;
+
+    var a = arrive[n], r = ready[n], d = r - a;
+    var peak = FILL_PEAK[n] || 0.30;
+    // Visual cooldown only: after ignition there is no sustain plateau.
+    // The fill continuously loses intensity through the dwell and keeps
+    // fading for a short tail after the output departs at r.
+    var cool1 = Math.min(r + 0.22 * d, 99.1);
+    var cool2 = Math.min(r + 0.48 * d, 99.35);
+    var off   = Math.min(r + 0.72 * d, 99.5);
+
+    // 1) Boundary strike: nearly instantaneous attack, quick recoil.
+    // The overlay outline returns to zero after the hit; the ordinary node
+    // outline underneath remains visible throughout.
+    if (impact) {
+      var hit = a + 0.04 * d;
+      var recoil = a + 0.16 * d;
+      var impactName = 'gru-impact-' + n;
+      rules.push(
+        '@keyframes ' + impactName + '{' +
+        '0%,' + a.toFixed(2) + '%{opacity:0;stroke-width:1.1}' +
+        hit.toFixed(2) + '%{opacity:0.95;stroke-width:2.25}' +
+        recoil.toFixed(2) + '%{opacity:0;stroke-width:1.1}' +
+        '100%{opacity:0;stroke-width:1.1}}'
+      );
+      impact.style.animationName = impactName;
+      dotEls.push(impact);
+    }
+
+    // 2) Interior ignition: starts just after the outline strike, fills rapidly,
+    // then immediately begins one continuous decay. There is deliberately no
+    // flat sustain segment: the node is always visibly cooling after the peak.
+    if (fill) {
+      var fillStart = a + 0.030 * d;
+      var fillPeak = a + 0.105 * d;
+      var mid1 = a + 0.40 * d;
+      var mid2 = a + 0.70 * d;
+      var fillName = 'gru-glow-' + n;
+      rules.push(
+        '@keyframes ' + fillName + '{' +
+        '0%,' + fillStart.toFixed(2) + '%{opacity:0}' +
+        fillPeak.toFixed(2) + '%{opacity:' + peak.toFixed(3) + '}' +
+        mid1.toFixed(2) + '%{opacity:' + (peak * 0.76).toFixed(3) + '}' +
+        mid2.toFixed(2) + '%{opacity:' + (peak * 0.53).toFixed(3) + '}' +
+        r.toFixed(2) + '%{opacity:' + (peak * 0.34).toFixed(3) + '}' +
+        cool1.toFixed(2) + '%{opacity:' + (peak * 0.21).toFixed(3) + '}' +
+        cool2.toFixed(2) + '%{opacity:' + (peak * 0.09).toFixed(3) + '}' +
+        off.toFixed(2) + '%,100%{opacity:0}}'
+      );
+      fill.style.animationName = fillName;
+      dotEls.push(fill);
+    }
   });
 
   kf.textContent = rules.join(String.fromCharCode(10));
@@ -373,7 +441,7 @@
 </script>
 
 <style>
-  .node-glow {
+  .node-glow, .node-impact {
     pointer-events: none;
     animation-duration: var(--cycle);
     animation-timing-function: linear;
