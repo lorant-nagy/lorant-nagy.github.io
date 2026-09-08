@@ -260,6 +260,7 @@
   Object.keys(ready).forEach(function (n) { ready[n] *= scale; });
 
   var rules = [];
+  var dotEls = [];
   live.forEach(function (o, i) {
     var start = o.cfg.back ? DAG_END : ready[o.cfg.from];
     var end   = o.cfg.back ? 100     : ready[o.cfg.to];
@@ -282,21 +283,37 @@
     dot.style.offsetPath = "path('" + o.d + "')";
     dot.style.animationName = name;
     dotLayer.appendChild(dot);
+    dotEls.push(dot);
   });
 
   kf.textContent = rules.join(String.fromCharCode(10));
 
-  // overall speed: one multiplier over the whole schedule, relative pacing untouched
-  var BASE = 5.5, RANGE = 2.8;
-  var slider = document.getElementById('speed');
+  // Overall speed. Driven by playbackRate rather than animation-duration:
+  // changing the duration keeps elapsed time and rescales progress, which makes
+  // the dots snap. playbackRate preserves the current position and only alters
+  // the rate from here on, so dragging is continuous.
+  var RANGE = 2.8;
+  var slider  = document.getElementById('speed');
   var readout = document.getElementById('speed-val');
+
+  function setRate(mult) {
+    dotEls.forEach(function (el) {
+      if (!el.getAnimations) return;
+      el.getAnimations().forEach(function (a) {
+        if (a.updatePlaybackRate) a.updatePlaybackRate(mult);
+        else a.playbackRate = mult;
+      });
+    });
+  }
+
   function applySpeed() {
     var mult = Math.pow(RANGE, (slider.value - 50) / 50);
-    document.documentElement.style.setProperty('--cycle', (BASE / mult).toFixed(3) + 's');
+    setRate(mult);
     readout.textContent = mult.toFixed(1) + '\u00d7';
   }
+
   slider.addEventListener('input', applySpeed);
-  applySpeed();
+  requestAnimationFrame(applySpeed);
 })();
 </script>
 
