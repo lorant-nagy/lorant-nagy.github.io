@@ -13,28 +13,29 @@
     --border:  rgba(255,255,255,0.07);
     --text:    #c8cdd8;
     --muted:   #565c6e;
-    --neg:     #378ADD;
-    --pos:     #e8824a;
-    --accent:  #aa701e;
+    --decoder: #378ADD;
+    --x:       #e8824a;
+    --latent:  #aa701e;
     --prior:   #7F77DD;
     --recog:   #1D9E75;
+    --cycle:   7.2s;
   }
 
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    background: var(--bg); color: var(--text);
-    font-family: 'JetBrains Mono', monospace; font-size: 13px;
-    height: 100dvh;
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-    padding: 1.1rem 1.4rem 0.9rem;
-    gap: 0.55rem;
-    overflow: hidden;
+    background:var(--bg); color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    height:100dvh;
+    display:grid;
+    grid-template-rows:auto auto 1fr;
+    padding:1.1rem 1.4rem 0.9rem;
+    gap:0.5rem;
+    overflow:hidden;
   }
 
   a.back {
-    position: fixed; top:1rem; left:1.25rem;
+    position:fixed; top:1rem; left:1.25rem;
     font-size:11px; color:var(--muted);
     text-decoration:none; letter-spacing:0.05em; z-index:10;
   }
@@ -43,60 +44,94 @@
   h1 {
     font-family:'Spectral',serif; font-weight:300;
     font-size:1.45rem; color:#e8e4dc; letter-spacing:0.02em;
-    padding-top: 1.4rem;
+    padding-top:1.4rem;
   }
 
-  .meta { font-size:12px; color:var(--muted); line-height:1.85; font-style:italic; }
+  .meta { font-size:12px; color:var(--muted); line-height:1.8; font-style:italic; }
   .meta .name { font-style:normal; color:var(--text); }
   .meta .cite { font-style:normal; }
 
   .page { display:flex; flex-direction:column; min-height:0; }
 
-  .mode-row {
-    display:flex; gap:0.35rem; align-items:center;
-    margin-bottom:0.5rem; flex-shrink:0;
+  .controls {
+    display:flex; align-items:center; gap:1rem;
+    margin-bottom:0.5rem; flex-shrink:0; flex-wrap:wrap;
   }
+  .mode-row { display:flex; gap:0.35rem; align-items:center; }
   .mode-btn {
     background:none; border:0.5px solid var(--border);
     border-radius:3px; color:var(--muted);
-    font-family:'JetBrains Mono', monospace; font-size:9px;
+    font-family:'JetBrains Mono',monospace; font-size:9px;
     letter-spacing:0.06em; padding:4px 12px; cursor:pointer;
-    transition: all 0.15s;
+    transition:all 0.15s;
   }
   .mode-btn.active {
-    border-color:var(--accent); color:var(--accent);
+    border-color:var(--latent); color:var(--latent);
     background:rgba(170,112,30,0.08);
   }
   .mode-btn:hover:not(.active) { border-color:rgba(255,255,255,0.2); color:var(--text); }
 
+  .speed-row { display:flex; align-items:center; gap:0.6rem; }
+  .speed-row .lbl {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .speed-row .val { font-size:9px; color:var(--muted); width:2.6rem; }
+  #speed {
+    -webkit-appearance:none; appearance:none;
+    width:150px; height:2px; border-radius:1px;
+    background:rgba(255,255,255,0.12); outline:none; cursor:pointer;
+  }
+  #speed::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--latent); cursor:pointer;
+  }
+  #speed::-moz-range-thumb {
+    width:11px; height:11px; border:0; border-radius:50%;
+    background:var(--latent); cursor:pointer;
+  }
+
   .card-title {
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.28rem;
-    margin-bottom: 0.5rem;
-    flex-shrink: 0;
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); border-bottom:0.5px solid var(--border);
+    padding-bottom:0.28rem; margin-bottom:0.4rem; flex-shrink:0;
   }
 
   #cvae-svg { width:100%; flex:1; display:block; min-height:0; }
 
-  .flow-dot {
-    offset-rotate: 0deg;
-    animation-duration: 7s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
+  .formulae {
+    flex-shrink:0; margin-top:0.45rem;
+    border-top:0.5px solid var(--border); padding-top:0.5rem;
   }
+  .formulae .col-title {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:0.28rem;
+  }
+  .eq { font-size:10.5px; line-height:1.72; color:var(--text); white-space:nowrap; }
+  .eq sub { font-size:0.72em; }
+  .eq sup { font-size:0.72em; }
+  .step { display:inline-block; width:2.0em; color:var(--muted); }
+  .xq { color:var(--x); }
+  .yq, .rq { color:var(--recog); }
+  .pq { color:var(--prior); }
+  .zq { color:var(--latent); }
+  .dq { color:var(--decoder); }
+  .op { color:var(--text); }
+  .aside { color:var(--muted); font-size:0.88em; }
 
-  @media (max-width: 600px) {
-    body {
-      height: auto; overflow: auto;
-      padding: 2.5rem 1rem 2rem;
-      grid-template-rows: auto auto auto;
-    }
-    #cvae-svg { flex: none; min-height: 320px; }
+  .node-glow, .node-impact, .flow-dot, #kl-link, #kl-label {
+    pointer-events:none;
+    animation-duration:var(--cycle);
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    animation-fill-mode:both;
+  }
+  .flow-dot { offset-rotate:0deg; }
+
+  @media (max-width:780px), (max-height:720px) {
+    body { height:auto; overflow:auto; padding:2.5rem 1rem 2rem; grid-template-rows:auto auto auto; }
+    #cvae-svg { flex:none; min-height:330px; }
+    .eq { font-size:10px; white-space:normal; }
   }
 </style>
 </head>
@@ -112,15 +147,21 @@
 </div>
 
 <div class="page">
-
-  <div class="mode-row">
-    <button class="mode-btn active" id="btn-train">training</button>
-    <button class="mode-btn" id="btn-infer">inference</button>
+  <div class="controls">
+    <div class="mode-row">
+      <button class="mode-btn active" id="btn-train">training</button>
+      <button class="mode-btn" id="btn-infer">inference</button>
+    </div>
+    <div class="speed-row">
+      <span class="lbl">speed</span>
+      <input id="speed" type="range" min="0" max="100" value="50" step="1" aria-label="animation speed">
+      <span class="val" id="speed-val">1.0×</span>
+    </div>
   </div>
 
   <div class="card-title">computation graph</div>
 
-  <svg id="cvae-svg" viewBox="0 -30 700 292" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <svg id="cvae-svg" viewBox="0 -12 700 286" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="ar-live" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
         <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.3)"/>
@@ -128,80 +169,167 @@
       <marker id="ar-dim" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
         <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.09)"/>
       </marker>
+
+      <radialGradient id="fill-prior" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#7F77DD" stop-opacity="1"/>
+        <stop offset="58%" stop-color="#7F77DD" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#7F77DD" stop-opacity="0.22"/>
+      </radialGradient>
+      <radialGradient id="fill-recog" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#1D9E75" stop-opacity="1"/>
+        <stop offset="58%" stop-color="#1D9E75" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#1D9E75" stop-opacity="0.22"/>
+      </radialGradient>
+      <radialGradient id="fill-latent" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#aa701e" stop-opacity="1"/>
+        <stop offset="58%" stop-color="#aa701e" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#aa701e" stop-opacity="0.22"/>
+      </radialGradient>
+      <radialGradient id="fill-decoder" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#378ADD" stop-opacity="1"/>
+        <stop offset="58%" stop-color="#378ADD" stop-opacity="0.72"/>
+        <stop offset="100%" stop-color="#378ADD" stop-opacity="0.22"/>
+      </radialGradient>
     </defs>
 
     <g id="edges" fill="none">
-      <path id="e-x-gen"   d="M 54,65 C 140,-24 350,-20 452,110" stroke="rgba(255,255,255,0.18)" stroke-width="1" marker-end="url(#ar-live)"/>
-      <path id="e-x-prior" d="M 66,68 Q 108,42 146,46" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
-      <path id="e-x-recog" d="M 64,96 Q 106,152 146,186" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
-      <path id="e-y-recog" d="M 68,196 Q 108,204 146,204" stroke="#1D9E75" stroke-width="1.3" marker-end="url(#ar-live)"/>
-      <path id="e-prior-z" d="M 290,64 Q 340,84 352,106" stroke="rgba(255,255,255,0.09)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#ar-dim)"/>
-      <path id="e-recog-z" d="M 290,196 Q 340,166 352,142" stroke="#1D9E75" stroke-width="1.3" marker-end="url(#ar-live)"/>
-      <path id="e-z-gen"   d="M 389,124 L 446,124" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
-      <path id="e-gen-yh"  d="M 600,124 L 628,124" stroke="rgba(255,255,255,0.3)" stroke-width="1" marker-end="url(#ar-live)"/>
-      <path id="kl-link"   d="M 220,170 L 220,94" stroke="#1D9E75" stroke-width="1" stroke-dasharray="2,3"/>
+      <path id="e-x-dec"   d="M 56,69 C 145,-15 350,-18 448,112" stroke="rgba(232,130,74,0.35)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-x-prior" d="M 62,74 Q 105,43 146,48" stroke="rgba(255,255,255,0.28)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-x-recog" d="M 58,96 Q 104,150 146,184" stroke="rgba(255,255,255,0.28)" stroke-width="1" marker-end="url(#ar-live)"/>
+      <path id="e-y-recog" d="M 64,202 Q 106,206 146,204" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#ar-live)"/>
+      <path id="e-prior-z" d="M 294,64 Q 338,84 352,108" stroke="#7F77DD" stroke-width="1.2" marker-end="url(#ar-live)"/>
+      <path id="e-recog-z" d="M 294,200 Q 338,168 352,142" stroke="#1D9E75" stroke-width="1.2" marker-end="url(#ar-live)"/>
+      <path id="e-z-dec"   d="M 390,125 L 446,125" stroke="rgba(170,112,30,0.65)" stroke-width="1.2" marker-end="url(#ar-live)"/>
+      <path id="e-dec-yh"  d="M 604,125 L 628,125" stroke="#378ADD" stroke-width="1.2" marker-end="url(#ar-live)"/>
+      <path id="kl-link"   d="M 222,98 L 222,168" stroke="#1D9E75" stroke-width="1" stroke-dasharray="2,3" opacity="0.35"/>
     </g>
 
-    <g id="nodes">
-      <circle cx="44" cy="82" r="18" fill="#1e2230" stroke="#e8824a" stroke-width="1"/>
-      <text x="44" y="82" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e8824a">x</text>
+    <g id="edge-labels" font-family="'JetBrains Mono',monospace" font-size="8.5" letter-spacing="0.04em">
+      <text id="sampling-prior" x="324" y="79" text-anchor="middle" fill="#7F77DD">sampling</text>
+      <text id="sampling-recog" x="326" y="177" text-anchor="middle" fill="#1D9E75">sampling</text>
+      <text id="sampling-output" x="616" y="113" text-anchor="middle" fill="#378ADD">sampling</text>
+    </g>
 
-      <circle id="node-y" cx="44" cy="196" r="18" fill="#1e2230" stroke="#1D9E75" stroke-width="1.4"/>
-      <text id="label-y" x="44" y="196" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#1D9E75">y</text>
+    <g id="nodes" font-family="'JetBrains Mono',monospace">
+      <circle cx="42" cy="84" r="18" fill="#1e2230" stroke="#e8824a" stroke-width="1.2"/>
+      <text x="42" y="84" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#e8824a">x</text>
 
-      <rect x="150" y="28" width="140" height="64" rx="4" fill="none" stroke="#7F77DD" stroke-width="1.1"/>
-      <text x="220" y="46" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#7F77DD">p<tspan font-size="8" dy="2">θ</tspan><tspan font-size="11" dy="-2">(z|x)</tspan></text>
-      <path d="M 170,85.92 L 180,85.19 L 190,82.22 L 195,79.03 L 200,74.49 L 205,69.02 L 210,63.57 L 215,59.51 L 220,58 L 225,59.51 L 230,63.57 L 235,69.02 L 240,74.49 L 245,79.03 L 250,82.22 L 260,85.19 L 270,85.92" fill="rgba(127,119,221,0.13)" stroke="#7F77DD" stroke-width="1.1"/>
+      <circle id="node-y" cx="42" cy="202" r="18" fill="#1e2230" stroke="#1D9E75" stroke-width="1.2"/>
+      <text id="label-y" x="42" y="202" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#1D9E75">y</text>
 
-      <rect id="box-recog" x="150" y="170" width="140" height="64" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.3"/>
-      <text id="label-recog" x="220" y="188" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#1D9E75">q<tspan font-size="8" dy="2">φ</tspan><tspan font-size="11" dy="-2">(z|x,y)</tspan></text>
-      <path id="bell-recog" d="M 170,227.92 L 180,227.19 L 190,224.22 L 195,221.03 L 200,216.49 L 205,211.02 L 210,205.57 L 215,201.51 L 220,200 L 225,201.51 L 230,205.57 L 235,211.02 L 240,216.49 L 245,221.03 L 250,224.22 L 260,227.19 L 270,227.92" fill="rgba(29,158,117,0.13)" stroke="#1D9E75" stroke-width="1.1"/>
+      <!-- prior -->
+      <rect id="base-prior" x="148" y="28" width="146" height="70" rx="4" fill="none" stroke="#7F77DD" stroke-width="1.1"/>
+      <rect id="glow-prior" class="node-glow" x="148" y="28" width="146" height="70" rx="4" fill="url(#fill-prior)" opacity="0"/>
+      <rect id="impact-prior" class="node-impact" x="148" y="28" width="146" height="70" rx="4" fill="none" stroke="#7F77DD" stroke-width="1.1" opacity="0"/>
+      <text x="221" y="46" text-anchor="middle" font-size="8.5" letter-spacing="0.10em" fill="#7F77DD">PRIOR NETWORK</text>
+      <text x="221" y="62" text-anchor="middle" font-size="10.5" fill="#7F77DD">p<tspan font-size="7" dy="2">θ</tspan><tspan font-size="10.5" dy="-2">(z|x)</tspan></text>
+      <path id="bell-prior" d="M 171,91 L 181,90 L 191,87 L 196,83 L 201,78 L 206,72 L 211,67 L 216,63 L 221,62 L 226,63 L 231,67 L 236,72 L 241,78 L 246,83 L 251,87 L 261,90 L 271,91" fill="rgba(127,119,221,0.12)" stroke="#7F77DD" stroke-width="1.0"/>
 
-      <text id="kl-label" x="234" y="135" font-family="'JetBrains Mono',monospace" font-size="10" fill="#1D9E75">KL</text>
+      <!-- recognition -->
+      <rect id="base-recog" x="148" y="168" width="146" height="70" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1"/>
+      <rect id="glow-recog" class="node-glow" x="148" y="168" width="146" height="70" rx="4" fill="url(#fill-recog)" opacity="0"/>
+      <rect id="impact-recog" class="node-impact" x="148" y="168" width="146" height="70" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1" opacity="0"/>
+      <text id="name-recog" x="221" y="186" text-anchor="middle" font-size="8.5" letter-spacing="0.08em" fill="#1D9E75">RECOGNITION NETWORK</text>
+      <text id="label-recog" x="221" y="202" text-anchor="middle" font-size="10.5" fill="#1D9E75">q<tspan font-size="7" dy="2">φ</tspan><tspan font-size="10.5" dy="-2">(z|x,y)</tspan></text>
+      <path id="bell-recog" d="M 171,231 L 181,230 L 191,227 L 196,223 L 201,218 L 206,212 L 211,207 L 216,203 L 221,202 L 226,203 L 231,207 L 236,212 L 241,218 L 246,223 L 251,227 L 261,230 L 271,231" fill="rgba(29,158,117,0.12)" stroke="#1D9E75" stroke-width="1.0"/>
 
-      <circle cx="370" cy="124" r="19" fill="#1e2230" stroke="#aa701e" stroke-width="1.4"/>
-      <text x="370" y="124" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#aa701e">z</text>
+      <text id="kl-label" x="236" y="137" font-size="9.5" fill="#1D9E75">KL</text>
 
-      <rect x="450" y="92" width="150" height="64" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
-      <text x="525" y="110" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#378ADD">p<tspan font-size="8" dy="2">θ</tspan><tspan font-size="11" dy="-2">(y|x,z)</tspan></text>
-      <path d="M 472,149.92 L 482.6,149.19 L 493.2,146.22 L 498.5,143.03 L 503.8,138.49 L 509.1,133.02 L 514.4,127.57 L 519.7,123.51 L 525,122 L 530.3,123.51 L 535.6,127.57 L 540.9,133.02 L 546.2,138.49 L 551.5,143.03 L 556.8,146.22 L 567.4,149.19 L 578,149.92" fill="rgba(55,138,221,0.13)" stroke="#378ADD" stroke-width="1.1"/>
+      <!-- sampled latent -->
+      <circle id="base-z_hat" cx="371" cy="125" r="19" fill="#1e2230" stroke="#aa701e" stroke-width="1.3"/>
+      <circle id="glow-z_hat" class="node-glow" cx="371" cy="125" r="19" fill="url(#fill-latent)" opacity="0"/>
+      <circle id="impact-z_hat" class="node-impact" cx="371" cy="125" r="19" fill="none" stroke="#aa701e" stroke-width="1.2" opacity="0"/>
+      <text x="371" y="125" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#aa701e">z&#770;</text>
 
-      <circle cx="648" cy="124" r="19" fill="#1e2230" stroke="#378ADD" stroke-width="1.2"/>
-      <text x="648" y="124" text-anchor="middle" dominant-baseline="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#378ADD">ŷ</text>
+      <!-- decoder -->
+      <rect id="base-decoder" x="448" y="90" width="156" height="70" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
+      <rect id="glow-decoder" class="node-glow" x="448" y="90" width="156" height="70" rx="4" fill="url(#fill-decoder)" opacity="0"/>
+      <rect id="impact-decoder" class="node-impact" x="448" y="90" width="156" height="70" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1" opacity="0"/>
+      <text x="526" y="108" text-anchor="middle" font-size="8.5" letter-spacing="0.10em" fill="#378ADD">DECODER</text>
+      <text x="526" y="124" text-anchor="middle" font-size="10.5" fill="#378ADD">p<tspan font-size="7" dy="2">θ</tspan><tspan font-size="10.5" dy="-2">(y|x,z&#770;)</tspan></text>
+      <path d="M 474,153 L 484,152 L 494,149 L 499,145 L 504,140 L 509,134 L 514,129 L 521,125 L 526,124 L 531,125 L 538,129 L 543,134 L 548,140 L 553,145 L 558,149 L 568,152 L 578,153" fill="rgba(55,138,221,0.12)" stroke="#378ADD" stroke-width="1.0"/>
+
+      <!-- sampled output -->
+      <circle id="base-y_hat" cx="649" cy="125" r="19" fill="#1e2230" stroke="#378ADD" stroke-width="1.2"/>
+      <circle id="glow-y_hat" class="node-glow" cx="649" cy="125" r="19" fill="url(#fill-decoder)" opacity="0"/>
+      <circle id="impact-y_hat" class="node-impact" cx="649" cy="125" r="19" fill="none" stroke="#378ADD" stroke-width="1.2" opacity="0"/>
+      <text x="649" y="125" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#378ADD">ŷ</text>
     </g>
 
     <g id="dots"></g>
   </svg>
 
+  <div class="formulae">
+    <div class="col-title">equations · computation order</div>
+
+    <div class="eq" id="eq-train">
+      <div><span class="step">1a</span><span class="pq">(&mu;<sub>p</sub>, &sigma;<sub>p</sub>)</span> = PRIOR<sub>&theta;</sub>(<span class="xq">x</span>), &nbsp; <span class="pq">p<sub>&theta;</sub>(z|x)</span> = 𝒩(&mu;<sub>p</sub>, diag(&sigma;<sub>p</sub><sup>2</sup>))</div>
+      <div><span class="step">1b</span><span class="rq">(&mu;<sub>q</sub>, &sigma;<sub>q</sub>)</span> = REC<sub>&phi;</sub>(<span class="xq">x</span>, <span class="yq">y</span>), &nbsp; <span class="rq">q<sub>&phi;</sub>(z|x,y)</span> = 𝒩(&mu;<sub>q</sub>, diag(&sigma;<sub>q</sub><sup>2</sup>))</div>
+      <div><span class="step">2</span><span class="zq">z&#770;</span> = &mu;<sub>q</sub> + &sigma;<sub>q</sub> ⊙ &epsilon;, &nbsp; &epsilon; ~ 𝒩(0,I) <span class="aside">(sampling)</span></div>
+      <div><span class="step">3</span><span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> = DEC<sub>&theta;</sub>(<span class="xq">x</span>, <span class="zq">z&#770;</span>)</div>
+      <div><span class="step">4</span><span class="dq">ŷ</span> ~ <span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> <span class="aside">(sampling)</span></div>
+      <div><span class="step">∥</span><span class="rq">D<sub>KL</sub></span>(<span class="rq">q<sub>&phi;</sub>(z|x,y)</span> || <span class="pq">p<sub>&theta;</sub>(z|x)</span>) <span class="aside">(training regularizer; available once both distributions are ready)</span></div>
+    </div>
+
+    <div class="eq" id="eq-infer" hidden>
+      <div><span class="step">1</span><span class="pq">(&mu;<sub>p</sub>, &sigma;<sub>p</sub>)</span> = PRIOR<sub>&theta;</sub>(<span class="xq">x</span>), &nbsp; <span class="pq">p<sub>&theta;</sub>(z|x)</span> = 𝒩(&mu;<sub>p</sub>, diag(&sigma;<sub>p</sub><sup>2</sup>))</div>
+      <div><span class="step">2</span><span class="zq">z&#770;</span> = &mu;<sub>p</sub> + &sigma;<sub>p</sub> ⊙ &epsilon;, &nbsp; &epsilon; ~ 𝒩(0,I) <span class="aside">(sampling)</span></div>
+      <div><span class="step">3</span><span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> = DEC<sub>&theta;</sub>(<span class="xq">x</span>, <span class="zq">z&#770;</span>)</div>
+      <div><span class="step">4</span><span class="dq">ŷ</span> ~ <span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> <span class="aside">(sampling)</span></div>
+    </div>
+  </div>
 </div>
 
 <script>
 (function () {
   'use strict';
 
-  var SPEED = 14.6, MIN_W = 6, MAX_W = 18, FADE = 1.4;
+  // Scheduling model:
+  // - a node may process only after all required inputs arrive;
+  // - an output leaves exactly after that node's standard processing time;
+  // - every disc leaves its source immediately when the source is ready;
+  // - incoming edge speeds are solved so all inputs to a node arrive together.
+  // Thus there are no mid-edge waits and no arbitrary timing groups.
+  var DAG_END = 84;       // % of the cycle when the sampled output has arrived
+  var BASE_SPEED = 1.0;   // raw SVG px per schedule unit
+  var FADE_IN = 0.75;     // cycle-percentage visual fade-in only
   var DIM = 'rgba(255,255,255,0.09)';
 
+  // Processing times are in the same raw units as SVG path lengths.
+  var DWELL = {
+    prior:   82,
+    recog:   82,
+    z_hat:   30,
+    decoder: 82,
+    y_hat:   24
+  };
+
+  var FILL_PEAK = {
+    prior:0.46, recog:0.46, z_hat:0.52, decoder:0.48, y_hat:0.54
+  };
+
   var EDGES = [
-    { id:'e-x-prior', grp:1, dot:'#7F77DD', mode:'both',  live:'rgba(255,255,255,0.3)',  lw:1,   early:true },
-    { id:'e-x-recog', grp:1, dot:'#c8cdd8', mode:'train', live:'rgba(255,255,255,0.3)',  lw:1,   early:true },
-    { id:'e-y-recog', grp:1, dot:'#1D9E75', mode:'train', live:'#1D9E75',                lw:1.3, early:true },
-    { id:'e-recog-z', grp:2, dot:'#aa701e', mode:'train', live:'#1D9E75',                lw:1.3 },
-    { id:'e-prior-z', grp:2, dot:'#aa701e', mode:'infer', live:'#7F77DD',                lw:1.3 },
-    { id:'e-x-gen',   grp:3, dot:'#e8824a', mode:'both',  live:'rgba(255,255,255,0.18)', lw:1, early:true },
-    { id:'e-z-gen',   grp:3, dot:'#aa701e', mode:'both',  live:'rgba(255,255,255,0.3)',  lw:1   },
-    { id:'e-gen-yh',  grp:4, dot:'#378ADD', mode:'both',  live:'rgba(255,255,255,0.3)',  lw:1   }
+    { id:'e-x-prior', from:'x',       to:'prior',   dot:'#e8824a', mode:'both',  live:'rgba(255,255,255,0.28)', lw:1.0 },
+    { id:'e-x-recog', from:'x',       to:'recog',   dot:'#e8824a', mode:'train', live:'rgba(255,255,255,0.28)', lw:1.0 },
+    { id:'e-y-recog', from:'y',       to:'recog',   dot:'#1D9E75', mode:'train', live:'#1D9E75',                lw:1.2 },
+    { id:'e-prior-z', from:'prior',   to:'z_hat',   dot:'#aa701e', mode:'infer', live:'#7F77DD',                lw:1.2 },
+    { id:'e-recog-z', from:'recog',   to:'z_hat',   dot:'#aa701e', mode:'train', live:'#1D9E75',                lw:1.2 },
+    { id:'e-x-dec',   from:'x',       to:'decoder', dot:'#e8824a', mode:'both',  live:'rgba(232,130,74,0.35)', lw:1.0 },
+    { id:'e-z-dec',   from:'z_hat',   to:'decoder', dot:'#aa701e', mode:'both',  live:'rgba(170,112,30,0.65)', lw:1.2 },
+    { id:'e-dec-yh',  from:'decoder', to:'y_hat',   dot:'#378ADD', mode:'both',  live:'#378ADD',                lw:1.2 }
   ];
 
-  var GROUP_END = { 1:16, 2:40, 3:66, 4:88 };
+  var SOURCES = ['x', 'y'];
+  var SINK = 'y_hat';
 
-  var svg      = document.getElementById('cvae-svg');
+  var svg = document.getElementById('cvae-svg');
   var dotLayer = document.getElementById('dots');
-  var kf       = document.createElement('style');
+  var kf = document.createElement('style');
   document.head.appendChild(kf);
-
   var SVG_NS = 'http://www.w3.org/2000/svg';
   var mode = 'train';
+  var animatedEls = [];
+  var currentRate = 1;
 
   function active(e) { return e.mode === 'both' || e.mode === mode; }
 
@@ -216,108 +344,223 @@
     else el.setAttribute('stroke-dasharray', '4,3');
   }
 
-  function styleNodes() {
+  function setStaticModeStyling() {
     var train = mode === 'train';
+    var ids = ['base-recog','name-recog','label-recog','bell-recog','node-y','label-y'];
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (el.tagName === 'text') el.setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.15)');
+      else if (el.tagName === 'path') {
+        el.setAttribute('stroke', train ? '#1D9E75' : DIM);
+        el.setAttribute('fill', train ? 'rgba(29,158,117,0.12)' : 'none');
+      } else {
+        el.setAttribute('stroke', train ? '#1D9E75' : 'rgba(255,255,255,0.12)');
+      }
+    });
 
-    var box = document.getElementById('box-recog');
-    box.setAttribute('stroke', train ? '#1D9E75' : DIM);
-    box.setAttribute('stroke-width', train ? 1.3 : 1);
-    document.getElementById('label-recog').setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.16)');
+    document.getElementById('sampling-prior').setAttribute('opacity', train ? '0.18' : '1');
+    document.getElementById('sampling-recog').setAttribute('opacity', train ? '1' : '0.18');
+    document.getElementById('sampling-output').setAttribute('opacity', '1');
 
-    var bell = document.getElementById('bell-recog');
-    bell.setAttribute('stroke', train ? '#1D9E75' : DIM);
-    bell.setAttribute('fill', train ? 'rgba(29,158,117,0.13)' : 'none');
+    document.getElementById('eq-train').hidden = !train;
+    document.getElementById('eq-infer').hidden = train;
 
-    var ny = document.getElementById('node-y');
-    ny.setAttribute('stroke', train ? '#1D9E75' : 'rgba(255,255,255,0.12)');
-    ny.setAttribute('stroke-width', train ? 1.4 : 1);
-    document.getElementById('label-y').setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.16)');
-
-    document.getElementById('kl-link').setAttribute('stroke', train ? '#1D9E75' : DIM);
-    document.getElementById('kl-label').setAttribute('fill', train ? '#1D9E75' : 'rgba(255,255,255,0.16)');
+    document.getElementById('btn-train').classList.toggle('active', train);
+    document.getElementById('btn-infer').classList.toggle('active', !train);
   }
 
-  function buildDots() {
+  function clearAnimations() {
+    animatedEls.forEach(function (el) {
+      el.style.animationName = 'none';
+      if (el.classList && (el.classList.contains('node-glow') || el.classList.contains('node-impact'))) {
+        el.setAttribute('opacity', '0');
+      }
+    });
+    animatedEls = [];
     while (dotLayer.firstChild) dotLayer.removeChild(dotLayer.firstChild);
+    document.getElementById('kl-link').style.animationName = 'none';
+    document.getElementById('kl-label').style.animationName = 'none';
+  }
+
+  function buildSchedule() {
+    clearAnimations();
+    EDGES.forEach(styleEdge);
+    setStaticModeStyling();
 
     var live = [];
     EDGES.forEach(function (e) {
       if (!active(e)) return;
       var el = document.getElementById(e.id);
       if (!el) return;
-      live.push({ cfg: e, d: el.getAttribute('d'), len: el.getTotalLength() });
+      live.push({ cfg:e, d:el.getAttribute('d'), len:el.getTotalLength() });
     });
 
-    var byGroup = {};
+    var arrive = {}, ready = {};
+    SOURCES.forEach(function (n) { arrive[n] = 0; ready[n] = 0; });
     live.forEach(function (o) {
-      var g = o.cfg.grp;
-      (byGroup[g] = byGroup[g] || []).push(o);
+      if (!(o.cfg.from in arrive)) { arrive[o.cfg.from] = 0; ready[o.cfg.from] = 0; }
+      if (!(o.cfg.to in arrive))   { arrive[o.cfg.to] = 0; ready[o.cfg.to] = 0; }
     });
+
+    // Longest-path relaxation at the reference speed. A_v is the latest
+    // "leave immediately + travel at normal speed" arrival among dependencies.
+    // That A_v becomes the common deadline for every incoming edge.
+    for (var pass = 0; pass < live.length + 3; pass++) {
+      live.forEach(function (o) {
+        var candidate = ready[o.cfg.from] + o.len / BASE_SPEED;
+        if (candidate > arrive[o.cfg.to]) {
+          arrive[o.cfg.to] = candidate;
+          ready[o.cfg.to] = candidate + (DWELL[o.cfg.to] || 0);
+        }
+      });
+    }
+    SOURCES.forEach(function (n) { arrive[n] = 0; ready[n] = 0; });
+
+    // Scale the entire schedule into the animation cycle without altering any
+    // dependency relationship or relative processing/travel duration.
+    var scale = DAG_END / (ready[SINK] || 1);
+    Object.keys(arrive).forEach(function (n) { arrive[n] *= scale; });
+    Object.keys(ready).forEach(function (n) { ready[n] *= scale; });
 
     var rules = [];
-    Object.keys(byGroup).forEach(function (g) {
-      var items = byGroup[g];
-      var end = GROUP_END[g];
-      var paced = items.filter(function (o) { return !o.cfg.early; });
-      if (!paced.length) paced = items;
-      var maxLen = paced.reduce(function (m, o) { return Math.max(m, o.len); }, 1);
+    var prefix = 'cvae-' + mode + '-';
 
-      var w = maxLen / SPEED;
-      if (w < MIN_W) w = MIN_W;
-      if (w > MAX_W) w = MAX_W;
-      if (w > end) w = end;
+    // Each edge starts the instant its source is ready and reaches exactly the
+    // destination's common arrival time. Thus v = L / (A_v - R_u).
+    live.forEach(function (o, i) {
+      var start = ready[o.cfg.from];
+      var end = arrive[o.cfg.to];
+      var name = prefix + 'flow-' + i;
+      var fadeIn = Math.min(start + FADE_IN, end - 0.18);
+      var contact = Math.max(end - 0.04, fadeIn);
 
-      items.forEach(function (o, i) {
-        var start = o.cfg.early ? 0 : end - w * (o.len / maxLen);
-        if (start < 0) start = 0;
-        var name = 'flow-' + g + '-' + i;
-        var fadeIn = Math.min(start + FADE, end - 0.5);
-        var hold   = Math.max(end - 1, fadeIn);
+      rules.push(
+        '@keyframes ' + name + '{' +
+        '0%,' + start.toFixed(3) + '%{offset-distance:0%;opacity:0}' +
+        fadeIn.toFixed(3) + '%{opacity:1}' +
+        contact.toFixed(3) + '%{opacity:1}' +
+        end.toFixed(3) + '%,100%{offset-distance:100%;opacity:0}}'
+      );
 
-        rules.push(
-          '@keyframes ' + name + '{' +
-          '0%,' + start.toFixed(2) + '%{offset-distance:0%;opacity:0}' +
-          fadeIn.toFixed(2) + '%{opacity:1}' +
-          hold.toFixed(2) + '%{opacity:1}' +
-          end.toFixed(2) + '%,100%{offset-distance:100%;opacity:0}}'
-        );
-
-        var dot = document.createElementNS(SVG_NS, 'circle');
-        dot.setAttribute('class', 'flow-dot');
-        dot.setAttribute('r', o.cfg.grp === 2 ? 4.5 : 4);
-        dot.setAttribute('fill', o.cfg.dot);
-        dot.style.offsetPath = "path('" + o.d + "')";
-        dot.style.animationName = name;
-        dotLayer.appendChild(dot);
-      });
+      var dot = document.createElementNS(SVG_NS, 'circle');
+      dot.setAttribute('class', 'flow-dot');
+      dot.setAttribute('r', (o.cfg.to === 'z_hat' || o.cfg.to === 'y_hat') ? 4.5 : 4.2);
+      dot.setAttribute('fill', o.cfg.dot);
+      dot.style.offsetPath = "path('" + o.d + "')";
+      dot.style.animationName = name;
+      dotLayer.appendChild(dot);
+      animatedEls.push(dot);
     });
 
-    var link = document.getElementById('kl-link');
+    // Same node-response language as the GRU: crisp boundary strike, rapid
+    // interior ignition, then one continuous fade through processing and a
+    // short cooldown tail. No flat sustain plateau.
+    Object.keys(DWELL).forEach(function (n) {
+      if (!(n in arrive)) return;
+      var fill = document.getElementById('glow-' + n);
+      var impact = document.getElementById('impact-' + n);
+      if (!fill && !impact) return;
+
+      var a = arrive[n], r = ready[n], d = Math.max(r - a, 0.2);
+      var peak = FILL_PEAK[n] || 0.46;
+      var cool1 = Math.min(r + 0.20 * d, 98.8);
+      var cool2 = Math.min(r + 0.42 * d, 99.2);
+      var off   = Math.min(r + 0.66 * d, 99.55);
+
+      if (impact) {
+        var hit = a + 0.04 * d;
+        var recoil = a + 0.16 * d;
+        var impactName = prefix + 'impact-' + n;
+        rules.push(
+          '@keyframes ' + impactName + '{' +
+          '0%,' + a.toFixed(3) + '%{opacity:0;stroke-width:1.1}' +
+          hit.toFixed(3) + '%{opacity:0.95;stroke-width:2.25}' +
+          recoil.toFixed(3) + '%{opacity:0;stroke-width:1.1}' +
+          '100%{opacity:0;stroke-width:1.1}}'
+        );
+        impact.style.animationName = impactName;
+        animatedEls.push(impact);
+      }
+
+      if (fill) {
+        var fillStart = a + 0.030 * d;
+        var fillPeak = a + 0.105 * d;
+        var mid1 = a + 0.40 * d;
+        var mid2 = a + 0.70 * d;
+        var fillName = prefix + 'glow-' + n;
+        rules.push(
+          '@keyframes ' + fillName + '{' +
+          '0%,' + fillStart.toFixed(3) + '%{opacity:0}' +
+          fillPeak.toFixed(3) + '%{opacity:' + peak.toFixed(3) + '}' +
+          mid1.toFixed(3) + '%{opacity:' + (peak * 0.76).toFixed(3) + '}' +
+          mid2.toFixed(3) + '%{opacity:' + (peak * 0.53).toFixed(3) + '}' +
+          r.toFixed(3) + '%{opacity:' + (peak * 0.34).toFixed(3) + '}' +
+          cool1.toFixed(3) + '%{opacity:' + (peak * 0.21).toFixed(3) + '}' +
+          cool2.toFixed(3) + '%{opacity:' + (peak * 0.09).toFixed(3) + '}' +
+          off.toFixed(3) + '%,100%{opacity:0}}'
+        );
+        fill.style.animationName = fillName;
+        animatedEls.push(fill);
+      }
+    });
+
+    // KL is not part of the sampling path. During training it becomes available
+    // once both q_phi and p_theta are ready, and is shown as a restrained pulse.
+    var klLink = document.getElementById('kl-link');
+    var klLabel = document.getElementById('kl-label');
     if (mode === 'train') {
-      rules.push('@keyframes kl-pulse{0%,18%{stroke-opacity:0.3}26%{stroke-opacity:1}34%{stroke-opacity:1}42%,100%{stroke-opacity:0.3}}');
-      kf.textContent = rules.join('\n');
-      link.style.animation = 'none';
-      void svg.getBoundingClientRect();
-      link.style.animation = 'kl-pulse 7s linear infinite';
+      var klAt = Math.max(ready.prior || 0, ready.recog || 0);
+      var klPeak = Math.min(klAt + 2.0, 96);
+      var klOff = Math.min(klAt + 8.0, 99);
+      var klName = prefix + 'kl';
+      rules.push(
+        '@keyframes ' + klName + '{' +
+        '0%,' + klAt.toFixed(3) + '%{opacity:0.22}' +
+        klPeak.toFixed(3) + '%{opacity:1}' +
+        klOff.toFixed(3) + '%,100%{opacity:0.22}}'
+      );
+      klLink.style.animationName = klName;
+      klLabel.style.animationName = klName;
+      animatedEls.push(klLink, klLabel);
     } else {
-      kf.textContent = rules.join('\n');
-      link.style.animation = 'none';
+      klLink.setAttribute('opacity', '0.10');
+      klLabel.setAttribute('opacity', '0.15');
     }
+
+    kf.textContent = rules.join('\n');
+
+    // Force the newly assigned animation names to instantiate together.
+    void svg.getBoundingClientRect();
+    applyRate();
+  }
+
+  var RANGE = 2.8;
+  var slider = document.getElementById('speed');
+  var readout = document.getElementById('speed-val');
+
+  function applyRate() {
+    currentRate = Math.pow(RANGE, (slider.value - 50) / 50);
+    animatedEls.forEach(function (el) {
+      if (!el.getAnimations) return;
+      el.getAnimations().forEach(function (a) {
+        if (a.updatePlaybackRate) a.updatePlaybackRate(currentRate);
+        else a.playbackRate = currentRate;
+      });
+    });
+    readout.textContent = currentRate.toFixed(1) + '\u00d7';
   }
 
   function setMode(m) {
     mode = m;
-    EDGES.forEach(styleEdge);
-    styleNodes();
-    buildDots();
-    document.getElementById('btn-train').classList.toggle('active', m === 'train');
-    document.getElementById('btn-infer').classList.toggle('active', m === 'infer');
+    buildSchedule();
   }
 
+  slider.addEventListener('input', applyRate);
   document.getElementById('btn-train').addEventListener('click', function () { setMode('train'); });
   document.getElementById('btn-infer').addEventListener('click', function () { setMode('infer'); });
 
-  setMode('train');
+  buildSchedule();
 })();
 </script>
 

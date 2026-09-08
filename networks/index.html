@@ -111,33 +111,48 @@
   .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
   .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
   .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
-
-  @keyframes gru-x{0%,100%{fill:#1e2230}2%,12%{fill:#e8824a}}
-  @keyframes gru-hp{0%,100%{fill:#1e2230}2%,12%{fill:#7F77DD}}
-  @keyframes gru-r{0%,100%{fill-opacity:0}18%,32%{fill-opacity:0.35}}
-  @keyframes gru-z{0%,100%{fill-opacity:0}18%,32%{fill-opacity:0.35}}
-  @keyframes gru-hc{0%,100%{fill-opacity:0}38%,52%{fill-opacity:0.35}}
-  @keyframes gru-o1{0%,100%{fill:#1e2230}58%,70%{fill:#7F77DD}}
-  @keyframes gru-o2{0%,100%{fill:#1e2230}58%,70%{fill:#aa701e}}
-  @keyframes gru-plus{0%,100%{fill:#1e2230}76%,86%{fill:#7F77DD}}
-  @keyframes gru-ht{0%,100%{fill:#1e2230}88%,98%{fill:#7F77DD}}
-  @keyframes gru-hw{0%,100%{stroke-opacity:0.18}40%,64%{stroke-opacity:0.7}}
-  @keyframes gru-d1{0%,36%{offset-distance:0%;opacity:0}40%{opacity:1}54%{opacity:1}58%,100%{offset-distance:100%;opacity:0}}
-  @keyframes gru-d2{0%,48%{offset-distance:0%;opacity:0}52%{opacity:1}64%{opacity:1}68%,100%{offset-distance:100%;opacity:0}}
-  .gru-x{animation:gru-x 5s ease-in-out infinite}
-  .gru-hp{animation:gru-hp 5s ease-in-out infinite}
-  .gru-r{animation:gru-r 5s ease-in-out infinite}
-  .gru-z{animation:gru-z 5s ease-in-out infinite}
-  .gru-hc{animation:gru-hc 5s ease-in-out infinite}
-  .gru-o1{animation:gru-o1 5s ease-in-out infinite}
-  .gru-o2{animation:gru-o2 5s ease-in-out infinite}
-  .gru-plus{animation:gru-plus 5s ease-in-out infinite}
-  .gru-ht{animation:gru-ht 5s ease-in-out infinite}
-  .gru-hw{animation:gru-hw 5s ease-in-out infinite}
-  .gru-d1{offset-rotate:0deg;animation:gru-d1 5s linear infinite}
-  .gru-d2{offset-rotate:0deg;animation:gru-d2 5s linear infinite}
-
-  @keyframes attn-c1{0%,100%{opacity:0.08}50%{opacity:0.7}}
+    /* GRU miniature — mirrors the full computation-graph animation. */
+    @keyframes gru-mini-gate-fill{0%,15.8%{opacity:0}17.3%{opacity:.48}24%{opacity:.34}31%{opacity:.18}37%{opacity:.07}43%,100%{opacity:0}}
+    @keyframes gru-mini-gate-hit{0%,15.8%{opacity:0;stroke-width:1}16.5%{opacity:.95;stroke-width:2.1}18.5%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-orh-fill{0%,35.8%{opacity:0}37.2%{opacity:.52}41%{opacity:.34}45%{opacity:.16}50%,100%{opacity:0}}
+    @keyframes gru-mini-orh-hit{0%,35.8%{opacity:0;stroke-width:1}36.5%{opacity:.95;stroke-width:2}38.2%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-o1-fill{0%,47.8%{opacity:0}49.0%{opacity:.48}53%{opacity:.28}58%{opacity:.12}63%,100%{opacity:0}}
+    @keyframes gru-mini-o1-hit{0%,47.8%{opacity:0;stroke-width:1}48.5%{opacity:.95;stroke-width:2}50.2%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-cand-fill{0%,48.8%{opacity:0}50.2%{opacity:.50}55%{opacity:.34}61%{opacity:.17}68%,100%{opacity:0}}
+    @keyframes gru-mini-cand-hit{0%,48.8%{opacity:0;stroke-width:1}49.5%{opacity:.95;stroke-width:2}51.3%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-o2-fill{0%,65.8%{opacity:0}67.0%{opacity:.48}71%{opacity:.28}76%{opacity:.12}81%,100%{opacity:0}}
+    @keyframes gru-mini-o2-hit{0%,65.8%{opacity:0;stroke-width:1}66.5%{opacity:.95;stroke-width:2}68.2%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-plus-fill{0%,78.8%{opacity:0}80.0%{opacity:.50}83%{opacity:.30}87%{opacity:.13}91%,100%{opacity:0}}
+    @keyframes gru-mini-plus-hit{0%,78.8%{opacity:0;stroke-width:1}79.5%{opacity:.95;stroke-width:2}81.2%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-ht-fill{0%,89.6%{opacity:0}90.8%{opacity:.54}93%{opacity:.34}96%{opacity:.16}99.2%,100%{opacity:0}}
+    @keyframes gru-mini-ht-hit{0%,89.6%{opacity:0;stroke-width:1}90.2%{opacity:.95;stroke-width:2.1}92%,100%{opacity:0;stroke-width:1}}
+    @keyframes gru-mini-f0{0%{offset-distance:0%;opacity:0}1%{opacity:1}15.9%{offset-distance:100%;opacity:1}16%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f1{0%{offset-distance:0%;opacity:0}1%{opacity:1}35.9%{offset-distance:100%;opacity:1}36%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f2{0%,29.9%{offset-distance:0%;opacity:0}30.3%{opacity:1}35.9%{offset-distance:100%;opacity:1}36%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f3{0%,42.9%{offset-distance:0%;opacity:0}43.3%{opacity:1}48.9%{offset-distance:100%;opacity:1}49%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f4{0%,29.9%{offset-distance:0%;opacity:0}30.3%{opacity:1}47.9%{offset-distance:100%;opacity:1}48%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f5{0%,29.9%{offset-distance:0%;opacity:0}30.3%{opacity:1}65.9%{offset-distance:100%;opacity:1}66%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f6{0%,61.9%{offset-distance:0%;opacity:0}62.3%{opacity:1}65.9%{offset-distance:100%;opacity:1}66%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f7{0%,53.9%{offset-distance:0%;opacity:0}54.3%{opacity:1}78.9%{offset-distance:100%;opacity:1}79%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f8{0%,71.9%{offset-distance:0%;opacity:0}72.3%{opacity:1}78.9%{offset-distance:100%;opacity:1}79%,100%{offset-distance:100%;opacity:0}}
+    @keyframes gru-mini-f9{0%,84.9%{offset-distance:0%;opacity:0}85.3%{opacity:1}89.9%{offset-distance:100%;opacity:1}90%,100%{offset-distance:100%;opacity:0}}
+    .gru-mini-gate-fill{animation:gru-mini-gate-fill 6.6s linear infinite}
+    .gru-mini-gate-hit{animation:gru-mini-gate-hit 6.6s linear infinite}
+    .gru-mini-orh-fill{animation:gru-mini-orh-fill 6.6s linear infinite}
+    .gru-mini-orh-hit{animation:gru-mini-orh-hit 6.6s linear infinite}
+    .gru-mini-o1-fill{animation:gru-mini-o1-fill 6.6s linear infinite}
+    .gru-mini-o1-hit{animation:gru-mini-o1-hit 6.6s linear infinite}
+    .gru-mini-cand-fill{animation:gru-mini-cand-fill 6.6s linear infinite}
+    .gru-mini-cand-hit{animation:gru-mini-cand-hit 6.6s linear infinite}
+    .gru-mini-o2-fill{animation:gru-mini-o2-fill 6.6s linear infinite}
+    .gru-mini-o2-hit{animation:gru-mini-o2-hit 6.6s linear infinite}
+    .gru-mini-plus-fill{animation:gru-mini-plus-fill 6.6s linear infinite}
+    .gru-mini-plus-hit{animation:gru-mini-plus-hit 6.6s linear infinite}
+    .gru-mini-ht-fill{animation:gru-mini-ht-fill 6.6s linear infinite}
+    .gru-mini-ht-hit{animation:gru-mini-ht-hit 6.6s linear infinite}
+    .gru-mini-dot{offset-rotate:0deg;animation-duration:6.6s;animation-timing-function:linear;animation-iteration-count:infinite;animation-fill-mode:both}
+    .gru-mini-f0{animation-name:gru-mini-f0}.gru-mini-f1{animation-name:gru-mini-f1}.gru-mini-f2{animation-name:gru-mini-f2}.gru-mini-f3{animation-name:gru-mini-f3}.gru-mini-f4{animation-name:gru-mini-f4}.gru-mini-f5{animation-name:gru-mini-f5}.gru-mini-f6{animation-name:gru-mini-f6}.gru-mini-f7{animation-name:gru-mini-f7}.gru-mini-f8{animation-name:gru-mini-f8}.gru-mini-f9{animation-name:gru-mini-f9}
+@keyframes attn-c1{0%,100%{opacity:0.08}50%{opacity:0.7}}
   @keyframes attn-c2{0%,100%{opacity:0.08}30%,80%{opacity:0.42}}
   @keyframes attn-c3{0%,100%{opacity:0.08}65%{opacity:0.85}}
   @keyframes attn-f{0%,100%{opacity:0.05}40%,70%{opacity:0.35}}
@@ -145,25 +160,32 @@
   .ac2{animation:attn-c2 4s ease-in-out infinite}
   .ac3{animation:attn-c3 4s ease-in-out infinite}
   .af{animation:attn-f   4s ease-in-out infinite}
-
-  @keyframes cvae-x{0%,100%{fill:#1e2230}4%,16%{fill:#e8824a}}
-  @keyframes cvae-y{0%,100%{fill:#1e2230}6%,18%{fill:#1D9E75}}
-  @keyframes cvae-pri{0%,100%{fill-opacity:0.06}22%,38%{fill-opacity:0.3}}
-  @keyframes cvae-pos{0%,100%{fill-opacity:0.06}22%,40%{fill-opacity:0.5}}
-  @keyframes cvae-kl{0%,100%{stroke-opacity:0.15}26%,42%{stroke-opacity:0.85}}
-  @keyframes cvae-z{0%,100%{fill:#1e2230}50%,64%{fill:#aa701e}}
-  @keyframes cvae-yh{0%,100%{fill:#1e2230}72%,86%{fill:#378ADD}}
-  @keyframes cvae-d1{0%,36%{offset-distance:0%;opacity:0}40%{opacity:1}50%{opacity:1}53%,100%{offset-distance:100%;opacity:0}}
-  @keyframes cvae-d2{0%,60%{offset-distance:0%;opacity:0}64%{opacity:1}72%{opacity:1}75%,100%{offset-distance:100%;opacity:0}}
-  .cvae-x{animation:cvae-x 5s ease-in-out infinite}
-  .cvae-y{animation:cvae-y 5s ease-in-out infinite}
-  .cvae-pri{animation:cvae-pri 5s ease-in-out infinite}
-  .cvae-pos{animation:cvae-pos 5s ease-in-out infinite}
-  .cvae-kl{animation:cvae-kl 5s ease-in-out infinite}
-  .cvae-z{animation:cvae-z 5s ease-in-out infinite}
-  .cvae-yh{animation:cvae-yh 5s ease-in-out infinite}
-  .cvae-d1{offset-rotate:0deg;animation:cvae-d1 5s linear infinite}
-  .cvae-d2{offset-rotate:0deg;animation:cvae-d2 5s linear infinite}
+    /* CVAE miniature — training path with the same dependency-timed visual grammar. */
+    @keyframes cvae-mini-box-fill{0%,17.8%{opacity:0}19.2%{opacity:.46}24%{opacity:.34}30%{opacity:.20}36%{opacity:.09}42%,100%{opacity:0}}
+    @keyframes cvae-mini-box-hit{0%,17.8%{opacity:0;stroke-width:1}18.5%{opacity:.95;stroke-width:2.1}20.5%,100%{opacity:0;stroke-width:1}}
+    @keyframes cvae-mini-z-fill{0%,45.8%{opacity:0}47.0%{opacity:.52}50%{opacity:.33}54%{opacity:.15}58%,100%{opacity:0}}
+    @keyframes cvae-mini-z-hit{0%,45.8%{opacity:0;stroke-width:1}46.5%{opacity:.95;stroke-width:2}48.2%,100%{opacity:0;stroke-width:1}}
+    @keyframes cvae-mini-dec-fill{0%,59.8%{opacity:0}61.2%{opacity:.48}66%{opacity:.34}71%{opacity:.20}77%{opacity:.10}82%,100%{opacity:0}}
+    @keyframes cvae-mini-dec-hit{0%,59.8%{opacity:0;stroke-width:1}60.5%{opacity:.95;stroke-width:2.1}62.5%,100%{opacity:0;stroke-width:1}}
+    @keyframes cvae-mini-yh-fill{0%,85.8%{opacity:0}87%{opacity:.54}90%{opacity:.34}94%{opacity:.15}98.5%,100%{opacity:0}}
+    @keyframes cvae-mini-yh-hit{0%,85.8%{opacity:0;stroke-width:1}86.5%{opacity:.95;stroke-width:2}88%,100%{opacity:0;stroke-width:1}}
+    @keyframes cvae-mini-kl{0%,33.5%{opacity:.22}36%{opacity:1}44%,100%{opacity:.22}}
+    @keyframes cvae-mini-f0{0%{offset-distance:0%;opacity:0}1%{opacity:1}17.9%{offset-distance:100%;opacity:1}18%,100%{offset-distance:100%;opacity:0}}
+    @keyframes cvae-mini-f1{0%{offset-distance:0%;opacity:0}1%{opacity:1}59.9%{offset-distance:100%;opacity:1}60%,100%{offset-distance:100%;opacity:0}}
+    @keyframes cvae-mini-f2{0%,33.9%{offset-distance:0%;opacity:0}34.3%{opacity:1}45.9%{offset-distance:100%;opacity:1}46%,100%{offset-distance:100%;opacity:0}}
+    @keyframes cvae-mini-f3{0%,49.9%{offset-distance:0%;opacity:0}50.3%{opacity:1}59.9%{offset-distance:100%;opacity:1}60%,100%{offset-distance:100%;opacity:0}}
+    @keyframes cvae-mini-f4{0%,75.9%{offset-distance:0%;opacity:0}76.3%{opacity:1}85.9%{offset-distance:100%;opacity:1}86%,100%{offset-distance:100%;opacity:0}}
+    .cvae-mini-box-fill{animation:cvae-mini-box-fill 7.2s linear infinite}
+    .cvae-mini-box-hit{animation:cvae-mini-box-hit 7.2s linear infinite}
+    .cvae-mini-z-fill{animation:cvae-mini-z-fill 7.2s linear infinite}
+    .cvae-mini-z-hit{animation:cvae-mini-z-hit 7.2s linear infinite}
+    .cvae-mini-dec-fill{animation:cvae-mini-dec-fill 7.2s linear infinite}
+    .cvae-mini-dec-hit{animation:cvae-mini-dec-hit 7.2s linear infinite}
+    .cvae-mini-yh-fill{animation:cvae-mini-yh-fill 7.2s linear infinite}
+    .cvae-mini-yh-hit{animation:cvae-mini-yh-hit 7.2s linear infinite}
+    .cvae-mini-kl{animation:cvae-mini-kl 7.2s linear infinite}
+    .cvae-mini-dot{offset-rotate:0deg;animation-duration:7.2s;animation-timing-function:linear;animation-iteration-count:infinite;animation-fill-mode:both}
+    .cvae-mini-f0{animation-name:cvae-mini-f0}.cvae-mini-f1{animation-name:cvae-mini-f1}.cvae-mini-f2{animation-name:cvae-mini-f2}.cvae-mini-f3{animation-name:cvae-mini-f3}.cvae-mini-f4{animation-name:cvae-mini-f4}
 </style>
 </head>
 <body>
@@ -256,49 +278,61 @@
 
   <!-- GRU -->
   <a class="card" href="/networks/gru.html">
-    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-      <rect width="200" height="120" fill="#0d0f14"/>
-      <path class="gru-hw" d="M 27.0,24.0 L 114.0,24.0" fill="none" stroke="#7F77DD" stroke-width="1.10"/>
-      <path d="M 24.0,32.0 C 30.0,55.0 38.0,72.0 44.0,82.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
-      <path d="M 26.0,30.0 C 34.0,40.0 40.0,48.0 44.0,53.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
-      <path d="M 26.0,92.0 C 32.0,90.0 38.0,88.0 44.0,87.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
-      <path d="M 25.0,89.0 C 32.0,78.0 38.0,68.0 44.0,62.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
-      <path d="M 70.0,88.0 L 88.0,88.0" fill="none" stroke="#378ADD" stroke-width="0.80"/>
-      <path d="M 26.0,101.0 C 55.0,112.0 80.0,100.0 92.0,94.0" fill="none" stroke="rgba(232,130,74,0.4)" stroke-width="0.70"/>
-      <path d="M 66.0,50.0 C 88.0,40.0 104.0,30.0 114.0,27.0" fill="none" stroke="#1D9E75" stroke-width="0.80"/>
-      <path d="M 70.0,62.0 C 100.0,62.0 128.0,60.0 138.0,59.0" fill="none" stroke="#1D9E75" stroke-width="0.80"/>
-      <path d="M 120.0,86.0 C 134.0,78.0 141.0,70.0 143.0,66.0" fill="none" stroke="#aa701e" stroke-width="0.80"/>
-      <path d="M 130.0,24.0 L 162.0,24.0" fill="none" stroke="rgba(127,119,221,0.45)" stroke-width="0.90"/>
-      <path d="M 152.0,52.0 C 163.0,42.0 168.0,33.0 169.0,32.0" fill="none" stroke="rgba(127,119,221,0.45)" stroke-width="0.90"/>
-      <path d="M 178.0,24.0 L 182.0,24.0" fill="none" stroke="rgba(127,119,221,0.45)" stroke-width="0.90"/>
-      <circle class="gru-hp" cx="18.0" cy="24.0" r="9.0" stroke="#7F77DD" stroke-width="1.00"/>
-      <text x="18.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#7F77DD">h</text>
-      <circle class="gru-x" cx="18.0" cy="96.0" r="9.0" stroke="#e8824a" stroke-width="1.00"/>
-      <text x="18.0" y="96.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#e8824a">x</text>
-      <rect class="gru-z" x="44.0" y="50.0" width="26.0" height="16.0" rx="3.0" fill="#1D9E75" stroke="#1D9E75" stroke-width="0.90"/>
-      <text x="57.0" y="58.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#1D9E75">z</text>
-      <rect class="gru-r" x="44.0" y="80.0" width="26.0" height="16.0" rx="3.0" fill="#378ADD" stroke="#378ADD" stroke-width="0.90"/>
-      <text x="57.0" y="88.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#378ADD">r</text>
-      <rect class="gru-hc" x="90.0" y="80.0" width="30.0" height="16.0" rx="3.0" fill="#aa701e" stroke="#aa701e" stroke-width="0.90"/>
-      <text x="105.0" y="88.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#aa701e">h̃</text>
-      <circle class="gru-o1" cx="122.0" cy="24.0" r="8.0" stroke="rgba(255,255,255,0.28)" stroke-width="0.90"/>
-      <text x="122.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="rgba(255,255,255,0.55)">⊙</text>
-      <circle class="gru-o2" cx="146.0" cy="58.0" r="8.0" stroke="rgba(255,255,255,0.28)" stroke-width="0.90"/>
-      <text x="146.0" y="58.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="rgba(255,255,255,0.55)">⊙</text>
-      <circle class="gru-plus" cx="170.0" cy="24.0" r="8.0" stroke="rgba(255,255,255,0.28)" stroke-width="0.90"/>
-      <text x="170.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8.0" fill="rgba(255,255,255,0.55)">+</text>
-      <circle class="gru-ht" cx="190.0" cy="24.0" r="8.0" stroke="#7F77DD" stroke-width="1.00"/>
-      <text x="190.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6.5" fill="#7F77DD">hₜ</text>
-      <text x="92.0" y="40.0" text-anchor="middle" font-family="monospace" font-size="6.0" fill="#1D9E75">1−z</text>
-      <circle class="gru-d1" r="3.0" fill="#7F77DD" style="offset-path:path('M 27.0,24.0 L 114.0,24.0')"/>
-      <circle class="gru-d2" r="3.0" fill="#aa701e" style="offset-path:path('M 120.0,86.0 C 134.0,78.0 141.0,70.0 143.0,66.0')"/>
-    </svg>
+    <svg  viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+              <rect width="220" height="130" fill="#0d0f14"/>
+              <defs>
+                <radialGradient id="mini-gru-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#1D9E75"/><stop offset="58%" stop-color="#1D9E75" stop-opacity=".72"/><stop offset="100%" stop-color="#1D9E75" stop-opacity=".22"/></radialGradient>
+                <radialGradient id="mini-gru-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#378ADD"/><stop offset="58%" stop-color="#378ADD" stop-opacity=".72"/><stop offset="100%" stop-color="#378ADD" stop-opacity=".22"/></radialGradient>
+                <radialGradient id="mini-gru-c" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#aa701e"/><stop offset="58%" stop-color="#aa701e" stop-opacity=".72"/><stop offset="100%" stop-color="#aa701e" stop-opacity=".22"/></radialGradient>
+                <radialGradient id="mini-gru-s" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#7F77DD"/><stop offset="58%" stop-color="#7F77DD" stop-opacity=".72"/><stop offset="100%" stop-color="#7F77DD" stop-opacity=".22"/></radialGradient>
+              </defs>
+              <g fill="none">
+                <path d="M 23,40 L 158,40" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
+                <path d="M 22,36 C 31,31 40,27 48,27" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
+                <path d="M 20,90 C 30,69 40,45 48,35" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
+                <path d="M 21,46 C 31,65 40,83 48,91" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
+                <path d="M 22,98 C 31,98 40,97 48,96" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
+                <path d="M 80,95 L 98,95" stroke="#378ADD" stroke-width="1"/>
+                <path d="M 21,46 C 47,57 77,78 99,90" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
+                <path d="M 112,95 L 125,95" stroke="#378ADD" stroke-width="1"/>
+                <path d="M 23,101 C 61,123 104,118 125,103" stroke="rgba(232,130,74,.42)" stroke-width=".9"/>
+                <path d="M 80,27 C 111,18 143,27 159,36" stroke="#1D9E75" stroke-width="1"/>
+                <path d="M 80,35 C 111,47 145,62 159,70" stroke="#1D9E75" stroke-width="1"/>
+                <path d="M 159,94 C 165,90 167,85 166,82" stroke="#aa701e" stroke-width="1"/>
+                <path d="M 172,44 C 180,47 184,51 185,53" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
+                <path d="M 172,72 C 180,68 184,63 185,61" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
+                <path d="M 197,58 L 202,58" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
+                <path d="M 210,50 C 210,7 48,2 16,32" stroke="rgba(255,255,255,.12)" stroke-width=".8" stroke-dasharray="3,3"/>
+              </g>
+              <g font-family="'JetBrains Mono',monospace">
+                <circle cx="14" cy="40" r="9" fill="#1e2230" stroke="#7F77DD" stroke-width="1"/><text x="14" y="40" text-anchor="middle" dominant-baseline="middle" font-size="6.6" fill="#7F77DD">h<tspan font-size="4.6" dy="1.3">t−1</tspan></text>
+                <circle cx="14" cy="96" r="9" fill="#1e2230" stroke="#e8824a" stroke-width="1"/><text x="14" y="96" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#e8824a">x<tspan font-size="4.6" dy="1.3">t</tspan></text>
+                <rect x="48" y="20" width="32" height="20" rx="3" fill="none" stroke="#1D9E75"/><rect class="gru-mini-gate-fill" x="48" y="20" width="32" height="20" rx="3" fill="url(#mini-gru-z)" opacity="0"/><rect class="gru-mini-gate-hit" x="48" y="20" width="32" height="20" rx="3" fill="none" stroke="#1D9E75" opacity="0"/><text x="64" y="30" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#1D9E75">σ</text><text x="64" y="16" text-anchor="middle" font-size="5.3" fill="#1D9E75">z<tspan font-size="3.8" dy="1">t</tspan></text>
+                <rect x="48" y="85" width="32" height="20" rx="3" fill="none" stroke="#378ADD"/><rect class="gru-mini-gate-fill" x="48" y="85" width="32" height="20" rx="3" fill="url(#mini-gru-r)" opacity="0"/><rect class="gru-mini-gate-hit" x="48" y="85" width="32" height="20" rx="3" fill="none" stroke="#378ADD" opacity="0"/><text x="64" y="95" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#378ADD">σ</text><text x="64" y="112" text-anchor="middle" font-size="5.3" fill="#378ADD">r<tspan font-size="3.8" dy="1">t</tspan></text>
+                <circle cx="105" cy="95" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-orh-fill" cx="105" cy="95" r="7" fill="url(#mini-gru-r)" opacity="0"/><circle class="gru-mini-orh-hit" cx="105" cy="95" r="7" fill="none" stroke="#378ADD" opacity="0"/><text x="105" y="95" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#c8cdd8">⊙</text>
+                <rect x="125" y="85" width="34" height="20" rx="3" fill="none" stroke="#aa701e"/><rect class="gru-mini-cand-fill" x="125" y="85" width="34" height="20" rx="3" fill="url(#mini-gru-c)" opacity="0"/><rect class="gru-mini-cand-hit" x="125" y="85" width="34" height="20" rx="3" fill="none" stroke="#aa701e" opacity="0"/><text x="142" y="95" text-anchor="middle" dominant-baseline="middle" font-size="5.7" fill="#aa701e">tanh</text><text x="142" y="112" text-anchor="middle" font-size="5.2" fill="#aa701e">h̃<tspan font-size="3.7" dy="1">t</tspan></text>
+                <circle cx="165" cy="40" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-o1-fill" cx="165" cy="40" r="7" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-o1-hit" cx="165" cy="40" r="7" fill="none" stroke="#7F77DD" opacity="0"/><text x="165" y="40" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#c8cdd8">⊙</text>
+                <circle cx="165" cy="75" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-o2-fill" cx="165" cy="75" r="7" fill="url(#mini-gru-c)" opacity="0"/><circle class="gru-mini-o2-hit" cx="165" cy="75" r="7" fill="none" stroke="#aa701e" opacity="0"/><text x="165" y="75" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#c8cdd8">⊙</text>
+                <circle cx="190" cy="58" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-plus-fill" cx="190" cy="58" r="7" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-plus-hit" cx="190" cy="58" r="7" fill="none" stroke="#7F77DD" opacity="0"/><text x="190" y="58" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#c8cdd8">+</text>
+                <circle cx="210" cy="58" r="8" fill="#1e2230" stroke="#7F77DD"/><circle class="gru-mini-ht-fill" cx="210" cy="58" r="8" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-ht-hit" cx="210" cy="58" r="8" fill="none" stroke="#7F77DD" opacity="0"/><text x="210" y="58" text-anchor="middle" dominant-baseline="middle" font-size="5.8" fill="#7F77DD">h<tspan font-size="4" dy="1">t</tspan></text>
+                <text x="119" y="30" text-anchor="middle" font-size="4.8" fill="#1D9E75">1−z<tspan font-size="3.4" dy="1">t</tspan></text>
+              </g>
+              <g>
+                <circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#7F77DD" style="offset-path:path('M 22,36 C 31,31 40,27 48,27')"/><circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 20,90 C 30,69 40,45 48,35')"/>
+                <circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#7F77DD" style="offset-path:path('M 21,46 C 31,65 40,83 48,91')"/><circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 22,98 C 31,98 40,97 48,96')"/>
+                <circle class="gru-mini-dot gru-mini-f1" r="2.7" fill="#7F77DD" style="offset-path:path('M 21,46 C 47,57 77,78 99,90')"/><circle class="gru-mini-dot gru-mini-f2" r="2.7" fill="#378ADD" style="offset-path:path('M 80,95 L 98,95')"/>
+                <circle class="gru-mini-dot gru-mini-f3" r="2.7" fill="#378ADD" style="offset-path:path('M 112,95 L 125,95')"/><circle class="gru-mini-dot gru-mini-f3" r="2.7" fill="#e8824a" style="offset-path:path('M 23,101 C 61,123 104,118 125,103')"/>
+                <circle class="gru-mini-dot gru-mini-f4" r="2.7" fill="#1D9E75" style="offset-path:path('M 80,27 C 111,18 143,27 159,36')"/><circle class="gru-mini-dot gru-mini-f5" r="2.7" fill="#1D9E75" style="offset-path:path('M 80,35 C 111,47 145,62 159,70')"/>
+                <circle class="gru-mini-dot gru-mini-f6" r="2.7" fill="#aa701e" style="offset-path:path('M 159,94 C 165,90 167,85 166,82')"/><circle class="gru-mini-dot gru-mini-f7" r="2.7" fill="#7F77DD" style="offset-path:path('M 172,44 C 180,47 184,51 185,53')"/>
+                <circle class="gru-mini-dot gru-mini-f8" r="2.7" fill="#aa701e" style="offset-path:path('M 172,72 C 180,68 184,63 185,61')"/><circle class="gru-mini-dot gru-mini-f9" r="2.7" fill="#7F77DD" style="offset-path:path('M 197,58 L 202,58')"/>
+              </g>
+              
+            </svg>
     <div class="card-body">
       <div class="card-title">GRU</div>
       <div class="card-desc">reset and update gates — a lighter alternative to LSTM</div>
     </div>
   </a>
-
   <!-- attention -->
   <a class="card" href="/networks/attention.html">
     <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
@@ -353,39 +387,47 @@
 
   <!-- conditional VAE -->
   <a class="card" href="/networks/cvae.html">
-    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
-      <rect width="200" height="120" fill="#0d0f14"/>
-      <path d="M 30,38 Q 38,16 44,14" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.7"/>
-      <path d="M 30,52 Q 38,76 44,82" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.7"/>
-      <path d="M 31,92 Q 38,90 44,88" fill="none" stroke="#1D9E75" stroke-width="0.9"/>
-      <path d="M 100,26 Q 120,38 122,45" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.7" stroke-dasharray="3,2"/>
-      <path d="M 100,80 Q 120,68 122,61" fill="none" stroke="#1D9E75" stroke-width="0.9"/>
-      <line x1="138" y1="53" x2="162" y2="53" stroke="rgba(255,255,255,0.13)" stroke-width="0.7"/>
-      <line class="cvae-kl" x1="73" y1="68" x2="73" y2="38" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="2,3"/>
-      <text x="78" y="56" font-family="monospace" font-size="6" fill="#1D9E75">KL</text>
-      <circle class="cvae-x" cx="22" cy="44" r="9" stroke="#e8824a" stroke-width="1"/>
-      <text x="22" y="44" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#e8824a">x</text>
-      <circle class="cvae-y" cx="22" cy="92" r="9" stroke="#1D9E75" stroke-width="1"/>
-      <text x="22" y="92" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#1D9E75">y</text>
-      <rect x="46" y="6" width="54" height="30" rx="3" fill="none" stroke="#7F77DD" stroke-width="0.9"/>
-      <text x="73" y="16" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#7F77DD">p(z|x)</text>
-      <path class="cvae-pri" d="M 51,33.97 L 55.4,33.65 L 59.8,32.38 L 62,31.01 L 64.2,29.07 L 66.4,26.72 L 68.6,24.39 L 70.8,22.65 L 73,22 L 75.2,22.65 L 77.4,24.39 L 79.6,26.72 L 81.8,29.07 L 84,31.01 L 86.2,32.38 L 90.6,33.65 L 95,33.97" fill="#7F77DD" stroke="#7F77DD" stroke-width="0.9"/>
-      <rect x="46" y="70" width="54" height="30" rx="3" fill="none" stroke="#1D9E75" stroke-width="0.9"/>
-      <text x="73" y="80" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#1D9E75">q(z|x,y)</text>
-      <path class="cvae-pos" d="M 51,97.97 L 55.4,97.65 L 59.8,96.38 L 62,95.01 L 64.2,93.07 L 66.4,90.72 L 68.6,88.39 L 70.8,86.65 L 73,86 L 75.2,86.65 L 77.4,88.39 L 79.6,90.72 L 81.8,93.07 L 84,95.01 L 86.2,96.38 L 90.6,97.65 L 95,97.97" fill="#1D9E75" stroke="#1D9E75" stroke-width="0.9"/>
-      <circle class="cvae-z" cx="128" cy="53" r="10" stroke="#aa701e" stroke-width="1"/>
-      <text x="128" y="53" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#aa701e">z</text>
-      <circle class="cvae-yh" cx="172" cy="53" r="10" stroke="#378ADD" stroke-width="1"/>
-      <text x="172" y="53" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="#378ADD">ŷ</text>
-      <circle class="cvae-d1" r="3" fill="#aa701e" style="offset-path:path('M 100,80 Q 120,68 122,61')"/>
-      <circle class="cvae-d2" r="3" fill="#378ADD" style="offset-path:path('M 138,53 L 162,53')"/>
-    </svg>
+    <svg  viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+              <rect width="220" height="130" fill="#0d0f14"/>
+              <defs>
+                <radialGradient id="mini-cvae-p" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#7F77DD"/><stop offset="58%" stop-color="#7F77DD" stop-opacity=".72"/><stop offset="100%" stop-color="#7F77DD" stop-opacity=".22"/></radialGradient>
+                <radialGradient id="mini-cvae-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#1D9E75"/><stop offset="58%" stop-color="#1D9E75" stop-opacity=".72"/><stop offset="100%" stop-color="#1D9E75" stop-opacity=".22"/></radialGradient>
+                <radialGradient id="mini-cvae-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#aa701e"/><stop offset="58%" stop-color="#aa701e" stop-opacity=".72"/><stop offset="100%" stop-color="#aa701e" stop-opacity=".22"/></radialGradient>
+                <radialGradient id="mini-cvae-d" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#378ADD"/><stop offset="58%" stop-color="#378ADD" stop-opacity=".72"/><stop offset="100%" stop-color="#378ADD" stop-opacity=".22"/></radialGradient>
+              </defs>
+              <g fill="none">
+                <path d="M 25,36 Q 36,23 48,25" stroke="rgba(255,255,255,.24)" stroke-width=".8"/>
+                <path d="M 24,44 Q 36,77 48,90" stroke="rgba(255,255,255,.24)" stroke-width=".8"/>
+                <path d="M 25,98 L 48,98" stroke="#1D9E75" stroke-width="1"/>
+                <path d="M 108,28 Q 120,40 124,55" stroke="rgba(127,119,221,.18)" stroke-width=".8" stroke-dasharray="3,2"/>
+                <path d="M 108,94 Q 120,82 124,69" stroke="#1D9E75" stroke-width="1"/>
+                <path d="M 24,34 C 76,0 133,4 157,51" stroke="rgba(232,130,74,.34)" stroke-width=".8"/>
+                <path d="M 141,62 L 157,62" stroke="rgba(170,112,30,.62)" stroke-width="1"/>
+                <path d="M 199,62 L 202,62" stroke="#378ADD" stroke-width="1"/>
+                <path class="cvae-mini-kl" d="M 78,78 L 78,44" stroke="#1D9E75" stroke-width=".8" stroke-dasharray="2,3"/>
+              </g>
+              <g font-family="'JetBrains Mono',monospace">
+                <circle cx="16" cy="40" r="9" fill="#1e2230" stroke="#e8824a"/><text x="16" y="40" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#e8824a">x</text>
+                <circle cx="16" cy="98" r="9" fill="#1e2230" stroke="#1D9E75"/><text x="16" y="98" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#1D9E75">y</text>
+                <rect x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="#7F77DD"/><rect class="cvae-mini-box-fill" x="48" y="10" width="60" height="34" rx="3" fill="url(#mini-cvae-p)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="#7F77DD" opacity="0"/><text x="78" y="19" text-anchor="middle" font-size="5.2" letter-spacing=".55" fill="#7F77DD">PRIOR</text><text x="78" y="30" text-anchor="middle" font-size="5.9" fill="#7F77DD">p<tspan font-size="4" dy="1">θ</tspan><tspan font-size="5.9" dy="-1">(z|x)</tspan></text>
+                <rect x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="#1D9E75"/><rect class="cvae-mini-box-fill" x="48" y="78" width="60" height="34" rx="3" fill="url(#mini-cvae-r)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="#1D9E75" opacity="0"/><text x="78" y="87" text-anchor="middle" font-size="5.2" letter-spacing=".45" fill="#1D9E75">RECOG</text><text x="78" y="99" text-anchor="middle" font-size="5.8" fill="#1D9E75">q<tspan font-size="4" dy="1">φ</tspan><tspan font-size="5.8" dy="-1">(z|x,y)</tspan></text>
+                <text class="cvae-mini-kl" x="83" y="63" font-size="5" fill="#1D9E75">KL</text>
+                <circle cx="132" cy="62" r="9" fill="#1e2230" stroke="#aa701e"/><circle class="cvae-mini-z-fill" cx="132" cy="62" r="9" fill="url(#mini-cvae-z)" opacity="0"/><circle class="cvae-mini-z-hit" cx="132" cy="62" r="9" fill="none" stroke="#aa701e" opacity="0"/><text x="132" y="62" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#aa701e">ẑ</text>
+                <rect x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="#378ADD"/><rect class="cvae-mini-dec-fill" x="157" y="45" width="42" height="34" rx="3" fill="url(#mini-cvae-d)" opacity="0"/><rect class="cvae-mini-dec-hit" x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="#378ADD" opacity="0"/><text x="178" y="54" text-anchor="middle" font-size="5.1" letter-spacing=".55" fill="#378ADD">DECODER</text><text x="178" y="66" text-anchor="middle" font-size="5.2" fill="#378ADD">p<tspan font-size="3.7" dy="1">θ</tspan><tspan font-size="5.2" dy="-1">(y|x,ẑ)</tspan></text>
+                <circle cx="211" cy="62" r="8" fill="#1e2230" stroke="#378ADD"/><circle class="cvae-mini-yh-fill" cx="211" cy="62" r="8" fill="url(#mini-cvae-d)" opacity="0"/><circle class="cvae-mini-yh-hit" cx="211" cy="62" r="8" fill="none" stroke="#378ADD" opacity="0"/><text x="211" y="62" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#378ADD">ŷ</text>
+                <text x="116" y="86" text-anchor="middle" font-size="4.3" fill="#1D9E75">sampling</text><text x="116" y="42" text-anchor="middle" font-size="4.1" fill="#7F77DD" opacity=".34">sampling</text><text x="205" y="49" text-anchor="middle" font-size="4.3" fill="#378ADD">sampling</text>
+              </g>
+              <g>
+                <circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 25,36 Q 36,23 48,25')"/><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 24,44 Q 36,77 48,90')"/><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#1D9E75" style="offset-path:path('M 25,98 L 48,98')"/>
+                <circle class="cvae-mini-dot cvae-mini-f1" r="2.7" fill="#e8824a" style="offset-path:path('M 24,34 C 76,0 133,4 157,51')"/><circle class="cvae-mini-dot cvae-mini-f2" r="2.9" fill="#aa701e" style="offset-path:path('M 108,94 Q 120,82 124,69')"/><circle class="cvae-mini-dot cvae-mini-f3" r="2.9" fill="#aa701e" style="offset-path:path('M 141,62 L 157,62')"/><circle class="cvae-mini-dot cvae-mini-f4" r="2.9" fill="#378ADD" style="offset-path:path('M 199,62 L 202,62')"/>
+              </g>
+              
+            </svg>
     <div class="card-body">
       <div class="card-title">conditional VAE</div>
-      <div class="card-desc">the recognition net sees the target, the prior only the input</div>
+      <div class="card-desc">recognition and prior distributions feed a sampled latent code and decoder</div>
     </div>
   </a>
-
 </div>
 
 </body>
