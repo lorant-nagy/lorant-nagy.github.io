@@ -18,6 +18,7 @@
     --rgate:   #378ADD;
     --zgate:   #1D9E75;
     --cand:    #aa701e;
+    --cycle:   5.5s;
   }
 
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -65,9 +66,34 @@
 
   #gru-svg { width:100%; flex:1; display:block; min-height:0; }
 
+  .speed-row {
+    display:flex; align-items:center; gap:0.6rem;
+    margin-bottom:0.55rem; flex-shrink:0;
+  }
+  .speed-row .lbl {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .speed-row .val {
+    font-size:9px; color:var(--muted); width:2.6rem;
+  }
+  #speed {
+    -webkit-appearance:none; appearance:none;
+    width:170px; height:2px; border-radius:1px;
+    background:rgba(255,255,255,0.12); outline:none; cursor:pointer;
+  }
+  #speed::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--cand); cursor:pointer;
+  }
+  #speed::-moz-range-thumb {
+    width:11px; height:11px; border:0; border-radius:50%;
+    background:var(--cand); cursor:pointer;
+  }
+
   .flow-dot {
     offset-rotate: 0deg;
-    animation-duration: 8.5s;
+    animation-duration: var(--cycle);
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     animation-fill-mode: both;
@@ -95,6 +121,12 @@
 </div>
 
 <div class="page">
+
+  <div class="speed-row">
+    <span class="lbl">speed</span>
+    <input id="speed" type="range" min="0" max="100" value="50" step="1" aria-label="animation speed">
+    <span class="val" id="speed-val">1.0×</span>
+  </div>
 
   <div class="card-title">computation graph</div>
 
@@ -173,93 +205,98 @@
 (function () {
   'use strict';
 
-  var SPEED = 16, MIN_W = 4, MAX_W = 18, FADE = 1.2;
+  // Dataflow schedule: a dot departs a node the instant that node is ready,
+  // and every input to a node is timed to arrive together. Nothing waits.
+  var DAG_END = 78;   // % of the cycle at which h_t is ready
+  var FADE    = 1.0;
 
   var EDGES = [
-    { id:'e-h-r',   grp:1, dot:'#7F77DD' },
-    { id:'e-x-r',   grp:1, dot:'#e8824a' },
-    { id:'e-h-z',   grp:1, dot:'#7F77DD' },
-    { id:'e-x-z',   grp:1, dot:'#e8824a' },
-    { id:'e-r-orh', grp:2, dot:'#378ADD' },
-    { id:'e-h-orh', grp:2, dot:'#7F77DD', early:true },
-    { id:'e-orh-t', grp:3, dot:'#378ADD' },
-    { id:'e-x-t',   grp:3, dot:'#e8824a', early:true },
-    { id:'e-z-o1',  grp:4, dot:'#1D9E75' },
-    { id:'e-h-o1',  grp:4, dot:'#7F77DD', early:true },
-    { id:'e-z-o2',  grp:4, dot:'#1D9E75' },
-    { id:'e-t-o2',  grp:4, dot:'#aa701e' },
-    { id:'e-o1-p',  grp:5, dot:'#7F77DD' },
-    { id:'e-o2-p',  grp:5, dot:'#7F77DD' },
-    { id:'e-p-h',   grp:6, dot:'#7F77DD' },
-    { id:'e-loop',  grp:7, dot:'#7F77DD' }
+    { id:'e-h-r',   from:'h_prev', to:'sig_r', dot:'#7F77DD' },
+    { id:'e-x-r',   from:'x',      to:'sig_r', dot:'#e8824a' },
+    { id:'e-h-z',   from:'h_prev', to:'sig_z', dot:'#7F77DD' },
+    { id:'e-x-z',   from:'x',      to:'sig_z', dot:'#e8824a' },
+    { id:'e-r-orh', from:'sig_r',  to:'orh',   dot:'#378ADD' },
+    { id:'e-h-orh', from:'h_prev', to:'orh',   dot:'#7F77DD' },
+    { id:'e-orh-t', from:'orh',    to:'tanh',  dot:'#378ADD' },
+    { id:'e-x-t',   from:'x',      to:'tanh',  dot:'#e8824a' },
+    { id:'e-z-o1',  from:'sig_z',  to:'o1',    dot:'#1D9E75' },
+    { id:'e-h-o1',  from:'h_prev', to:'o1',    dot:'#7F77DD' },
+    { id:'e-z-o2',  from:'sig_z',  to:'o2',    dot:'#1D9E75' },
+    { id:'e-t-o2',  from:'tanh',   to:'o2',    dot:'#aa701e' },
+    { id:'e-o1-p',  from:'o1',     to:'plus',  dot:'#7F77DD' },
+    { id:'e-o2-p',  from:'o2',     to:'plus',  dot:'#7F77DD' },
+    { id:'e-p-h',   from:'plus',   to:'h_t',   dot:'#7F77DD' },
+    { id:'e-loop',  from:'h_t',    to:'h_prev', dot:'#7F77DD', back:true }
   ];
 
-  var GROUP_END  = { 1:16, 2:30, 3:46, 4:64, 5:78, 6:84, 7:100 };
-  var GROUP_CAPW = { 7:15 };
+  var SOURCES = ['h_prev', 'x'];
+  var SINK    = 'h_t';
 
-  var svg = document.getElementById('gru-svg');
   var dotLayer = document.getElementById('dots');
   var kf = document.createElement('style');
   document.head.appendChild(kf);
   var SVG_NS = 'http://www.w3.org/2000/svg';
 
-  function build() {
-    var live = [];
-    EDGES.forEach(function (e) {
-      var el = document.getElementById(e.id);
-      if (!el) return;
-      live.push({ cfg: e, d: el.getAttribute('d'), len: el.getTotalLength() });
-    });
+  var live = [];
+  EDGES.forEach(function (e) {
+    var el = document.getElementById(e.id);
+    if (el) live.push({ cfg: e, d: el.getAttribute('d'), len: el.getTotalLength() });
+  });
 
-    var byGroup = {};
+  // longest-path relaxation over the acyclic part
+  var ready = {};
+  live.forEach(function (o) { ready[o.cfg.from] = 0; ready[o.cfg.to] = 0; });
+  SOURCES.forEach(function (n) { ready[n] = 0; });
+  for (var pass = 0; pass < live.length + 2; pass++) {
     live.forEach(function (o) {
-      var g = o.cfg.grp;
-      (byGroup[g] = byGroup[g] || []).push(o);
+      if (o.cfg.back) return;
+      var cand = ready[o.cfg.from] + o.len;
+      if (cand > ready[o.cfg.to]) ready[o.cfg.to] = cand;
     });
-
-    var rules = [];
-    Object.keys(byGroup).forEach(function (g) {
-      var items = byGroup[g];
-      var end = GROUP_END[g];
-      var paced = items.filter(function (o) { return !o.cfg.early; });
-      if (!paced.length) paced = items;
-      var maxLen = paced.reduce(function (m, o) { return Math.max(m, o.len); }, 1);
-
-      var w = maxLen / SPEED;
-      if (w < MIN_W) w = MIN_W;
-      if (w > MAX_W) w = MAX_W;
-      if (GROUP_CAPW[g] && w > GROUP_CAPW[g]) w = GROUP_CAPW[g];
-      if (w > end) w = end;
-
-      items.forEach(function (o, i) {
-        var start = o.cfg.early ? 0 : end - w * (o.len / maxLen);
-        if (start < 0) start = 0;
-        var name = 'gru-flow-' + g + '-' + i;
-        var fadeIn = Math.min(start + FADE, end - 0.5);
-        var hold   = Math.max(end - 1, fadeIn);
-
-        rules.push(
-          '@keyframes ' + name + '{' +
-          '0%,' + start.toFixed(2) + '%{offset-distance:0%;opacity:0}' +
-          fadeIn.toFixed(2) + '%{opacity:1}' +
-          hold.toFixed(2) + '%{opacity:1}' +
-          end.toFixed(2) + '%,100%{offset-distance:100%;opacity:0}}'
-        );
-
-        var dot = document.createElementNS(SVG_NS, 'circle');
-        dot.setAttribute('class', 'flow-dot');
-        dot.setAttribute('r', 4.5);
-        dot.setAttribute('fill', o.cfg.dot);
-        dot.style.offsetPath = "path('" + o.d + "')";
-        dot.style.animationName = name;
-        dotLayer.appendChild(dot);
-      });
-    });
-
-    kf.textContent = rules.join('\n');
   }
 
-  build();
+  // scale so the sink lands at DAG_END
+  var scale = DAG_END / (ready[SINK] || 1);
+  Object.keys(ready).forEach(function (n) { ready[n] *= scale; });
+
+  var rules = [];
+  live.forEach(function (o, i) {
+    var start = o.cfg.back ? DAG_END : ready[o.cfg.from];
+    var end   = o.cfg.back ? 100     : ready[o.cfg.to];
+    var name  = 'gru-flow-' + i;
+    var fadeIn = Math.min(start + FADE, end - 0.4);
+    var hold   = Math.max(end - 0.8, fadeIn);
+
+    rules.push(
+      '@keyframes ' + name + '{' +
+      '0%,' + start.toFixed(2) + '%{offset-distance:0%;opacity:0}' +
+      fadeIn.toFixed(2) + '%{opacity:1}' +
+      hold.toFixed(2) + '%{opacity:1}' +
+      end.toFixed(2) + '%,100%{offset-distance:100%;opacity:0}}'
+    );
+
+    var dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('class', 'flow-dot');
+    dot.setAttribute('r', 4.5);
+    dot.setAttribute('fill', o.cfg.dot);
+    dot.style.offsetPath = "path('" + o.d + "')";
+    dot.style.animationName = name;
+    dotLayer.appendChild(dot);
+  });
+
+  kf.textContent = rules.join(String.fromCharCode(10));
+
+  // overall speed: one multiplier over the whole schedule, relative pacing untouched
+  var BASE = 5.5, RANGE = 2.8;
+  var slider = document.getElementById('speed');
+  var readout = document.getElementById('speed-val');
+  function applySpeed() {
+    var mult = Math.pow(RANGE, (slider.value - 50) / 50);
+    document.documentElement.style.setProperty('--cycle', (BASE / mult).toFixed(3) + 's');
+    readout.textContent = mult.toFixed(1) + '\u00d7';
+  }
+  slider.addEventListener('input', applySpeed);
+  applySpeed();
 })();
 </script>
 
