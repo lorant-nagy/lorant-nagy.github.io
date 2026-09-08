@@ -112,16 +112,30 @@
   .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
   .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
 
-  @keyframes gru-r{0%,100%{fill:#1e2230}10%,25%{fill:#378ADD}}
-  @keyframes gru-z{0%,100%{fill:#1e2230}30%,50%{fill:#1D9E75}}
-  @keyframes gru-h{0%,100%{fill:#1e2230}55%,72%{fill:#aa701e}}
-  @keyframes gru-ht{0%,100%{fill:#1e2230}75%,90%{fill:#e8824a}}
-  @keyframes gru-interp{0%,100%{stroke-opacity:0.12}60%,85%{stroke-opacity:0.55}}
+  @keyframes gru-x{0%,100%{fill:#1e2230}2%,12%{fill:#e8824a}}
+  @keyframes gru-hp{0%,100%{fill:#1e2230}2%,12%{fill:#7F77DD}}
+  @keyframes gru-r{0%,100%{fill-opacity:0}18%,32%{fill-opacity:0.35}}
+  @keyframes gru-z{0%,100%{fill-opacity:0}18%,32%{fill-opacity:0.35}}
+  @keyframes gru-hc{0%,100%{fill-opacity:0}38%,52%{fill-opacity:0.35}}
+  @keyframes gru-o1{0%,100%{fill:#1e2230}58%,70%{fill:#7F77DD}}
+  @keyframes gru-o2{0%,100%{fill:#1e2230}58%,70%{fill:#aa701e}}
+  @keyframes gru-plus{0%,100%{fill:#1e2230}76%,86%{fill:#7F77DD}}
+  @keyframes gru-ht{0%,100%{fill:#1e2230}88%,98%{fill:#7F77DD}}
+  @keyframes gru-hw{0%,100%{stroke-opacity:0.18}40%,64%{stroke-opacity:0.7}}
+  @keyframes gru-d1{0%,36%{offset-distance:0%;opacity:0}40%{opacity:1}54%{opacity:1}58%,100%{offset-distance:100%;opacity:0}}
+  @keyframes gru-d2{0%,48%{offset-distance:0%;opacity:0}52%{opacity:1}64%{opacity:1}68%,100%{offset-distance:100%;opacity:0}}
+  .gru-x{animation:gru-x 5s ease-in-out infinite}
+  .gru-hp{animation:gru-hp 5s ease-in-out infinite}
   .gru-r{animation:gru-r 5s ease-in-out infinite}
   .gru-z{animation:gru-z 5s ease-in-out infinite}
-  .gru-h{animation:gru-h 5s ease-in-out infinite}
+  .gru-hc{animation:gru-hc 5s ease-in-out infinite}
+  .gru-o1{animation:gru-o1 5s ease-in-out infinite}
+  .gru-o2{animation:gru-o2 5s ease-in-out infinite}
+  .gru-plus{animation:gru-plus 5s ease-in-out infinite}
   .gru-ht{animation:gru-ht 5s ease-in-out infinite}
-  .gru-interp{animation:gru-interp 5s ease-in-out infinite}
+  .gru-hw{animation:gru-hw 5s ease-in-out infinite}
+  .gru-d1{offset-rotate:0deg;animation:gru-d1 5s linear infinite}
+  .gru-d2{offset-rotate:0deg;animation:gru-d2 5s linear infinite}
 
   @keyframes attn-c1{0%,100%{opacity:0.08}50%{opacity:0.7}}
   @keyframes attn-c2{0%,100%{opacity:0.08}30%,80%{opacity:0.42}}
@@ -244,36 +258,40 @@
   <a class="card" href="/networks/gru.html">
     <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
       <rect width="200" height="120" fill="#0d0f14"/>
-      <circle cx="18" cy="35" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-      <circle cx="18" cy="85" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-      <text x="18" y="35" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.4)">x</text>
-      <text x="18" y="85" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.4)">h</text>
-      <line x1="27" y1="35" x2="50" y2="35" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <line x1="27" y1="35" x2="50" y2="85" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
-      <line x1="27" y1="85" x2="50" y2="35" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
-      <line x1="27" y1="85" x2="50" y2="85" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <circle class="gru-r" cx="60" cy="35" r="10" stroke="#378ADD" stroke-width="1"/>
-      <circle class="gru-z" cx="60" cy="85" r="10" stroke="#1D9E75" stroke-width="1"/>
-      <text x="60" y="35" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="#378ADD">r</text>
-      <text x="60" y="85" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="#1D9E75">z</text>
-      <line x1="70" y1="35" x2="88" y2="46" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <line x1="27" y1="85" x2="88" y2="46" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
-      <text x="88" y="46" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">⊙</text>
-      <line x1="96" y1="46" x2="108" y2="60" stroke="rgba(255,255,255,0.12)" stroke-width="0.7"/>
-      <line x1="27" y1="35" x2="108" y2="60" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
-      <circle class="gru-h" cx="118" cy="60" r="10" stroke="#aa701e" stroke-width="1"/>
-      <text x="118" y="60" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="#aa701e">h̃</text>
-      <text x="148" y="37" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">⊙</text>
-      <text x="148" y="83" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.3)">⊙</text>
-      <line class="gru-interp" x1="70" y1="85" x2="141" y2="40" stroke="#1D9E75" stroke-width="0.8"/>
-      <line class="gru-interp" x1="70" y1="85" x2="141" y2="81" stroke="#1D9E75" stroke-width="0.8"/>
-      <line x1="27"  y1="85" x2="141" y2="40" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
-      <line x1="128" y1="60" x2="141" y2="81" stroke="rgba(255,255,255,0.07)" stroke-width="0.7"/>
-      <text x="163" y="60" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.35)">+</text>
-      <line x1="148" y1="39" x2="156" y2="56" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
-      <line x1="148" y1="81" x2="156" y2="64" stroke="rgba(255,255,255,0.1)" stroke-width="0.7"/>
-      <circle class="gru-ht" cx="183" cy="60" r="10" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-      <text x="183" y="60" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.45)">hₜ</text>
+      <path class="gru-hw" d="M 27.0,24.0 L 114.0,24.0" fill="none" stroke="#7F77DD" stroke-width="1.10"/>
+      <path d="M 24.0,32.0 C 30.0,55.0 38.0,72.0 44.0,82.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
+      <path d="M 26.0,30.0 C 34.0,40.0 40.0,48.0 44.0,53.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
+      <path d="M 26.0,92.0 C 32.0,90.0 38.0,88.0 44.0,87.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
+      <path d="M 25.0,89.0 C 32.0,78.0 38.0,68.0 44.0,62.0" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="0.70"/>
+      <path d="M 70.0,88.0 L 88.0,88.0" fill="none" stroke="#378ADD" stroke-width="0.80"/>
+      <path d="M 26.0,101.0 C 55.0,112.0 80.0,100.0 92.0,94.0" fill="none" stroke="rgba(232,130,74,0.4)" stroke-width="0.70"/>
+      <path d="M 66.0,50.0 C 88.0,40.0 104.0,30.0 114.0,27.0" fill="none" stroke="#1D9E75" stroke-width="0.80"/>
+      <path d="M 70.0,62.0 C 100.0,62.0 128.0,60.0 138.0,59.0" fill="none" stroke="#1D9E75" stroke-width="0.80"/>
+      <path d="M 120.0,86.0 C 134.0,78.0 141.0,70.0 143.0,66.0" fill="none" stroke="#aa701e" stroke-width="0.80"/>
+      <path d="M 130.0,24.0 L 162.0,24.0" fill="none" stroke="rgba(127,119,221,0.45)" stroke-width="0.90"/>
+      <path d="M 152.0,52.0 C 163.0,42.0 168.0,33.0 169.0,32.0" fill="none" stroke="rgba(127,119,221,0.45)" stroke-width="0.90"/>
+      <path d="M 178.0,24.0 L 182.0,24.0" fill="none" stroke="rgba(127,119,221,0.45)" stroke-width="0.90"/>
+      <circle class="gru-hp" cx="18.0" cy="24.0" r="9.0" stroke="#7F77DD" stroke-width="1.00"/>
+      <text x="18.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#7F77DD">h</text>
+      <circle class="gru-x" cx="18.0" cy="96.0" r="9.0" stroke="#e8824a" stroke-width="1.00"/>
+      <text x="18.0" y="96.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#e8824a">x</text>
+      <rect class="gru-z" x="44.0" y="50.0" width="26.0" height="16.0" rx="3.0" fill="#1D9E75" stroke="#1D9E75" stroke-width="0.90"/>
+      <text x="57.0" y="58.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#1D9E75">z</text>
+      <rect class="gru-r" x="44.0" y="80.0" width="26.0" height="16.0" rx="3.0" fill="#378ADD" stroke="#378ADD" stroke-width="0.90"/>
+      <text x="57.0" y="88.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#378ADD">r</text>
+      <rect class="gru-hc" x="90.0" y="80.0" width="30.0" height="16.0" rx="3.0" fill="#aa701e" stroke="#aa701e" stroke-width="0.90"/>
+      <text x="105.0" y="88.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="#aa701e">h̃</text>
+      <circle class="gru-o1" cx="122.0" cy="24.0" r="8.0" stroke="rgba(255,255,255,0.28)" stroke-width="0.90"/>
+      <text x="122.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="rgba(255,255,255,0.55)">⊙</text>
+      <circle class="gru-o2" cx="146.0" cy="58.0" r="8.0" stroke="rgba(255,255,255,0.28)" stroke-width="0.90"/>
+      <text x="146.0" y="58.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7.0" fill="rgba(255,255,255,0.55)">⊙</text>
+      <circle class="gru-plus" cx="170.0" cy="24.0" r="8.0" stroke="rgba(255,255,255,0.28)" stroke-width="0.90"/>
+      <text x="170.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8.0" fill="rgba(255,255,255,0.55)">+</text>
+      <circle class="gru-ht" cx="190.0" cy="24.0" r="8.0" stroke="#7F77DD" stroke-width="1.00"/>
+      <text x="190.0" y="24.0" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6.5" fill="#7F77DD">hₜ</text>
+      <text x="92.0" y="40.0" text-anchor="middle" font-family="monospace" font-size="6.0" fill="#1D9E75">1−z</text>
+      <circle class="gru-d1" r="3.0" fill="#7F77DD" style="offset-path:path('M 27.0,24.0 L 114.0,24.0')"/>
+      <circle class="gru-d2" r="3.0" fill="#aa701e" style="offset-path:path('M 120.0,86.0 C 134.0,78.0 141.0,70.0 143.0,66.0')"/>
     </svg>
     <div class="card-body">
       <div class="card-title">GRU</div>
