@@ -111,6 +111,10 @@
   .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
   .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
   .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
+  @keyframes lstm-mul{0%,100%{fill:#1e2230}18%,34%{fill:#378ADD}}
+  @keyframes lstm-add{0%,100%{fill:#1e2230}50%,66%{fill:#c8cdd8}}
+  .lstm-mul{animation:lstm-mul 5s ease-in-out infinite}
+  .lstm-add{animation:lstm-add 5s ease-in-out infinite}
     /* GRU miniature — mirrors the full computation-graph animation. */
     @keyframes gru-mini-gate-fill{0%,15.8%{opacity:0}17.3%{opacity:.48}24%{opacity:.34}31%{opacity:.18}37%{opacity:.07}43%,100%{opacity:0}}
     @keyframes gru-mini-gate-hit{0%,15.8%{opacity:0;stroke-width:1}16.5%{opacity:.95;stroke-width:2.1}18.5%,100%{opacity:0;stroke-width:1}}
@@ -219,7 +223,7 @@
     </div>
   </a>
 
-  <!-- vanilla RNN -->
+  <!-- Elman network -->
   <a class="card" href="/networks/rnn.html">
     <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
       <rect width="200" height="120" fill="#0d0f14"/>
@@ -242,12 +246,40 @@
       <circle cx="183" cy="60" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
     </svg>
     <div class="card-body">
-      <div class="card-title">vanilla RNN</div>
-      <div class="card-desc">recurrent hidden state across a sequence</div>
+      <div class="card-title">Elman network</div>
+      <div class="card-desc">a hidden state fed back as context — Elman, 1990</div>
     </div>
   </a>
 
-  <!-- LSTM -->
+  <!-- LSTM 1997 -->
+  <a class="card" href="/networks/lstm-1997.html">
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <rect class="lstm-cell" x="8" y="18" width="184" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
+      <line class="lstm-hw" x1="12" y1="23" x2="190" y2="23" stroke="white" stroke-width="2"/>
+      <text x="100" y="14" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)">cell state</text>
+      <rect class="lstm-gate-i" x="36"  y="40" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
+      <rect class="lstm-gate-g" x="84"  y="40" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
+      <rect class="lstm-gate-o" x="132" y="40" width="28" height="28" rx="4" stroke="#7B5EA7" stroke-width="1"/>
+      <text x="50"  y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
+      <text x="98"  y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
+      <text x="146" y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
+      <line x1="50"  y1="40" x2="69" y2="29" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="98"  y1="40" x2="79" y2="29" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="146" y1="68" x2="146" y2="88" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <circle class="lstm-add" cx="74" cy="23" r="6.5" stroke="rgba(255,255,255,0.35)" stroke-width="0.9"/>
+      <text x="74" y="23" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.7)">+</text>
+      <line x1="14"  y1="108" x2="14"  y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="186" y1="108" x2="186" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="14"  y1="90" x2="186" y2="90" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+    </svg>
+    <div class="card-body">
+      <div class="card-title">LSTM 1997</div>
+      <div class="card-desc">the original — nothing gates the cell rail, it just accumulates</div>
+    </div>
+  </a>
+
+  <!-- LSTM 2000 -->
   <a class="card" href="/networks/lstm.html">
     <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
       <rect width="200" height="120" fill="#0d0f14"/>
@@ -262,17 +294,21 @@
       <text x="70"  y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
       <text x="110" y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
       <text x="150" y="55" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
-      <line x1="30"  y1="40" x2="30"  y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="70"  y1="40" x2="70"  y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="110" y1="40" x2="110" y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-      <line x1="150" y1="40" x2="150" y2="23" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="30"  y1="40" x2="30"  y2="29" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="70"  y1="40" x2="85"  y2="29" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="110" y1="40" x2="95"  y2="29" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <line x1="150" y1="68" x2="150" y2="88" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+      <circle class="lstm-mul" cx="30" cy="23" r="6.5" stroke="#378ADD" stroke-width="0.9"/>
+      <text x="30" y="23" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.7)">⊙</text>
+      <circle class="lstm-add" cx="90" cy="23" r="6.5" stroke="rgba(255,255,255,0.35)" stroke-width="0.9"/>
+      <text x="90" y="23" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.7)">+</text>
       <line x1="14"  y1="108" x2="14"  y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
       <line x1="186" y1="108" x2="186" y2="90" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
       <line x1="14"  y1="90" x2="186" y2="90" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
     </svg>
     <div class="card-body">
-      <div class="card-title">LSTM</div>
-      <div class="card-desc">gated memory cell — forget, input, candidate, output</div>
+      <div class="card-title">LSTM 2000</div>
+      <div class="card-desc">a forget gate on the cell rail — the vanilla LSTM</div>
     </div>
   </a>
 

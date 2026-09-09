@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LSTM 2000</title>
+<title>LSTM 1997</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
 
@@ -128,12 +128,12 @@
 
 <a class="back" href="/networks/">← networks</a>
 
-<h1>LSTM 2000</h1>
+<h1>LSTM 1997</h1>
 
 <div class="meta">
-  <span class="name">Long Short-Term Memory with a forget gate — the vanilla LSTM</span><br>
-  <span class="cite">Gers, Schmidhuber &amp; Cummins — Learning to Forget: Continual Prediction with LSTM, Neural Computation 12(10):2451–2471, 2000, extending Hochreiter &amp; Schmidhuber 1997</span><br>
-  <a class="xref" href="/networks/lstm-1997.html">→ LSTM 1997, the original, with no forget gate</a>
+  <span class="name">Long Short-Term Memory — the original</span><br>
+  <span class="cite">Hochreiter &amp; Schmidhuber — Long Short-Term Memory, Neural Computation 9(8):1735–1780, 1997. Input and output gates only; the cell state accumulates through a weight-1 self-connection, the constant error carousel</span><br>
+  <a class="xref" href="/networks/lstm.html">→ LSTM 2000, which adds the forget gate</a>
 </div>
 
 <div class="page">
@@ -163,17 +163,14 @@
     </defs>
 
     <g id="edges" fill="none">
-      <path id="e-C-mf"   d="M 54,62 L 166,62"                                stroke="rgba(200,205,216,0.55)" stroke-width="1.4" marker-end="url(#ar)"/>
+      <path id="e-C-add"  d="M 54,62 L 385,62"                                stroke="rgba(200,205,216,0.55)" stroke-width="1.4" marker-end="url(#ar)"/>
       <path id="e-x-cat"  d="M 52,218 C 68,226 84,234 92,238"                 stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
       <path id="e-h-cat"  d="M 52,264 C 68,256 84,249 92,245"                 stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-cat-f"  d="M 108,235 C 124,212 148,190 176,178"             stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
       <path id="e-cat-i"  d="M 112,238 C 160,224 220,196 264,178"             stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
       <path id="e-cat-c"  d="M 114,241 C 190,240 300,205 356,178"             stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
       <path id="e-cat-o"  d="M 116,244 C 220,252 360,220 446,178"             stroke="rgba(255,255,255,0.28)" stroke-width="1"   marker-end="url(#ar)"/>
-      <path id="e-f-mf"   d="M 183,132 L 183,79"                              stroke="#378ADD"                stroke-width="1.2" marker-end="url(#ar)"/>
       <path id="e-i-mi"   d="M 271,132 C 292,120 315,108 324,105"             stroke="#1D9E75"                stroke-width="1.2" marker-end="url(#ar)"/>
       <path id="e-c-mi"   d="M 362,132 C 352,122 342,112 337,106"             stroke="#aa701e"                stroke-width="1.2" marker-end="url(#ar)"/>
-      <path id="e-mf-add" d="M 198,62 L 385,62"                               stroke="rgba(200,205,216,0.55)" stroke-width="1.4" marker-end="url(#ar)"/>
       <path id="e-mi-add" d="M 343,88 C 362,78 380,68 386,66"                 stroke="rgba(200,205,216,0.55)" stroke-width="1.4" marker-end="url(#ar)"/>
       <path id="e-add-C"  d="M 415,62 L 637,62"                               stroke="rgba(200,205,216,0.55)" stroke-width="1.4" marker-end="url(#ar)"/>
       <path id="e-add-to" d="M 411,74 C 462,98 512,118 528,130"               stroke="rgba(200,205,216,0.55)" stroke-width="1.4" marker-end="url(#ar)"/>
@@ -197,11 +194,6 @@
       <circle cx="100" cy="242" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.3)"/>
       <text x="100" y="272" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.35)">[h,x]</text>
 
-      <rect x="150" y="132" width="66" height="44" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
-      <rect id="glow-sig_f" class="node-glow" x="150" y="132" width="66" height="44" rx="4" fill="url(#fill-f)" fill-opacity="0" stroke="#378ADD" stroke-width="2" stroke-opacity="0"/>
-      <text x="183" y="154" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#378ADD">σ</text>
-      <text x="183" y="196" text-anchor="middle" font-size="11" fill="#378ADD">f<tspan font-size="8" dy="2">t</tspan></text>
-
       <rect x="238" y="132" width="66" height="44" rx="4" fill="none" stroke="#1D9E75" stroke-width="1.1"/>
       <rect id="glow-sig_i" class="node-glow" x="238" y="132" width="66" height="44" rx="4" fill="url(#fill-i)" fill-opacity="0" stroke="#1D9E75" stroke-width="2" stroke-opacity="0"/>
       <text x="271" y="154" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#1D9E75">σ</text>
@@ -216,10 +208,6 @@
       <rect id="glow-sig_o" class="node-glow" x="420" y="132" width="66" height="44" rx="4" fill="url(#fill-o)" fill-opacity="0" stroke="#7B5EA7" stroke-width="2" stroke-opacity="0"/>
       <text x="453" y="154" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#7B5EA7">σ</text>
       <text x="453" y="196" text-anchor="middle" font-size="11" fill="#7B5EA7">o<tspan font-size="8" dy="2">t</tspan></text>
-
-      <circle cx="183" cy="62" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
-      <circle id="glow-mul_f" class="node-glow" cx="183" cy="62" r="15" fill="url(#fill-f)" fill-opacity="0" stroke="#378ADD" stroke-width="2" stroke-opacity="0"/>
-      <text x="183" y="62" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#c8cdd8">⊙</text>
 
       <circle cx="330" cy="100" r="15" fill="#1e2230" stroke="rgba(255,255,255,0.28)"/>
       <circle id="glow-mul_i" class="node-glow" cx="330" cy="100" r="15" fill="url(#fill-i)" fill-opacity="0" stroke="#1D9E75" stroke-width="2" stroke-opacity="0"/>
@@ -253,14 +241,14 @@
     <div class="col-title">equations</div>
     <div class="eq"><div class="grid">
       <div>
-        <span class="fg">f<sub>t</sub></span> = σ(W<sub>f</sub> <span class="xi">x<sub>t</sub></span> + U<sub>f</sub> <span class="hd">h<sub>t−1</sub></span> + b<sub>f</sub>)<br>
         <span class="ig">i<sub>t</sub></span> = σ(W<sub>i</sub> <span class="xi">x<sub>t</sub></span> + U<sub>i</sub> <span class="hd">h<sub>t−1</sub></span> + b<sub>i</sub>)<br>
-        <span class="og">o<sub>t</sub></span> = σ(W<sub>o</sub> <span class="xi">x<sub>t</sub></span> + U<sub>o</sub> <span class="hd">h<sub>t−1</sub></span> + b<sub>o</sub>)
+        <span class="og">o<sub>t</sub></span> = σ(W<sub>o</sub> <span class="xi">x<sub>t</sub></span> + U<sub>o</sub> <span class="hd">h<sub>t−1</sub></span> + b<sub>o</sub>)<br>
+        <span class="cd">C̃<sub>t</sub></span> = tanh(W<sub>C</sub> <span class="xi">x<sub>t</sub></span> + U<sub>C</sub> <span class="hd">h<sub>t−1</sub></span> + b<sub>C</sub>)
       </div>
       <div>
-        <span class="cd">C̃<sub>t</sub></span> = tanh(W<sub>C</sub> <span class="xi">x<sub>t</sub></span> + U<sub>C</sub> <span class="hd">h<sub>t−1</sub></span> + b<sub>C</sub>)<br>
-        <span class="cl">C<sub>t</sub></span> = <span class="fg">f<sub>t</sub></span> ⊙ <span class="cl">C<sub>t−1</sub></span> + <span class="ig">i<sub>t</sub></span> ⊙ <span class="cd">C̃<sub>t</sub></span><br>
-        <span class="hd">h<sub>t</sub></span> = <span class="og">o<sub>t</sub></span> ⊙ tanh(<span class="cl">C<sub>t</sub></span>)
+        <span class="cl">C<sub>t</sub></span> = <span class="cl">C<sub>t−1</sub></span> + <span class="ig">i<sub>t</sub></span> ⊙ <span class="cd">C̃<sub>t</sub></span><br>
+        <span class="hd">h<sub>t</sub></span> = <span class="og">o<sub>t</sub></span> ⊙ tanh(<span class="cl">C<sub>t</sub></span>)<br>
+        <span style="color:var(--muted)">no gate on the cell rail — it simply accumulates</span>
       </div>
     </div></div>
   </div>
@@ -276,27 +264,24 @@
 
   var DWELL_BOX = 80, DWELL_OP = 34;
   var DWELL = {
-    sig_f: DWELL_BOX, sig_i: DWELL_BOX, tanh_c: DWELL_BOX, sig_o: DWELL_BOX, tanh_o: DWELL_BOX,
-    mul_f: DWELL_OP, mul_i: DWELL_OP, add: DWELL_OP, mul_o: DWELL_OP,
+    sig_i: DWELL_BOX, tanh_c: DWELL_BOX, sig_o: DWELL_BOX, tanh_o: DWELL_BOX,
+    mul_i: DWELL_OP, add: DWELL_OP, mul_o: DWELL_OP,
     C_t: DWELL_OP, h_t: DWELL_OP
   };
   var GLOW_PEAK = {
-    sig_f:0.46, sig_i:0.46, tanh_c:0.46, sig_o:0.46, tanh_o:0.46,
-    mul_f:0.55, mul_i:0.55, add:0.55, mul_o:0.55, C_t:0.60, h_t:0.60
+    sig_i:0.46, tanh_c:0.46, sig_o:0.46, tanh_o:0.46,
+    mul_i:0.55, add:0.55, mul_o:0.55, C_t:0.60, h_t:0.60
   };
 
   var EDGES = [
     { id:'e-x-cat',  from:'x',      to:'cat',    dot:'#e8824a' },
     { id:'e-h-cat',  from:'h_prev', to:'cat',    dot:'#7F77DD' },
-    { id:'e-cat-f',  from:'cat',    to:'sig_f',  dot:'#378ADD' },
     { id:'e-cat-i',  from:'cat',    to:'sig_i',  dot:'#1D9E75' },
     { id:'e-cat-c',  from:'cat',    to:'tanh_c', dot:'#aa701e' },
     { id:'e-cat-o',  from:'cat',    to:'sig_o',  dot:'#7B5EA7' },
-    { id:'e-C-mf',   from:'C_prev', to:'mul_f',  dot:'#c8cdd8' },
-    { id:'e-f-mf',   from:'sig_f',  to:'mul_f',  dot:'#378ADD' },
+    { id:'e-C-add',  from:'C_prev', to:'add',    dot:'#c8cdd8' },
     { id:'e-i-mi',   from:'sig_i',  to:'mul_i',  dot:'#1D9E75' },
     { id:'e-c-mi',   from:'tanh_c', to:'mul_i',  dot:'#aa701e' },
-    { id:'e-mf-add', from:'mul_f',  to:'add',    dot:'#c8cdd8' },
     { id:'e-mi-add', from:'mul_i',  to:'add',    dot:'#c8cdd8' },
     { id:'e-add-C',  from:'add',    to:'C_t',    dot:'#c8cdd8' },
     { id:'e-add-to', from:'add',    to:'tanh_o', dot:'#c8cdd8' },

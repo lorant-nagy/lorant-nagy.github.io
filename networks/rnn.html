@@ -3,1040 +3,338 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elman Network</title>
+<title>Elman network</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
 
   :root {
     --bg:      #0d0f14;
-    --surface: #13161d;
     --border:  rgba(255,255,255,0.07);
     --text:    #c8cdd8;
     --muted:   #565c6e;
-    --neg:     #378ADD;
-    --pos:     #e8824a;
+    --hid:     #7F77DD;
+    --xin:     #e8824a;
+    --out:     #378ADD;
     --accent:  #aa701e;
+    --cycle:   5.4s;
   }
 
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
+    background: var(--bg); color: var(--text);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
     height: 100dvh;
     display: grid;
     grid-template-rows: auto auto 1fr;
     padding: 1.1rem 1.4rem 0.9rem;
-    gap: 0.55rem;
+    gap: 0.5rem;
     overflow: hidden;
   }
 
-  .back-link {
-    position: fixed; top: 1rem; left: 1.25rem;
-    font-size: 11px; color: var(--muted);
-    text-decoration: none; letter-spacing: 0.05em; z-index: 10;
+  a.back {
+    position: fixed; top:1rem; left:1.25rem;
+    font-size:11px; color:var(--muted);
+    text-decoration:none; letter-spacing:0.05em; z-index:10;
   }
-  .back-link:hover { color: var(--text); }
+  a.back:hover { color:var(--text); }
 
   h1 {
-    font-family: 'Spectral', serif; font-weight: 300;
-    font-size: 1.45rem; color: #e8e4dc; letter-spacing: 0.02em;
+    font-family:'Spectral',serif; font-weight:300;
+    font-size:1.45rem; color:#e8e4dc; letter-spacing:0.02em;
     padding-top: 1.4rem;
   }
 
-  .equations {
-    font-size: 12px; color: var(--muted);
-    line-height: 1.85; font-style: italic;
-  }
-  .equations span { font-style: normal; }
+  .meta { font-size:12px; color:var(--muted); line-height:1.8; font-style:italic; }
+  .meta .name { font-style:normal; color:var(--text); }
+  .meta .cite { font-style:normal; }
 
-  /* ── 2×2 main grid ── */
-  .page {
-    display: grid;
-    grid-template-columns: 1fr 230px;
-    grid-template-rows: 1fr auto;
-    gap: 0.7rem;
-    min-height: 0;
-  }
+  .page { display:flex; flex-direction:column; min-height:0; }
 
-  .card {
-    border-radius: 6px;
+  .speed-row {
+    display:flex; align-items:center; gap:0.6rem;
+    margin-bottom:0.5rem; flex-shrink:0;
+  }
+  .speed-row .lbl {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .speed-row .val { font-size:9px; color:var(--muted); width:2.6rem; }
+  #speed {
+    -webkit-appearance:none; appearance:none;
+    width:170px; height:2px; border-radius:1px;
+    background:rgba(255,255,255,0.12); outline:none; cursor:pointer;
+  }
+  #speed::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--accent); cursor:pointer;
+  }
+  #speed::-moz-range-thumb {
+    width:11px; height:11px; border:0; border-radius:50%;
+    background:var(--accent); cursor:pointer;
   }
 
   .card-title {
     font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
     color: var(--muted); border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.28rem; margin-bottom: 0.5rem; flex-shrink: 0;
+    padding-bottom: 0.28rem; margin-bottom: 0.4rem; flex-shrink: 0;
   }
 
-  /* top-left: network */
-  .network-card {
-    grid-column: 1; grid-row: 1;
-    padding: 0.8rem 1rem 0.65rem;
-    display: flex; flex-direction: column;
-    min-height: 0;
-  }
-  #rnn-svg { width: 100%; height: 320px; display: block; margin: auto 0; }
+  #rnn-svg { width:100%; flex:1; display:block; min-height:0; }
 
-  /* top-right: parameters */
-  .controls-card {
-    grid-column: 2; grid-row: 1;
-    padding: 0.75rem 0.85rem;
-    display: flex; flex-direction: column;
-    overflow-y: auto;
+  .formulae {
+    flex-shrink:0; margin-top:0.5rem;
+    border-top:0.5px solid var(--border); padding-top:0.55rem;
   }
+  .formulae .col-title {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:0.35rem;
+  }
+  .eq { font-size:11px; line-height:1.95; color:var(--text); }
+  .eq sub { font-size:0.72em; }
+  .eq .grid { display:grid; grid-template-columns:1fr 1fr; gap:0 2.4rem; }
+  .hd { color:var(--hid); } .xi { color:var(--xin); } .ou { color:var(--out); }
 
-  /* bottom-left: sequence + trail side by side */
-  .timelines {
-    grid-column: 1; grid-row: 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.7rem;
-  }
-
-  .seq-card {
-    padding: 0.7rem 0.85rem;
-    display: flex; flex-direction: column;
-  }
-  .trail-card {
-    padding: 0.7rem 0.85rem;
-    display: flex; flex-direction: column;
-  }
-
-  #seq-svg   { width: 100%; height: 72px; display: block; flex-shrink: 0; }
-  #trail-svg { width: 100%; height: 72px; display: block; flex-shrink: 0; }
-
-  /* bottom-right: narrative */
-  .narrative-card {
-    grid-column: 2; grid-row: 2;
-    padding: 0.7rem 0.85rem;
-    overflow-y: auto;
-  }
-
-  .narrative { font-size: 10.5px; color: var(--text); line-height: 1.65; }
-  .narrative .hi  { color: var(--pos); }
-  .narrative .lo  { color: var(--neg); }
-  .narrative .dim { color: var(--muted); }
-
-  .btn-row {
-    display: flex; align-items: center; gap: 0.4rem;
-    margin-top: 0.45rem; flex-shrink: 0;
-  }
-
-  button {
-    background: none; border: 0.5px solid var(--border);
-    border-radius: 3px; color: var(--muted);
-    font-family: 'JetBrains Mono', monospace; font-size: 10px;
-    padding: 4px 8px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
-  }
-  button:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
-  button.primary { border-color: var(--accent); color: var(--accent); }
-  button.primary:hover { background: rgba(170,112,30,0.1); }
-  button:disabled { opacity: 0.3; cursor: default; animation: none; }
-
-  @keyframes pulse {
-    0%, 100% { border-color: var(--accent); box-shadow: 0 0 0 0 rgba(170,112,30,0); }
-    50%       { border-color: #d4921f;      box-shadow: 0 0 0 3px rgba(170,112,30,0.18); }
-  }
-  button.primary:not(:disabled) { animation: pulse 2s ease-in-out infinite; }
-
-  .step-badge {
-    font-size: 10px; color: var(--muted);
-    letter-spacing: 0.06em; flex-shrink: 0;
-  }
-  .step-badge span { color: var(--accent); font-size: 1.1rem; font-family: 'Spectral', serif; }
-
-  /* controls */
-  .ctrl-section-title {
-    font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--muted); border-bottom: 0.5px solid var(--border);
-    padding-bottom: 0.2rem; margin-top: 0.5rem; margin-bottom: 0.22rem; flex-shrink: 0;
-  }
-  .ctrl-section-title:first-child { margin-top: 0; }
-
-  .ctrl-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.1rem; }
-  .ctrl-label { font-size: 8.5px; color: var(--muted); min-width: 44px; flex-shrink: 0; }
-
-  input[type=range] {
-    flex: 1; appearance: none; -webkit-appearance: none; height: 2px;
-    background: rgba(255,255,255,0.1); border-radius: 2px;
-    outline: none; cursor: pointer; min-width: 0;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 9px; height: 9px;
-    border-radius: 50%; background: var(--accent); cursor: pointer;
-  }
-  .ctrl-val { font-size: 8.5px; color: var(--text); min-width: 28px; text-align: right; }
-
-  .act-fn-row { display: flex; gap: 0.3rem; margin-bottom: 0.2rem; }
-  .reset-btn {
-    width: 100%; background: none; border: 0.5px solid var(--border);
-    border-radius: 3px; color: var(--muted);
-    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
-    padding: 4px 0; cursor: pointer; transition: all 0.15s;
-    letter-spacing: 0.06em; margin-bottom: 0.1rem;
-  }
-  .reset-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
-  .act-btn {
-    flex: 1; background: none; border: 0.5px solid var(--border);
-    border-radius: 3px; color: var(--muted);
-    font-family: 'JetBrains Mono', monospace; font-size: 8.5px;
-    padding: 3px 0; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
-  }
-  .act-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(170,112,30,0.08); }
-  .act-btn:hover:not(.active):not(:disabled) { border-color: rgba(255,255,255,0.2); color: var(--text); }
-  .act-btn:disabled { opacity: 0.3; cursor: default; }
-
-  /* mobile */
-  @media (max-width: 600px) {
-    body { height: auto; overflow: auto; padding: 2.5rem 1rem 2rem; grid-template-rows: auto auto auto; }
-    .page { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; }
-    .network-card   { grid-column: 1; grid-row: 1; min-height: 240px; }
-    .controls-card  { grid-column: 1; grid-row: 2; }
-    .timelines      { grid-column: 1; grid-row: 3; }
-    .narrative-card { grid-column: 1; grid-row: 4; }
-    #rnn-svg { min-height: 200px; flex: none; }
-  }
-
-  @keyframes dot-travel {
-    0%   { offset-distance: 0%;   opacity: 0; }
-    8%   { opacity: 1; }
-    88%  { opacity: 1; }
-    100% { offset-distance: 100%; opacity: 0; }
-  }
-  @keyframes ghost-slide {
-    0%   { opacity: 0;   transform: translateX(0px); }
-    8%   { opacity: 0.8; transform: translateX(0px); }
-    80%  { opacity: 0.5; transform: translateX(var(--ghost-dx)); }
-    100% { opacity: 0;   transform: translateX(var(--ghost-dx)); }
-  }
-  @keyframes node-glow {
-    0%   { opacity: 0; }
-    20%  { opacity: 0.55; }
-    100% { opacity: 0; }
-  }
-  .anim-dot {
-    opacity: 0; offset-rotate: 0deg;
-    animation-name: dot-travel;
-    animation-timing-function: cubic-bezier(0.37,0,0.63,1);
+  .node-glow {
+    pointer-events:none;
+    animation-duration: var(--cycle);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
     animation-fill-mode: both;
   }
-  .anim-ghost {
-    opacity: 0;
-    animation-name: ghost-slide;
-    animation-timing-function: cubic-bezier(0.4,0,0.2,1);
+  .flow-dot {
+    offset-rotate: 0deg;
+    animation-duration: var(--cycle);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
     animation-fill-mode: both;
   }
-  .anim-glow {
-    opacity: 0; pointer-events: none;
-    animation-name: node-glow;
-    animation-timing-function: ease-out;
-    animation-fill-mode: both;
+
+  @media (max-width: 820px) {
+    body { height:auto; overflow:auto; padding:2.5rem 1rem 2rem; grid-template-rows:auto auto auto; }
+    #rnn-svg { flex:none; min-height:280px; }
+    .eq .grid { grid-template-columns:1fr; gap:0; }
   }
 </style>
 </head>
 <body>
 
-<a class="back-link" href="/networks/">← networks</a>
+<a class="back" href="/networks/">← networks</a>
 
 <h1>Elman network</h1>
-<div class="equations">
-  input: <span style="color:#e8824a">x</span><sub>t</sub> ∈ ℝ &nbsp;&nbsp;
-  hidden: <span style="color:#e8824a">h</span><sub>t</sub> = σ(W<sub>x</sub> · <span style="color:#e8824a">x</span><sub>t</sub> + W<sub>h</sub> · <span style="color:#e8824a">h</span><sub>t−1</sub> + b),  W<sub>x</sub> ∈ ℝ<sup>2×1</sup>,  W<sub>h</sub> ∈ ℝ<sup>2×2</sup>,  <span style="color:#e8824a">h</span><sub>t</sub> ∈ ℝ²
+
+<div class="meta">
+  <span class="name">Simple recurrent network — the hidden layer is copied into context units</span><br>
+  <span class="cite">Elman — Finding Structure in Time, Cognitive Science 14(2):179–211, 1990. The copy is one-for-one with fixed weight 1.0; it develops a proposal by Jordan (1986), which feeds back the output instead</span>
 </div>
 
 <div class="page">
 
-  <!-- top-left: network diagram -->
-  <div class="network-card card">
-    <div class="card-title">computation graph</div>
-    <svg id="rnn-svg"></svg>
+  <div class="speed-row">
+    <span class="lbl">speed</span>
+    <input id="speed" type="range" min="0" max="100" value="50" step="1" aria-label="animation speed">
+    <span class="val" id="speed-val">1.0×</span>
   </div>
 
-  <!-- top-right: parameters -->
-  <div class="controls-card card" id="controls"></div>
+  <div class="card-title">computation graph</div>
 
-  <!-- bottom-left: sequence + trail side by side -->
-  <div class="timelines">
-    <div class="seq-card card">
-      <div class="card-title">input sequence  x₁ … x₇</div>
-      <svg id="seq-svg"></svg>
-      <div class="btn-row">
-        <button class="primary" id="btn-step">step →</button>
-        <span class="step-badge">t = <span id="t-display">0</span> / 7</span>
+  <svg id="rnn-svg" viewBox="0 30 700 235" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.3)"/>
+      </marker>
+      <marker id="ar-dim" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.16)"/>
+      </marker>
+      <radialGradient id="fill-hid"><stop offset="0" stop-color="#7F77DD" stop-opacity="1"/><stop offset="1" stop-color="#7F77DD" stop-opacity="0.22"/></radialGradient>
+      <radialGradient id="fill-out"><stop offset="0" stop-color="#378ADD" stop-opacity="1"/><stop offset="1" stop-color="#378ADD" stop-opacity="0.22"/></radialGradient>
+    </defs>
+
+    <g id="edges" fill="none">
+      <path id="e-h-hid"   d="M 64,81 C 92,100 122,122 148,136"     stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-x-hid"   d="M 64,224 C 92,205 122,182 148,166"    stroke="rgba(232,130,74,0.5)"   stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-hid-ht"  d="M 252,150 L 314,150"                  stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-ht-out"  d="M 354,150 L 413,150"                  stroke="rgba(127,119,221,0.5)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-out-y"   d="M 517,150 L 584,150"                  stroke="rgba(55,138,221,0.55)"  stroke-width="1.2" marker-end="url(#ar)"/>
+      <path id="e-loop"    d="M 335,131 C 325,28 150,16 48,51"       stroke="rgba(255,255,255,0.16)" stroke-width="1"   stroke-dasharray="3,4" marker-end="url(#ar-dim)"/>
+    </g>
+
+    <g id="nodes" font-family="'JetBrains Mono',monospace">
+      <circle cx="48" cy="70" r="19" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
+      <text x="48" y="70" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t−1</tspan></text>
+      <text x="48" y="106" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.32)">context</text>
+
+      <circle cx="48" cy="236" r="19" fill="#1e2230" stroke="#e8824a" stroke-width="1.2"/>
+      <text x="48" y="236" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#e8824a">x<tspan font-size="8" dy="2">t</tspan></text>
+
+      <rect x="150" y="126" width="102" height="48" rx="4" fill="none" stroke="#7F77DD" stroke-width="1.1"/>
+      <rect id="glow-hidden" class="node-glow" x="150" y="126" width="102" height="48" rx="4" fill="url(#fill-hid)" fill-opacity="0" stroke="#7F77DD" stroke-width="2" stroke-opacity="0"/>
+      <text x="201" y="150" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#7F77DD">σ</text>
+      <text x="201" y="194" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.32)">hidden</text>
+
+      <circle cx="335" cy="150" r="19" fill="#1e2230" stroke="#7F77DD" stroke-width="1.2"/>
+      <circle id="glow-h_t" class="node-glow" cx="335" cy="150" r="19" fill="url(#fill-hid)" fill-opacity="0" stroke="#7F77DD" stroke-width="2" stroke-opacity="0"/>
+      <text x="335" y="150" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#7F77DD">h<tspan font-size="8" dy="2">t</tspan></text>
+
+      <rect x="415" y="126" width="102" height="48" rx="4" fill="none" stroke="#378ADD" stroke-width="1.1"/>
+      <rect id="glow-output" class="node-glow" x="415" y="126" width="102" height="48" rx="4" fill="url(#fill-out)" fill-opacity="0" stroke="#378ADD" stroke-width="2" stroke-opacity="0"/>
+      <text x="466" y="150" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="#378ADD">σ</text>
+      <text x="466" y="194" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.32)">output</text>
+
+      <circle cx="605" cy="150" r="19" fill="#1e2230" stroke="#378ADD" stroke-width="1.2"/>
+      <circle id="glow-y_t" class="node-glow" cx="605" cy="150" r="19" fill="url(#fill-out)" fill-opacity="0" stroke="#378ADD" stroke-width="2" stroke-opacity="0"/>
+      <text x="605" y="150" text-anchor="middle" dominant-baseline="middle" font-size="11" fill="#378ADD">y<tspan font-size="8" dy="2">t</tspan></text>
+
+      <text x="192" y="46" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.3)">copied back, weight 1.0</text>
+    </g>
+
+    <g id="dots"></g>
+  </svg>
+
+  <div class="formulae">
+    <div class="col-title">equations</div>
+    <div class="eq"><div class="grid">
+      <div>
+        <span class="hd">h<sub>t</sub></span> = σ(W <span class="xi">x<sub>t</sub></span> + U <span class="hd">h<sub>t−1</sub></span> + b)<br>
+        <span class="ou">y<sub>t</sub></span> = σ(V <span class="hd">h<sub>t</sub></span> + c)
       </div>
-    </div>
-    <div class="trail-card card">
-      <div class="card-title">hidden state history</div>
-      <svg id="trail-svg"></svg>
-    </div>
-  </div>
-
-  <!-- bottom-right: narrative -->
-  <div class="narrative-card card">
-    <div class="card-title">what is happening</div>
-    <div class="narrative" id="narrative">Press step → to start.</div>
+      <div>
+        <span style="color:var(--muted)">the context layer is <span class="hd">h<sub>t−1</sub></span> verbatim — no weights on the copy</span><br>
+        <span style="color:var(--muted)">Elman used the logistic σ; tanh is the usual modern choice for the hidden layer</span>
+      </div>
+    </div></div>
   </div>
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <script>
-// ── Parameters ───────────────────────────────────────────────────────────────
-const SEQ_LEN = 7;
-const H_SIZE  = 2;
+(function () {
+  'use strict';
 
-let sequence = [0.8, -0.5, 0.3, 0.9, -0.7, 0.2, 0.6];
+  var DAG_END = 76;
+  var FADE    = 1.0;
 
-// Wx[j] = weight from x to h_j  (separate for each hidden unit)
-let Wx = [0.9, -0.6];
+  var DWELL_BOX = 80, DWELL_OP = 34;
+  var DWELL = { hidden: DWELL_BOX, output: DWELL_BOX, h_t: DWELL_OP, y_t: DWELL_OP };
+  var GLOW_PEAK = { hidden: 0.46, output: 0.46, h_t: 0.60, y_t: 0.60 };
 
-// Wh[j][i] = weight from h_i to h_j
-let Wh = [
-  [ 0.7, -0.3],   // h0 receives from h0, h1
-  [ 0.4,  0.6],   // h1 receives from h0, h1
-];
+  var EDGES = [
+    { id:'e-h-hid',  from:'h_prev', to:'hidden', dot:'#7F77DD' },
+    { id:'e-x-hid',  from:'x',      to:'hidden', dot:'#e8824a' },
+    { id:'e-hid-ht', from:'hidden', to:'h_t',    dot:'#7F77DD' },
+    { id:'e-ht-out', from:'h_t',    to:'output', dot:'#7F77DD' },
+    { id:'e-out-y',  from:'output', to:'y_t',    dot:'#378ADD' },
+    { id:'e-loop',   from:'h_t',    to:'h_prev', dot:'#7F77DD', back:true }
+  ];
 
-let b = [0.1, -0.1];
+  var SOURCES = ['h_prev', 'x'];
+  var SINK    = 'y_t';
 
-// ── State ────────────────────────────────────────────────────────────────────
-let t        = 0;
-let h        = [0, 0];
-let hHistory = [[0, 0]];
-let hiddenRevealed = false;
-let prevRevealed   = false;
+  var dotLayer = document.getElementById('dots');
+  var kf = document.createElement('style');
+  document.head.appendChild(kf);
+  var SVG_NS = 'http://www.w3.org/2000/svg';
 
-// ── Activation ───────────────────────────────────────────────────────────────
-let actFn = 'tanh';
-const activations = {
-  tanh:   z => Math.tanh(z),
-  relu:   z => Math.max(0, z),
-  linear: z => z,
-};
-
-// ── Math ─────────────────────────────────────────────────────────────────────
-function stepRNN(x_t, h_prev) {
-  return h_prev.map((_, j) => {
-    let z = b[j] + Wx[j] * x_t;
-    for (let i = 0; i < H_SIZE; i++) z += Wh[j][i] * h_prev[i];
-    return activations[actFn](z);
-  });
-}
-
-// ── Colour helpers ────────────────────────────────────────────────────────────
-const colorScale = d3.scaleLinear()
-  .domain([-1, 0, 1])
-  .range(['#378ADD', '#1e2230', '#e8824a'])
-  .clamp(true);
-
-function weightColor(w) {
-  return colorScale(Math.max(-1, Math.min(1, w)));
-}
-
-function weightWidth(w) {
-  return 0.5 + Math.abs(w) * 2.5;
-}
-
-// ── SVG references ────────────────────────────────────────────────────────────
-const seqSvg   = d3.select('#seq-svg');
-const rnnSvg   = d3.select('#rnn-svg');
-const trailSvg = d3.select('#trail-svg');
-
-// ── Draw sequence ─────────────────────────────────────────────────────────────
-function drawSequence() {
-  seqSvg.selectAll('*').remove();
-  const W = 560, H = 80;
-  seqSvg.attr('viewBox', `0 0 ${W} ${H}`);
-
-  const barW = W / SEQ_LEN;
-  const midY = H / 2;
-  const scale = 28;
-
-  seqSvg.append('line')
-    .attr('x1', 0).attr('x2', W).attr('y1', midY).attr('y2', midY)
-    .attr('stroke', 'rgba(255,255,255,0.06)').attr('stroke-width', 1);
-
-  sequence.forEach((v, i) => {
-    const cx     = barW * i + barW / 2;
-    const barH   = Math.abs(v) * scale;
-    const isCur  = (i === t - 1);
-    const isPast = (i < t - 1);
-
-    seqSvg.append('rect')
-      .attr('x', cx - barW * 0.3)
-      .attr('y', v >= 0 ? midY - barH : midY)
-      .attr('width', barW * 0.6)
-      .attr('height', barH || 2)
-      .attr('fill', isCur ? colorScale(v) : isPast ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.18)')
-      .attr('rx', 2);
-
-    seqSvg.append('text')
-      .attr('x', cx).attr('y', H - 4)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace')
-      .attr('font-size', 9)
-      .attr('fill', isCur ? '#e8824a' : 'var(--muted)')
-      .text(`x${i+1}`);
-
-    seqSvg.append('text')
-      .attr('x', cx)
-      .attr('y', v >= 0 ? midY - barH - 5 : midY + barH + 12)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace')
-      .attr('font-size', 9)
-      .attr('fill', isCur ? colorScale(v) : 'rgba(255,255,255,0.25)')
-      .text(v.toFixed(2));
-
-    if (isCur) {
-      seqSvg.append('rect')
-        .attr('x', barW * i + 2).attr('y', 1)
-        .attr('width', barW - 4).attr('height', H - 2)
-        .attr('fill', 'none')
-        .attr('stroke', 'var(--accent)')
-        .attr('stroke-width', 1).attr('rx', 3).attr('opacity', 0.5);
-    }
-  });
-}
-
-// ── Draw RNN diagram ──────────────────────────────────────────────────────────
-//
-//  Layout (vertical hidden units):
-//
-//         ┌─────┐         ┌─────┐
-//  x_t ──►│  h1 │◄── Wh ─┤  h1 │  (prev)
-//         └─────┘    ╲    └─────┘
-//                     ╲
-//         ┌─────┐   ╲  ╲ ┌─────┐
-//  x_t ──►│  h2 │◄───╲──┤  h2 │  (prev)
-//         └─────┘         └─────┘
-//
-//  We show:
-//   - x_t node on the left
-//   - TWO separate arrows from x_t to h1 and h2, labelled Wx1 and Wx2
-//   - h_prev column on the right (ghosted, showing previous values)
-//   - four recurrent arrows from h_prev to h_cur, one per Wh[j][i]
-//
-function drawRNN() {
-  rnnSvg.selectAll('*').remove();
-  const W = 560, H = 250;
-  rnnSvg.attr('viewBox', `0 0 ${W} ${H}`);
-
-  const R = 26;
-
-  // Column x positions
-  const xPrev   = W - 90;   // h_{t-1} (ghost column, right)
-  const xCur    = W / 2 + 20; // h_t (current, centre-right)
-  const xInput  = 80;        // x_t (left)
-
-  // Row y positions for the two hidden units
-  const yH = [H * 0.32, H * 0.72];
-
-  const curX = t < SEQ_LEN ? sequence[t] : sequence[SEQ_LEN - 1];
-
-  // ── Arrow marker ────────────────────────────────────────────────────────────
-  rnnSvg.append('defs').append('marker')
-    .attr('id', 'arr')
-    .attr('markerWidth', 7).attr('markerHeight', 7)
-    .attr('refX', 5).attr('refY', 3.5)
-    .attr('orient', 'auto')
-    .append('path').attr('d', 'M0,0 L0,7 L7,3.5 z')
-    .attr('fill', 'rgba(255,255,255,0.3)');
-
-  // ── h_{t-1} ghost nodes (right column) ─────────────────────────────────────
-  const hPrev = hHistory[hHistory.length - 1];
-  const hasPrev = prevRevealed && hHistory.length >= 2;
-
-  yH.forEach((y, j) => {
-    const g = rnnSvg.append('g').attr('class', 'prev-node');
-
-    g.append('circle')
-      .attr('cx', xPrev).attr('cy', y).attr('r', R)
-      .attr('fill',   hasPrev ? colorScale(hPrev[j]) : '#13161d')
-      .attr('stroke', 'rgba(255,255,255,0.1)')
-      .attr('stroke-width', 1)
-      .attr('opacity', 0.45);
-
-    g.append('text')
-      .attr('x', xPrev).attr('y', y)
-      .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-      .attr('fill', 'rgba(255,255,255,0.4)')
-      .text(hasPrev ? hPrev[j].toFixed(2) : '');
-
-    rnnSvg.append('text')
-      .attr('x', xPrev).attr('y', y + R + 12)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-      .attr('fill', 'var(--muted)')
-      .text(`h${j+1}  t-1`);
+  var live = [];
+  EDGES.forEach(function (e) {
+    var el = document.getElementById(e.id);
+    if (el) live.push({ cfg: e, d: el.getAttribute('d'), len: el.getTotalLength() });
   });
 
-  // ── Recurrent arrows: h_prev[i] → h_cur[j] ─────────────────────────────────
-  // Curve direction rules:
-  //   self (i==j, i==0): arc upward   (control point above)
-  //   self (i==j, i==1): arc downward (control point below)
-  //   cross (i=0→j=1):  curves downward (goes from upper to lower)
-  //   cross (i=1→j=0):  curves upward   (goes from lower to upper)
-  for (let j = 0; j < H_SIZE; j++) {
-    for (let i = 0; i < H_SIZE; i++) {
-      const x1 = xPrev - R;
-      const y1 = yH[i];
-      const x2 = xCur + R;
-      const y2 = yH[j];
-      const w  = Wh[j][i];
-      const cpX = (x1 + x2) / 2;
-
-      let cpY;
-      if (i === j) {
-        // self-connection: h0→h0 arcs up, h1→h1 arcs down
-        cpY = i === 0 ? y1 - 70 : y1 + 70;
-      } else if (i < j) {
-        // going downward (h0→h1): curve below the midpoint
-        cpY = (y1 + y2) / 2 + 40;
-      } else {
-        // going upward (h1→h0): curve above the midpoint
-        cpY = (y1 + y2) / 2 - 40;
+  var arrive = {}, ready = {};
+  live.forEach(function (o) {
+    arrive[o.cfg.from] = 0; ready[o.cfg.from] = 0;
+    arrive[o.cfg.to]   = 0; ready[o.cfg.to]   = 0;
+  });
+  for (var pass = 0; pass < live.length + 2; pass++) {
+    live.forEach(function (o) {
+      if (o.cfg.back) return;
+      var cand = ready[o.cfg.from] + o.len;
+      if (cand > arrive[o.cfg.to]) {
+        arrive[o.cfg.to] = cand;
+        ready[o.cfg.to]  = cand + (DWELL[o.cfg.to] || 0);
       }
-
-      rnnSvg.append('path')
-        .attr('d', `M ${x1} ${y1} Q ${cpX} ${cpY} ${x2} ${y2}`)
-        .attr('fill', 'none')
-        .attr('stroke', weightColor(w))
-        .attr('stroke-width', weightWidth(w))
-        .attr('opacity', 0.65)
-        .attr('marker-end', 'url(#arr)');
-
-      // Label at the quadratic bezier midpoint: B(0.5) = 0.25*P0 + 0.5*CP + 0.25*P1
-      const lx = 0.25*x1 + 0.5*cpX + 0.25*x2;
-      const ly = 0.25*y1 + 0.5*cpY + 0.25*y2;
-      const labelOffset = (i === j && i === 0) ? -7
-                        : (i === j && i === 1) ?  7
-                        : (i < j)              ?  9
-                        :                        -7;
-      rnnSvg.append('text')
-        .attr('x', lx).attr('y', ly + labelOffset)
-        .attr('text-anchor', 'middle')
-        .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 8)
-        .attr('fill', weightColor(w))
-        .attr('opacity', 0.9)
-        .text(`${Wh[j][i].toFixed(2)}`);
-    }
-  }
-
-  // ── x_t input node ───────────────────────────────────────────────────────────
-  rnnSvg.append('circle')
-    .attr('cx', xInput).attr('cy', H / 2).attr('r', R)
-    .attr('fill',   colorScale(curX))
-    .attr('stroke', 'rgba(255,255,255,0.15)').attr('stroke-width', 1.5);
-
-  rnnSvg.append('text')
-    .attr('x', xInput).attr('y', H / 2)
-    .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-    .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 10)
-    .attr('fill', 'rgba(255,255,255,0.8)')
-    .text(curX.toFixed(2));
-
-  rnnSvg.append('text')
-    .attr('x', xInput).attr('y', H / 2 + R + 13)
-    .attr('text-anchor', 'middle')
-    .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-    .attr('fill', 'var(--muted)')
-    .text(`x${t + 1}`);
-
-  // ── Input → hidden arrows (one per hidden unit, explicitly separate) ─────────
-  yH.forEach((y, j) => {
-    const x1 = xInput + R;
-    const y1 = H / 2;
-    const x2 = xCur - R;
-    const y2 = y;
-    const w  = Wx[j];
-
-    // Straight line from input to each hidden unit
-    rnnSvg.append('line')
-      .attr('x1', x1).attr('y1', y1)
-      .attr('x2', x2).attr('y2', y2)
-      .attr('stroke', weightColor(w))
-      .attr('stroke-width', weightWidth(w))
-      .attr('opacity', 0.75)
-      .attr('marker-end', 'url(#arr)');
-
-    // Label midpoint — offset up/down to avoid overlap
-    const mx = (x1 + x2) / 2;
-    const my = (y1 + y2) / 2 + (j === 0 ? -10 : 10);
-    rnnSvg.append('text')
-      .attr('x', mx).attr('y', my)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-      .attr('fill', weightColor(w))
-      .attr('opacity', 0.9)
-      .text(`Wx${j+1}=${w.toFixed(2)}`);
-  });
-
-  // ── h_t current nodes ─────────────────────────────────────────────────────────
-  yH.forEach((y, j) => {
-    const g = rnnSvg.append('g').attr('class', 'cur-node');
-
-    g.append('circle')
-      .attr('cx', xCur).attr('cy', y).attr('r', R)
-      .attr('fill',   hiddenRevealed ? colorScale(h[j]) : '#13161d')
-      .attr('stroke', hiddenRevealed ? d3.color(colorScale(h[j])).brighter(0.4) : 'rgba(255,255,255,0.15)')
-      .attr('stroke-width', 1.5);
-
-    g.append('text')
-      .attr('x', xCur).attr('y', y)
-      .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 10)
-      .attr('fill', 'rgba(255,255,255,0.9)')
-      .text(hiddenRevealed ? h[j].toFixed(2) : '');
-
-    rnnSvg.append('text')
-      .attr('x', xCur).attr('y', y + R + 13)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-      .attr('fill', 'var(--muted)')
-      .text(`h${j+1}  t`);
-  });
-
-  // ── Column headers ────────────────────────────────────────────────────────────
-  [ [xInput, 'x_t'], [xCur, 'h_t  (current)'], [xPrev, 'h_{t-1}'] ]
-    .forEach(([x, label]) => {
-      rnnSvg.append('text')
-        .attr('x', x).attr('y', 12)
-        .attr('text-anchor', 'middle')
-        .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-        .attr('fill', 'var(--muted)')
-        .attr('letter-spacing', '0.06em')
-        .text(label);
-    });
-}
-
-// ── Draw hidden state trail ───────────────────────────────────────────────────
-function drawTrail() {
-  trailSvg.selectAll('*').remove();
-  const W = 560, H = 100;
-  trailSvg.attr('viewBox', `0 0 ${W} ${H}`);
-
-  const colW  = W / (SEQ_LEN + 1);  // +1 for t=0
-  const unitH = (H - 28) / H_SIZE;
-
-  hHistory.forEach((hVec, step) => {
-    const isLast = step === hHistory.length - 1;
-    hVec.forEach((val, j) => {
-      const x = step * colW;
-      const y = 16 + j * unitH;
-      trailSvg.append('rect')
-        .attr('x', x + 2).attr('y', y)
-        .attr('width', colW - 4).attr('height', unitH - 3)
-        .attr('fill', colorScale(val))
-        .attr('rx', 2)
-        .attr('opacity', isLast ? 1.0 : 0.65);
-
-      trailSvg.append('text')
-        .attr('x', x + colW / 2).attr('y', y + unitH / 2 - 1)
-        .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
-        .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 8)
-        .attr('fill', 'rgba(255,255,255,0.65)')
-        .text(val.toFixed(2));
-    });
-
-    trailSvg.append('text')
-      .attr('x', step * colW + colW / 2).attr('y', H - 4)
-      .attr('text-anchor', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-      .attr('fill', isLast ? 'var(--accent)' : 'var(--muted)')
-      .text(`t=${step}`);
-  });
-
-  // Row labels on the right
-  ['h₁', 'h₂'].forEach((label, j) => {
-    trailSvg.append('text')
-      .attr('x', hHistory.length * colW + 4)
-      .attr('y', 16 + j * unitH + unitH / 2 - 1)
-      .attr('dominant-baseline', 'middle')
-      .attr('font-family', 'JetBrains Mono, monospace').attr('font-size', 9)
-      .attr('fill', 'var(--muted)')
-      .text(label);
-  });
-}
-
-// ── Narrative ─────────────────────────────────────────────────────────────────
-function updateNarrative() {
-  const el = document.getElementById('narrative');
-  if (t === 0) {
-    el.innerHTML = 'Hidden state initialised to <span class="dim">h = [0, 0]</span>. Press step → to begin.';
-    return;
-  }
-  const x      = sequence[t - 1];
-  const hPrev  = hHistory[t - 1];
-  const parts  = h.map((hj, j) => {
-    const fromX = Wx[j] * x;
-    const fromH = Wh[j].reduce((s, w, i) => s + w * hPrev[i], 0);  // recurrent only
-    const bias  = b[j];
-    return `h${j+1}: ` +
-           `<span class="${fromX>0?'hi':'lo'}">x·Wx${j+1}=${fromX.toFixed(2)}</span> ` +
-           `+ <span class="${fromH>0?'hi':'lo'}">h_prev·Wh=${fromH.toFixed(2)}</span> ` +
-           `+ <span class="${bias>0?'hi':'lo'}">b=${bias.toFixed(2)}</span>` +
-           ` → ${actFn} → <span class="${hj>0?'hi':'lo'}">${hj.toFixed(3)}</span>`;
-  });
-  el.innerHTML =
-    `t=${t}  input <span class="hi">x=${x.toFixed(2)}</span><br>` +
-    parts.join('<br>') +
-    (t === SEQ_LEN ? '<br><span class="dim">— sequence complete</span>' : '');
-}
-
-// ── Full redraw ───────────────────────────────────────────────────────────────
-function redraw() {
-  document.getElementById('t-display').textContent = t;
-  document.getElementById('btn-step').disabled = t >= SEQ_LEN;
-  drawSequence();
-  drawRNN();
-  drawTrail();
-  updateNarrative();
-}
-
-function resetAndRedraw() {
-  t = 0; h = [0, 0]; hHistory = [[0, 0]]; hiddenRevealed = false; prevRevealed = false;
-  redraw();
-}
-
-// ── Buttons ───────────────────────────────────────────────────────────────────
-document.getElementById('btn-step').addEventListener('click', () => {
-  if (t >= SEQ_LEN) return;
-  function setAnimating(on) {
-    ['btn-step','btn-zero','btn-rand-weights','btn-rand-seq','btn-reset-state'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.disabled = on || (id === 'btn-step' && t >= SEQ_LEN);
-    });
-    document.querySelectorAll('.act-btn').forEach(btn => btn.disabled = on);
-  }
-
-  setAnimating(true);
-  // hidden visibility is controlled within this step lifecycle
-
-  const svgEl = document.getElementById('rnn-svg');
-  const NS  = 'http://www.w3.org/2000/svg';
-  const W = 560, H = 250, R = 26;
-  const xInput = 80, xCur = W/2+20, xPrev = W-90;
-  const yInput = H/2;
-  const yH = [H*0.32, H*0.72];
-
-  const T_DOT      = 1.1;
-  const T_GAP      = 0.3;
-  const T_GHOST    = 1.0;
-  const T_GHOST_DLY = 0.3;
-  const isFirst = t === 0;
-
-  const animEls = [];
-  const timers  = [];
-
-  const defs = svgEl.querySelector('defs') || svgEl.insertBefore(
-    document.createElementNS(NS,'defs'), svgEl.firstChild);
-
-  function mkPath(id, x1,y1, x2,y2, cpX,cpY) {
-    const d = cpX != null ? `M${x1},${y1} Q${cpX},${cpY} ${x2},${y2}` : `M${x1},${y1} L${x2},${y2}`;
-    const p = document.createElementNS(NS,'path');
-    p.setAttribute('id',id); p.setAttribute('d',d);
-    p.setAttribute('fill','none'); p.setAttribute('stroke','none');
-    defs.appendChild(p); animEls.push(p); return p;
-  }
-
-  function mkDot(color, pathId, delay, dur) {
-    const c = document.createElementNS(NS,'circle');
-    c.setAttribute('r', 5); c.setAttribute('fill', color);
-    c.classList.add('anim-dot');
-    c.style.offsetPath = `url(#${pathId})`;
-    c.style.animationDuration = dur+'s';
-    c.style.animationDelay = delay+'s';
-    svgEl.appendChild(c); animEls.push(c);
-  }
-
-  function mkGlow(x, y, color, delay) {
-    const c = document.createElementNS(NS,'circle');
-    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',R+8);
-    c.setAttribute('fill',color); c.classList.add('anim-glow');
-    c.style.animationDuration = '0.5s';
-    c.style.animationDelay = delay+'s';
-    svgEl.appendChild(c); animEls.push(c);
-  }
-
-  function mkPulse(x, y, color) {
-    // expanding ring that grows from R to R+22 and fades out
-    const styleEl2 = document.createElement('style');
-    document.head.appendChild(styleEl2);
-    animEls.push(styleEl2);
-    const uid = `pulse-${x}-${y}-${Date.now()}`;
-    styleEl2.sheet.insertRule(`
-      @keyframes ${uid} {
-        0%   { r: ${R}px;    opacity: 0.9; }
-        100% { r: ${R+24}px; opacity: 0;   }
-      }
-    `, 0);
-    const ring = document.createElementNS(NS, 'circle');
-    ring.setAttribute('cx', x); ring.setAttribute('cy', y); ring.setAttribute('r', R);
-    ring.setAttribute('fill', 'none');
-    ring.setAttribute('stroke', color);
-    ring.setAttribute('stroke-width', '2');
-    ring.style.animationName = uid;
-    ring.style.animationDuration = '0.6s';
-    ring.style.animationTimingFunction = 'ease-out';
-    ring.style.animationFillMode = 'both';
-    svgEl.appendChild(ring);
-    animEls.push(ring);
-  }
-
-  function schedule(ms, fn) { timers.push(setTimeout(fn, ms)); }
-
-  const x_t  = sequence[t];
-  const hSnap = [...h]; // snapshot of h before this step
-
-  // ── Phase 1a: orange dots xInput → xCur ──────────────────────────────────────
-  yH.forEach((y,j) => {
-    const oid = `rp-ox-${j}-${Date.now()}`;
-    mkPath(oid, xInput+R, yInput, xCur-R, y);
-    mkDot('#e8824a', oid, 0, T_DOT);
-  });
-
-  // when orange arrives: show partial hidden values
-  function updateCurNodes(vals) {
-    const rnnSvgEl = document.getElementById('rnn-svg');
-    rnnSvgEl.querySelectorAll('.cur-node').forEach((g, j) => {
-      const circle = g.querySelector('circle');
-      const text   = g.querySelector('text');
-      if (circle) circle.setAttribute('fill', colorScale(vals[j]));
-      if (text)   text.textContent = vals[j].toFixed(2);
     });
   }
+  SOURCES.forEach(function (n) { arrive[n] = 0; ready[n] = 0; });
 
-  // when orange arrives: show partial (Wx·x + b, no activation, no Wh term)
-  schedule(T_DOT * 1000, () => {
-    if (isFirst) {
-      h = stepRNN(x_t, [0, 0]);
-      t++; hHistory.push([...h]);
-      hiddenRevealed = true;
-      updateCurNodes(h);
-      yH.forEach(y => mkPulse(xCur, y, '#e8824a'));
-    } else {
-      // partial: Wx·x + b only (linear, no activation, no recurrent term)
-      const partial = yH.map((_, j) => b[j] + Wx[j] * x_t);
-      hiddenRevealed = true;
-      updateCurNodes(partial);
-      yH.forEach(y => mkPulse(xCur, y, '#e8824a'));
-    }
+  var scale = DAG_END / (ready[SINK] || 1);
+  Object.keys(ready).forEach(function (n) { ready[n] *= scale; arrive[n] *= scale; });
+
+  var rules = [];
+  var animEls = [];
+  live.forEach(function (o, i) {
+    var start = ready[o.cfg.from];
+    var end   = o.cfg.back ? 100 : arrive[o.cfg.to];
+    var name  = 'rnn-flow-' + i;
+    var fadeIn = Math.min(start + FADE, end - 0.4);
+    var hold   = Math.max(end - 0.8, fadeIn);
+
+    rules.push(
+      '@keyframes ' + name + '{' +
+      '0%,' + start.toFixed(2) + '%{offset-distance:0%;opacity:0}' +
+      fadeIn.toFixed(2) + '%{opacity:1}' +
+      hold.toFixed(2) + '%{opacity:1}' +
+      end.toFixed(2) + '%,100%{offset-distance:100%;opacity:0}}'
+    );
+
+    var dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('class', 'flow-dot');
+    dot.setAttribute('r', 4.5);
+    dot.setAttribute('fill', o.cfg.dot);
+    dot.style.offsetPath = "path('" + o.d + "')";
+    dot.style.animationName = name;
+    dotLayer.appendChild(dot);
+    animEls.push(dot);
   });
 
-  // ── Phase 1b: blue dots xPrev → xCur (steps 2+) ──────────────────────────────
-  if (!isFirst) {
-    const blueDelay = T_DOT + T_GAP;
-    yH.forEach((y,j) => {
-      yH.forEach((yp,i) => {
-        const x1 = xPrev-R, x2 = xCur+R;
-        const cpX = (x1+x2)/2;
-        let cpY;
-        if (i===j) cpY = i===0 ? yp-70 : yp+70;
-        else if (i<j) cpY = (yp+y)/2+40;
-        else cpY = (yp+y)/2-40;
-        const bid = `rp-bh-${i}-${j}-${Date.now()}`;
-        mkPath(bid, x1, yp, x2, y, cpX, cpY);
-        mkDot('#378ADD', bid, blueDelay, T_DOT);
+  Object.keys(DWELL).forEach(function (n) {
+    var el = document.getElementById('glow-' + n);
+    if (!el || !(n in arrive)) return;
+    var a = arrive[n], r = ready[n], peak = GLOW_PEAK[n] || 0.45, d = r - a;
+    var sus = peak * 0.40;
+    var atk = a + 0.05 * d;
+    var dec = a + 0.30 * d;
+    var rel = Math.min(r + 0.60 * d, 99.5);
+    var name = 'rnn-glow-' + n;
+    rules.push(
+      '@keyframes ' + name + '{' +
+      '0%,' + a.toFixed(2) + '%{fill-opacity:0;stroke-opacity:0}' +
+      atk.toFixed(2) + '%{fill-opacity:' + (peak * 0.62).toFixed(3) + ';stroke-opacity:1}' +
+      dec.toFixed(2) + '%{fill-opacity:' + sus.toFixed(3) + ';stroke-opacity:0.34}' +
+      r.toFixed(2) + '%{fill-opacity:' + (sus * 0.82).toFixed(3) + ';stroke-opacity:0.24}' +
+      rel.toFixed(2) + '%,100%{fill-opacity:0;stroke-opacity:0}}'
+    );
+    el.style.animationName = name;
+    animEls.push(el);
+  });
+
+  kf.textContent = rules.join(String.fromCharCode(10));
+
+  var RANGE = 2.8;
+  var slider  = document.getElementById('speed');
+  var readout = document.getElementById('speed-val');
+
+  function setRate(mult) {
+    animEls.forEach(function (el) {
+      if (!el.getAnimations) return;
+      el.getAnimations().forEach(function (a) {
+        if (a.updatePlaybackRate) a.updatePlaybackRate(mult);
+        else a.playbackRate = mult;
       });
     });
-    yH.forEach(y => mkGlow(xCur, y, '#e8824a', blueDelay + T_DOT * 0.9));
-
-    // when blue arrives: full computation with recurrent term + activation, second pulse
-    schedule((blueDelay + T_DOT) * 1000, () => {
-      h = stepRNN(x_t, hSnap);
-      t++; hHistory.push([...h]);
-      hiddenRevealed = true;
-      updateCurNodes(h);
-      yH.forEach(y => mkPulse(xCur, y, '#378ADD'));
-    });
   }
 
-  // ── Phase 2: ghost-clone xCur → xPrev (built after h is computed) ────────────
-  const ghostStart = isFirst
-    ? T_DOT + T_GHOST_DLY
-    : T_DOT + T_GAP + T_DOT + T_GHOST_DLY;
-  const dx = xPrev - xCur;
-
-  schedule(ghostStart * 1000, () => {
-    // border ring slides from mid to prev — fill and value stay in mid column
-    const styleEl = document.createElement('style');
-    document.head.appendChild(styleEl);
-    animEls.push(styleEl);
-
-    yH.forEach((y, j) => {
-      const uid = `ghost-${j}-${Date.now()}`;
-      styleEl.sheet.insertRule(`
-        @keyframes ${uid} {
-          0%   { opacity: 0;   transform: translateX(0px); }
-          8%   { opacity: 1;   transform: translateX(0px); }
-          80%  { opacity: 0.8; transform: translateX(${dx}px); }
-          100% { opacity: 0;   transform: translateX(${dx}px); }
-        }
-      `, 0);
-
-      const ring = document.createElementNS(NS, 'circle');
-      ring.setAttribute('cx', xCur);
-      ring.setAttribute('cy', y);
-      ring.setAttribute('r', R);
-      ring.setAttribute('fill', 'none');
-      ring.setAttribute('stroke', '#378ADD');
-      ring.setAttribute('stroke-width', '2.5');
-      ring.style.animationName = uid;
-      ring.style.animationDuration = T_GHOST + 's';
-      ring.style.animationTimingFunction = 'cubic-bezier(0.4,0,0.2,1)';
-      ring.style.animationFillMode = 'both';
-      svgEl.appendChild(ring);
-      animEls.push(ring);
-    });
-
-    mkGlow(xPrev, yH[0], '#378ADD', T_GHOST * 0.82);
-    mkGlow(xPrev, yH[1], '#378ADD', T_GHOST * 0.82);
-  });
-
-  // ── Phase 3a: ghost lands → reveal prev column ────────────────────────────────
-  const ghostLandMs = (ghostStart + T_GHOST * 0.82) * 1000;
-  schedule(ghostLandMs, () => {
-    prevRevealed = t >= 1;
-    // update prev column nodes directly — full redraw would wipe the ring animation
-    if (prevRevealed) {
-      const prevH = hHistory[hHistory.length - 1];
-      document.getElementById('rnn-svg').querySelectorAll('.prev-node').forEach((g, j) => {
-        const circle = g.querySelector('circle');
-        const text   = g.querySelector('text');
-        if (circle) circle.setAttribute('fill', colorScale(prevH[j]));
-        if (text)   text.textContent = prevH[j].toFixed(2);
-      });
-    }
-  });
-
-  // ── Phase 3b: clean up anim elements, then clear h_t for next iteration ───────
-  const totalMs = (ghostStart + T_GHOST + 0.5) * 1000;
-  schedule(totalMs, () => {
-    animEls.forEach(e => e.remove());
-    hiddenRevealed = false;
-    redraw();
-    setAnimating(false);
-  });
-});
-
-
-// ── Build controls ────────────────────────────────────────────────────────────
-function buildControls() {
-  const ctrl = d3.select('#controls');
-  ctrl.selectAll('*').remove();
-
-  // Reset to zero
-  const resetSec = ctrl.append('div');
-  resetSec.append('div').attr('class','ctrl-section-title').text('reset');
-  resetSec.append('button')
-    .attr('class','reset-btn').attr('id','btn-zero')
-    .text('zero all weights')
-    .on('click', () => {
-      Wx.fill(0);
-      Wh.forEach(row => row.fill(0));
-      b.fill(0);
-      resetAndRedraw();
-      buildControls();
-    });
-  resetSec.append('button')
-    .attr('class','reset-btn').attr('id','btn-rand-weights')
-    .style('margin-top','0.25rem')
-    .text('randomise weights')
-    .on('click', () => {
-      Wx = Wx.map(() => Math.round((Math.random()*2-1)*100)/100);
-      Wh = Wh.map(row => row.map(() => Math.round((Math.random()*2-1)*100)/100));
-      b  = b.map(() => Math.round((Math.random()*2-1)*100)/100);
-      resetAndRedraw();
-      buildControls();
-    });
-
-  // Activation function
-  const actSec = ctrl.append('div');
-  actSec.append('div').attr('class', 'ctrl-section-title').text('activation');
-  const btnRow = actSec.append('div').attr('class', 'act-fn-row');
-  ['tanh','relu','linear'].forEach(fn => {
-    btnRow.append('button')
-      .attr('class', `act-btn${actFn===fn?' active':''}`)
-      .text(fn)
-      .on('click', () => { actFn = fn; buildControls(); resetAndRedraw(); });
-  });
-
-  // Wx sliders — clearly labelled per hidden unit
-  const wxSec = ctrl.append('div');
-  wxSec.append('div').attr('class', 'ctrl-section-title').text('Wx  (x → hidden)');
-  Wx.forEach((w, j) => {
-    const row = wxSec.append('div').attr('class', 'ctrl-row');
-    row.append('span').attr('class', 'ctrl-label').text(`x → h${j+1}`);
-    const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',w);
-    const vl = row.append('span').attr('class','ctrl-val').text(w.toFixed(2));
-    sl.on('input', function() {
-      Wx[j] = +this.value; vl.text(Wx[j].toFixed(2)); resetAndRedraw();
-    });
-  });
-
-  // Wh sliders — labelled as from→to
-  const whSec = ctrl.append('div');
-  whSec.append('div').attr('class', 'ctrl-section-title').text('Wh  (recurrent)');
-  for (let j = 0; j < H_SIZE; j++) {
-    for (let i = 0; i < H_SIZE; i++) {
-      const row = whSec.append('div').attr('class', 'ctrl-row');
-      row.append('span').attr('class', 'ctrl-label').text(`h${i+1}→h${j+1}`);
-      const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',Wh[j][i]);
-      const vl = row.append('span').attr('class','ctrl-val').text(Wh[j][i].toFixed(2));
-      sl.on('input', function() {
-        Wh[j][i] = +this.value; vl.text(Wh[j][i].toFixed(2)); resetAndRedraw();
-      });
-    }
+  function applySpeed() {
+    var mult = Math.pow(RANGE, (slider.value - 50) / 50);
+    setRate(mult);
+    readout.textContent = mult.toFixed(1) + '\u00d7';
   }
 
-  // Bias sliders
-  const bSec = ctrl.append('div');
-  bSec.append('div').attr('class', 'ctrl-section-title').text('biases');
-  b.forEach((bv, j) => {
-    const row = bSec.append('div').attr('class', 'ctrl-row');
-    row.append('span').attr('class', 'ctrl-label').text(`b  h${j+1}`);
-    const sl = row.append('input').attr('type','range').attr('min',-2).attr('max',2).attr('step',0.01).attr('value',bv);
-    const vl = row.append('span').attr('class','ctrl-val').text(bv.toFixed(2));
-    sl.on('input', function() {
-      b[j] = +this.value; vl.text(b[j].toFixed(2)); resetAndRedraw();
-    });
-  });
-
-  // Sequence sliders
-  const seqSec = ctrl.append('div');
-  seqSec.append('div').attr('class', 'ctrl-section-title').text('sequence');
-  sequence.forEach((v, i) => {
-    const row = seqSec.append('div').attr('class', 'ctrl-row');
-    row.append('span').attr('class', 'ctrl-label').text(`x${i+1}`);
-    const sl = row.append('input').attr('type','range').attr('min',-1).attr('max',1).attr('step',0.01).attr('value',v);
-    const vl = row.append('span').attr('class','ctrl-val').text(v.toFixed(2));
-    sl.on('input', function() {
-      sequence[i] = +this.value; vl.text(sequence[i].toFixed(2)); resetAndRedraw();
-    });
-  });
-
-  // sequence and state controls at bottom
-  const seqCtrlSec = ctrl.append('div');
-  seqCtrlSec.append('div').attr('class','ctrl-section-title').text('sequence');
-  seqCtrlSec.append('button')
-    .attr('class','reset-btn').attr('id','btn-rand-seq')
-    .text('randomise sequence')
-    .on('click', () => {
-      sequence = Array.from({length: SEQ_LEN}, () => Math.round((Math.random()*2-1)*100)/100);
-      resetAndRedraw(); buildControls();
-    });
-  seqCtrlSec.append('button')
-    .attr('class','reset-btn').attr('id','btn-reset-state')
-    .style('margin-top','0.25rem')
-    .text('reset state')
-    .on('click', resetAndRedraw);
-}
-
-buildControls();
-redraw();
+  slider.addEventListener('input', applySpeed);
+  requestAnimationFrame(applySpeed);
+})();
 </script>
+
 </body>
 </html>

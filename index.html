@@ -45,6 +45,10 @@
     .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
     .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
     .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
+    @keyframes lstm-mul{0%,100%{fill:#1e2230}18%,34%{fill:#378ADD}}
+    @keyframes lstm-add{0%,100%{fill:#1e2230}50%,66%{fill:#c8cdd8}}
+    .lstm-mul{animation:lstm-mul 5s ease-in-out infinite}
+    .lstm-add{animation:lstm-add 5s ease-in-out infinite}
     /* GRU miniature — mirrors the full computation-graph animation. */
     @keyframes gru-mini-gate-fill{0%,15.8%{opacity:0}17.3%{opacity:.48}24%{opacity:.34}31%{opacity:.18}37%{opacity:.07}43%,100%{opacity:0}}
     @keyframes gru-mini-gate-hit{0%,15.8%{opacity:0;stroke-width:1}16.5%{opacity:.95;stroke-width:2.1}18.5%,100%{opacity:0;stroke-width:1}}
@@ -225,10 +229,33 @@
           <path d="M 54 49 Q 30 65 54 81" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
           <line x1="70" y1="65" x2="175" y2="65" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
           <circle cx="185" cy="65" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
-          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">vanilla RNN</text>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">Elman network</text>
         </svg>
       </div>
 
+      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+        <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+          <rect width="220" height="130" fill="#0d0f14"/>
+          <rect class="lstm-cell" x="10" y="20" width="200" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
+          <line class="lstm-hw" x1="15" y1="25" x2="205" y2="25" stroke="white" stroke-width="2"/>
+          <text x="110" y="16" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)">cell state</text>
+          <rect class="lstm-gate-i" x="42"  y="44" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
+          <rect class="lstm-gate-g" x="94"  y="44" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
+          <rect class="lstm-gate-o" x="146" y="44" width="28" height="28" rx="4" stroke="#7B5EA7" stroke-width="1"/>
+          <text x="56"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
+          <text x="108" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
+          <text x="160" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
+          <line x1="56"  y1="44" x2="76" y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="108" y1="44" x2="88" y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="160" y1="72" x2="160" y2="94" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <circle class="lstm-add" cx="82" cy="25" r="7" stroke="rgba(255,255,255,0.35)" stroke-width="0.9"/>
+          <text x="82" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.7)">+</text>
+          <line x1="20"  y1="114" x2="20"  y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="195" y1="114" x2="195" y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="20"  y1="96" x2="195" y2="96" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">LSTM 1997</text>
+        </svg>
+      </div>
       <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
           <rect width="220" height="130" fill="#0d0f14"/>
@@ -243,14 +270,18 @@
           <text x="76"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
           <text x="116" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
           <text x="156" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
-          <line x1="36"  y1="44" x2="36"  y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="76"  y1="44" x2="76"  y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="116" y1="44" x2="116" y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="156" y1="44" x2="156" y2="25" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="36"  y1="44" x2="36"  y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="76"  y1="44" x2="92"  y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="116" y1="44" x2="102" y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <line x1="156" y1="72" x2="156" y2="94" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
+          <circle class="lstm-mul" cx="36" cy="25" r="7" stroke="#378ADD" stroke-width="0.9"/>
+          <text x="36" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.7)">⊙</text>
+          <circle class="lstm-add" cx="97" cy="25" r="7" stroke="rgba(255,255,255,0.35)" stroke-width="0.9"/>
+          <text x="97" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.7)">+</text>
           <line x1="20"  y1="114" x2="20"  y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
           <line x1="195" y1="114" x2="195" y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
           <line x1="20"  y1="96" x2="195" y2="96" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">LSTM</text>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">LSTM 2000</text>
         </svg>
       </div>
 
