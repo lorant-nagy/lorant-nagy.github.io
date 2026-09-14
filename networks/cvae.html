@@ -107,7 +107,15 @@
     font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
     color:var(--muted); margin-bottom:0.28rem;
   }
-  .eq { font-size:10.5px; line-height:1.72; color:var(--text); white-space:nowrap; }
+  /* Keep both mode-specific equation sets in the layout at all times.
+     They occupy the same grid cell, so switching mode cannot resize the SVG above. */
+  .eq-stack { display:grid; }
+  .eq-stack > .eq { grid-area:1 / 1; }
+  .eq {
+    font-size:10.5px; line-height:1.72; color:var(--text); white-space:nowrap;
+    transition:opacity 0.12s linear;
+  }
+  .eq.mode-off { visibility:hidden; opacity:0; pointer-events:none; }
   .eq sub { font-size:0.72em; }
   .eq sup { font-size:0.72em; }
   .step { display:inline-block; width:2.0em; color:var(--muted); }
@@ -253,7 +261,7 @@
       <circle id="base-y_hat" cx="649" cy="125" r="19" fill="#1e2230" stroke="#378ADD" stroke-width="1.2"/>
       <circle id="glow-y_hat" class="node-glow" cx="649" cy="125" r="19" fill="url(#fill-decoder)" opacity="0"/>
       <circle id="impact-y_hat" class="node-impact" cx="649" cy="125" r="19" fill="none" stroke="#378ADD" stroke-width="1.2" opacity="0"/>
-      <text x="649" y="125" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#378ADD">ŷ</text>
+      <text id="label-y_hat" x="649" y="125" text-anchor="middle" dominant-baseline="middle" font-size="12" fill="#378ADD">y&#771;</text>
     </g>
 
     <g id="dots"></g>
@@ -262,20 +270,23 @@
   <div class="formulae">
     <div class="col-title">equations · computation order</div>
 
-    <div class="eq" id="eq-train">
+    <div class="eq-stack">
+      <div class="eq" id="eq-train">
       <div><span class="step">1a</span><span class="pq">(&mu;<sub>p</sub>, &sigma;<sub>p</sub>)</span> = PRIOR<sub>&theta;</sub>(<span class="xq">x</span>), &nbsp; <span class="pq">p<sub>&theta;</sub>(z|x)</span> = 𝒩(&mu;<sub>p</sub>, diag(&sigma;<sub>p</sub><sup>2</sup>))</div>
       <div><span class="step">1b</span><span class="rq">(&mu;<sub>q</sub>, &sigma;<sub>q</sub>)</span> = REC<sub>&phi;</sub>(<span class="xq">x</span>, <span class="yq">y</span>), &nbsp; <span class="rq">q<sub>&phi;</sub>(z|x,y)</span> = 𝒩(&mu;<sub>q</sub>, diag(&sigma;<sub>q</sub><sup>2</sup>))</div>
-      <div><span class="step">2</span><span class="zq">z&#770;</span> = &mu;<sub>q</sub> + &sigma;<sub>q</sub> ⊙ &epsilon;, &nbsp; &epsilon; ~ 𝒩(0,I) <span class="aside">(sampling)</span></div>
+      <div><span class="step">2</span><span class="zq">z&#770;</span> = &mu;<sub>q</sub> + &sigma;<sub>q</sub> ⊙ &epsilon;, &nbsp; &epsilon; ~ 𝒩(0,I)</div>
       <div><span class="step">3</span><span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> = DEC<sub>&theta;</sub>(<span class="xq">x</span>, <span class="zq">z&#770;</span>)</div>
-      <div><span class="step">4</span><span class="dq">ŷ</span> ~ <span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> <span class="aside">(sampling)</span></div>
-      <div><span class="step">∥</span><span class="rq">D<sub>KL</sub></span>(<span class="rq">q<sub>&phi;</sub>(z|x,y)</span> || <span class="pq">p<sub>&theta;</sub>(z|x)</span>) <span class="aside">(training regularizer; available once both distributions are ready)</span></div>
+      <div><span class="step">4</span><span class="dq">L<sub>rec</sub></span> = &minus;log <span class="dq">p<sub>&theta;</sub>(<span class="yq">y</span>|x,z&#770;)</span></div>
+      <div><span class="step">∥</span><span class="rq">L<sub>KL</sub></span> = <span class="rq">D<sub>KL</sub></span>(<span class="rq">q<sub>&phi;</sub>(z|x,y)</span> || <span class="pq">p<sub>&theta;</sub>(z|x)</span>)</div>
+      <div><span class="step">5</span><span class="dq">&minus;ELBO</span> &asymp; <span class="dq">L<sub>rec</sub></span> + <span class="rq">L<sub>KL</sub></span></div>
     </div>
 
-    <div class="eq" id="eq-infer" hidden>
+      <div class="eq mode-off" id="eq-infer" aria-hidden="true">
       <div><span class="step">1</span><span class="pq">(&mu;<sub>p</sub>, &sigma;<sub>p</sub>)</span> = PRIOR<sub>&theta;</sub>(<span class="xq">x</span>), &nbsp; <span class="pq">p<sub>&theta;</sub>(z|x)</span> = 𝒩(&mu;<sub>p</sub>, diag(&sigma;<sub>p</sub><sup>2</sup>))</div>
-      <div><span class="step">2</span><span class="zq">z&#770;</span> = &mu;<sub>p</sub> + &sigma;<sub>p</sub> ⊙ &epsilon;, &nbsp; &epsilon; ~ 𝒩(0,I) <span class="aside">(sampling)</span></div>
+      <div><span class="step">2</span><span class="zq">z&#770;</span> = &mu;<sub>p</sub> + &sigma;<sub>p</sub> ⊙ &epsilon;, &nbsp; &epsilon; ~ 𝒩(0,I)</div>
       <div><span class="step">3</span><span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> = DEC<sub>&theta;</sub>(<span class="xq">x</span>, <span class="zq">z&#770;</span>)</div>
-      <div><span class="step">4</span><span class="dq">ŷ</span> ~ <span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span> <span class="aside">(sampling)</span></div>
+      <div><span class="step">4</span><span class="dq">y&#771;</span> ~ <span class="dq">p<sub>&theta;</sub>(y|x,z&#770;)</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -290,7 +301,7 @@
   // - every disc leaves its source immediately when the source is ready;
   // - incoming edge speeds are solved so all inputs to a node arrive together.
   // Thus there are no mid-edge waits and no arbitrary timing groups.
-  var DAG_END = 84;       // % of the cycle when the sampled output has arrived
+  var DAG_END = 84;       // % of the cycle when the active computation path is complete
   var BASE_SPEED = 1.0;   // raw SVG px per schedule unit
   var FADE_IN = 0.75;     // cycle-percentage visual fade-in only
   var DIM = 'rgba(255,255,255,0.09)';
@@ -316,11 +327,11 @@
     { id:'e-recog-z', from:'recog',   to:'z_hat',   dot:'#aa701e', mode:'train', live:'#1D9E75',                lw:1.2 },
     { id:'e-x-dec',   from:'x',       to:'decoder', dot:'#e8824a', mode:'both',  live:'rgba(232,130,74,0.35)', lw:1.0 },
     { id:'e-z-dec',   from:'z_hat',   to:'decoder', dot:'#aa701e', mode:'both',  live:'rgba(170,112,30,0.65)', lw:1.2 },
-    { id:'e-dec-yh',  from:'decoder', to:'y_hat',   dot:'#378ADD', mode:'both',  live:'#378ADD',                lw:1.2 }
+    { id:'e-dec-yh',  from:'decoder', to:'y_hat',   dot:'#378ADD', mode:'infer', live:'#378ADD',                lw:1.2 }
   ];
 
   var SOURCES = ['x', 'y'];
-  var SINK = 'y_hat';
+  function sinkNode() { return mode === 'train' ? 'decoder' : 'y_hat'; }
 
   var svg = document.getElementById('cvae-svg');
   var dotLayer = document.getElementById('dots');
@@ -361,10 +372,22 @@
 
     document.getElementById('sampling-prior').setAttribute('opacity', train ? '0.18' : '1');
     document.getElementById('sampling-recog').setAttribute('opacity', train ? '1' : '0.18');
-    document.getElementById('sampling-output').setAttribute('opacity', '1');
+    document.getElementById('sampling-output').setAttribute('opacity', train ? '0.18' : '1');
 
-    document.getElementById('eq-train').hidden = !train;
-    document.getElementById('eq-infer').hidden = train;
+    var outputIds = ['base-y_hat','label-y_hat'];
+    outputIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (el.tagName === 'text') el.setAttribute('fill', train ? 'rgba(255,255,255,0.15)' : '#378ADD');
+      else el.setAttribute('stroke', train ? 'rgba(255,255,255,0.12)' : '#378ADD');
+    });
+
+    var eqTrain = document.getElementById('eq-train');
+    var eqInfer = document.getElementById('eq-infer');
+    eqTrain.classList.toggle('mode-off', !train);
+    eqInfer.classList.toggle('mode-off', train);
+    eqTrain.setAttribute('aria-hidden', train ? 'false' : 'true');
+    eqInfer.setAttribute('aria-hidden', train ? 'true' : 'false');
 
     document.getElementById('btn-train').classList.toggle('active', train);
     document.getElementById('btn-infer').classList.toggle('active', !train);
@@ -419,7 +442,7 @@
 
     // Scale the entire schedule into the animation cycle without altering any
     // dependency relationship or relative processing/travel duration.
-    var scale = DAG_END / (ready[SINK] || 1);
+    var scale = DAG_END / (ready[sinkNode()] || 1);
     Object.keys(arrive).forEach(function (n) { arrive[n] *= scale; });
     Object.keys(ready).forEach(function (n) { ready[n] *= scale; });
 
