@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResNet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+
+  :root {
+    --bg:      #0d0f14;
+    --surface: #13161d;
+    --border:  rgba(255,255,255,0.07);
+    --text:    #c8cdd8;
+    --muted:   #565c6e;
+    --x:       #e8824a;
+    --res:     #378ADD;
+    --skip:    #7F77DD;
+    --sum:     #1D9E75;
+    --accent:  #aa701e;
+    --cycle:   5.8s;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    height:100dvh;
+    display:grid;
+    grid-template-rows:auto auto 1fr;
+    padding:1.1rem 1.4rem 0.9rem;
+    gap:0.5rem;
+    overflow:hidden;
+  }
+
+  a.back {
+    position:fixed; top:1rem; left:1.25rem;
+    font-size:11px; color:var(--muted);
+    text-decoration:none; letter-spacing:0.05em; z-index:10;
+  }
+  a.back:hover { color:var(--text); }
+
+  h1 {
+    font-family:'Spectral',serif; font-weight:300;
+    font-size:1.45rem; color:#e8e4dc; letter-spacing:0.02em;
+    padding-top:1.4rem;
+  }
+
+  .meta { font-size:12px; color:var(--muted); line-height:1.8; font-style:italic; }
+  .meta .name { font-style:normal; color:var(--text); }
+  .meta .cite { font-style:normal; }
+
+  .page { display:flex; flex-direction:column; min-height:0; }
+
+  .speed-row {
+    display:flex; align-items:center; gap:0.6rem;
+    margin-bottom:0.5rem; flex-shrink:0;
+  }
+  .speed-row .lbl {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted);
+  }
+  .speed-row .val { font-size:9px; color:var(--muted); width:2.6rem; }
+  #speed {
+    -webkit-appearance:none; appearance:none;
+    width:170px; height:2px; border-radius:1px;
+    background:rgba(255,255,255,0.12); outline:none; cursor:pointer;
+  }
+  #speed::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--accent); cursor:pointer;
+  }
+  #speed::-moz-range-thumb {
+    width:11px; height:11px; border:0; border-radius:50%;
+    background:var(--accent); cursor:pointer;
+  }
+
+  .card-title {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); border-bottom:0.5px solid var(--border);
+    padding-bottom:0.28rem; margin-bottom:0.4rem; flex-shrink:0;
+  }
+
+  #resnet-svg { width:100%; flex:1; display:block; min-height:0; }
+
+  .formulae {
+    flex-shrink:0; margin-top:0.45rem;
+    border-top:0.5px solid var(--border); padding-top:0.5rem;
+  }
+  .formulae .col-title {
+    font-size:9px; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--muted); margin-bottom:0.28rem;
+  }
+  .eq { font-size:10.5px; line-height:1.72; color:var(--text); white-space:nowrap; }
+  .xq { color:var(--x); }
+  .fq { color:var(--res); }
+  .sq { color:var(--skip); }
+  .oq { color:var(--sum); }
+
+  .flow-dot, .node-glow, .impact {
+    pointer-events:none;
+    animation-duration:var(--cycle);
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    animation-fill-mode:both;
+  }
+  .flow-dot { offset-rotate:0deg; }
+
+  #dot-main {
+    offset-path:path('M350 32 L350 218');
+    animation-name:main-flow;
+  }
+  #dot-skip {
+    offset-path:path('M350 32 C520 32 558 112 558 150 C558 202 497 218 372 234');
+    animation-name:skip-flow;
+  }
+  #dot-out {
+    offset-path:path('M350 252 L350 292');
+    animation-name:out-flow;
+  }
+
+  #glow-l1 { animation-name:glow-l1; }
+  #glow-l2 { animation-name:glow-l2; }
+  #glow-sum { animation-name:glow-sum; }
+  #impact-sum { animation-name:impact-sum; }
+  #glow-out { animation-name:glow-out; }
+  #pulse-x { animation-name:pulse-x; }
+
+  @keyframes main-flow {
+    0%,8%   { offset-distance:0%; opacity:0; }
+    11%     { opacity:1; }
+    58%     { offset-distance:100%; opacity:1; }
+    62%,100%{ offset-distance:100%; opacity:0; }
+  }
+  @keyframes skip-flow {
+    0%,8%   { offset-distance:0%; opacity:0; }
+    11%     { opacity:1; }
+    58%     { offset-distance:100%; opacity:1; }
+    62%,100%{ offset-distance:100%; opacity:0; }
+  }
+  @keyframes out-flow {
+    0%,63%  { offset-distance:0%; opacity:0; }
+    66%     { opacity:1; }
+    79%     { offset-distance:100%; opacity:1; }
+    83%,100%{ offset-distance:100%; opacity:0; }
+  }
+  @keyframes glow-l1 {
+    0%,22% { opacity:0; }
+    27% { opacity:.48; }
+    38%,100% { opacity:0; }
+  }
+  @keyframes glow-l2 {
+    0%,42% { opacity:0; }
+    48% { opacity:.48; }
+    58%,100% { opacity:0; }
+  }
+  @keyframes glow-sum {
+    0%,57% { opacity:0; }
+    63% { opacity:.54; }
+    75%,100% { opacity:0; }
+  }
+  @keyframes impact-sum {
+    0%,58% { opacity:0; transform:scale(.92); transform-origin:350px 235px; }
+    62% { opacity:.95; transform:scale(1); }
+    72%,100% { opacity:0; transform:scale(1.25); transform-origin:350px 235px; }
+  }
+  @keyframes glow-out {
+    0%,76% { opacity:0; }
+    82% { opacity:.52; }
+    95%,100% { opacity:0; }
+  }
+  @keyframes pulse-x {
+    0% { opacity:0; transform:scale(.75); transform-origin:350px 32px; }
+    7% { opacity:.45; transform:scale(1); }
+    16%,100% { opacity:0; transform:scale(1.35); transform-origin:350px 32px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow-dot, .node-glow, .impact { animation:none !important; }
+    #glow-sum { opacity:.16; }
+  }
+
+  @media (max-width:780px), (max-height:720px) {
+    body { height:auto; overflow:auto; padding:2.5rem 1rem 2rem; grid-template-rows:auto auto auto; }
+    #resnet-svg { flex:none; min-height:350px; }
+    .eq { font-size:10px; white-space:normal; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back" href="/networks/">← networks</a>
+
+<h1>ResNet</h1>
+
+<div class="meta">
+  <span class="name">Residual Network — basic residual block</span><br>
+  <span class="cite">He, Zhang, Ren &amp; Sun — Deep Residual Learning for Image Recognition, CVPR 2016</span><br>
+  <span class="cite">He, Zhang, Ren &amp; Sun — Identity Mappings in Deep Residual Networks, ECCV 2016</span>
+</div>
+
+<div class="page">
+  <div class="speed-row">
+    <span class="lbl">speed</span>
+    <input id="speed" type="range" min="0" max="100" value="50" step="1" aria-label="animation speed">
+    <span class="val" id="speed-val">1.0×</span>
+  </div>
+
+  <div class="card-title">residual block</div>
+
+  <svg id="resnet-svg" viewBox="0 0 700 315" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-label="Animated ResNet residual block">
+    <defs>
+      <marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+        <path d="M0,0 L0,6 L6,3 z" fill="rgba(255,255,255,0.30)"/>
+      </marker>
+      <radialGradient id="fill-res" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#378ADD" stop-opacity="1"/>
+        <stop offset="58%" stop-color="#378ADD" stop-opacity="0.60"/>
+        <stop offset="100%" stop-color="#378ADD" stop-opacity="0.10"/>
+      </radialGradient>
+      <radialGradient id="fill-sum" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#1D9E75" stop-opacity="1"/>
+        <stop offset="58%" stop-color="#1D9E75" stop-opacity="0.62"/>
+        <stop offset="100%" stop-color="#1D9E75" stop-opacity="0.10"/>
+      </radialGradient>
+      <radialGradient id="fill-x" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#e8824a" stop-opacity="0.78"/>
+        <stop offset="100%" stop-color="#e8824a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+
+    <!-- static graph -->
+    <g fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1" marker-end="url(#ar)">
+      <path d="M350,38 L350,67"/>
+      <path d="M350,111 L350,146"/>
+      <path d="M350,190 L350,216"/>
+      <path d="M350,254 L350,292"/>
+    </g>
+
+    <path d="M350,38 C520,38 558,112 558,150 C558,202 497,218 372,234"
+          fill="none" stroke="#7F77DD" stroke-opacity="0.52" stroke-width="1.2" marker-end="url(#ar)"/>
+
+    <!-- labels -->
+    <g font-family="'JetBrains Mono',monospace">
+      <text x="350" y="25" text-anchor="middle" font-size="12" fill="#e8824a">x</text>
+      <text x="216" y="155" text-anchor="middle" font-size="12" fill="#378ADD">F(x)</text>
+      <text x="575" y="143" font-size="11" fill="#7F77DD">x</text>
+      <text x="575" y="158" font-size="8.5" letter-spacing="0.05em" fill="#565c6e">identity</text>
+      <text x="242" y="239" text-anchor="middle" font-size="11" fill="#c8cdd8">F(x) + x</text>
+      <text x="382" y="136" font-size="10" fill="#565c6e">relu</text>
+      <text x="382" y="283" font-size="10" fill="#565c6e">relu</text>
+    </g>
+
+    <!-- two layers -->
+    <g font-family="'JetBrains Mono',monospace">
+      <rect x="282" y="67" width="136" height="44" rx="4" fill="none" stroke="#378ADD" stroke-opacity="0.72" stroke-width="1.1"/>
+      <rect id="glow-l1" class="node-glow" x="282" y="67" width="136" height="44" rx="4" fill="url(#fill-res)" opacity="0"/>
+      <text x="350" y="90" text-anchor="middle" dominant-baseline="middle" font-size="10.5" fill="#c8cdd8">weight layer</text>
+
+      <rect x="282" y="146" width="136" height="44" rx="4" fill="none" stroke="#378ADD" stroke-opacity="0.72" stroke-width="1.1"/>
+      <rect id="glow-l2" class="node-glow" x="282" y="146" width="136" height="44" rx="4" fill="url(#fill-res)" opacity="0"/>
+      <text x="350" y="169" text-anchor="middle" dominant-baseline="middle" font-size="10.5" fill="#c8cdd8">weight layer</text>
+    </g>
+
+    <!-- summation -->
+    <circle id="glow-sum" class="node-glow" cx="350" cy="235" r="31" fill="url(#fill-sum)" opacity="0"/>
+    <circle cx="350" cy="235" r="18" fill="#1e2230" stroke="#1D9E75" stroke-width="1.2"/>
+    <circle id="impact-sum" class="impact" cx="350" cy="235" r="18" fill="none" stroke="#1D9E75" stroke-width="1.2" opacity="0"/>
+    <path d="M342,235 H358 M350,227 V243" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- output landing point -->
+    <circle id="glow-out" class="node-glow" cx="350" cy="298" r="22" fill="url(#fill-sum)" opacity="0"/>
+
+    <!-- input pulse -->
+    <circle id="pulse-x" class="impact" cx="350" cy="32" r="23" fill="url(#fill-x)" opacity="0"/>
+
+    <!-- flow dots -->
+    <circle id="dot-main" class="flow-dot" r="3.8" fill="#378ADD" opacity="0"/>
+    <circle id="dot-skip" class="flow-dot" r="3.8" fill="#7F77DD" opacity="0"/>
+    <circle id="dot-out" class="flow-dot" r="3.8" fill="#1D9E75" opacity="0"/>
+  </svg>
+
+  <div class="formulae">
+    <div class="col-title">computation</div>
+    <div class="eq">
+      <span class="fq">F(x)</span> = W<sub>2</sub> ReLU(W<sub>1</sub><span class="xq">x</span>)
+      &nbsp;&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;
+      <span class="oq">y</span> = ReLU(<span class="fq">F(x)</span> + <span class="xq">x</span>)
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const speed = document.getElementById('speed');
+  const speedVal = document.getElementById('speed-val');
+
+  function multFromSlider(v) {
+    return 0.45 + (Number(v) / 100) * 1.75;
+  }
+
+  function updateSpeed() {
+    const mult = multFromSlider(speed.value);
+    document.documentElement.style.setProperty('--cycle', (5.8 / mult).toFixed(3) + 's');
+    speedVal.textContent = mult.toFixed(1) + '×';
+  }
+
+  speed.addEventListener('input', updateSpeed);
+  updateSpeed();
+})();
+</script>
+</body>
+</html>

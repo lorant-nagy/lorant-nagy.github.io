@@ -124,6 +124,34 @@
     .cvae-mini-kl{animation:cvae-mini-kl 7.2s linear infinite}
     .cvae-mini-dot{offset-rotate:0deg;animation-duration:7.2s;animation-timing-function:linear;animation-iteration-count:infinite;animation-fill-mode:both}
     .cvae-mini-f0{animation-name:cvae-mini-f0}.cvae-mini-f1{animation-name:cvae-mini-f1}.cvae-mini-f2{animation-name:cvae-mini-f2}.cvae-mini-f3{animation-name:cvae-mini-f3}.cvae-mini-f4{animation-name:cvae-mini-f4}
+
+  @keyframes res-mini-box1-fill{0%,15.8%{opacity:0}17.0%{opacity:.46}23%{opacity:.30}29%{opacity:.15}36%,100%{opacity:0}}
+  @keyframes res-mini-box1-hit{0%,15.8%{opacity:0;stroke-width:1}16.6%{opacity:.95;stroke-width:2.1}18.8%,100%{opacity:0;stroke-width:1}}
+  @keyframes res-mini-box2-fill{0%,43.8%{opacity:0}45.0%{opacity:.46}51%{opacity:.30}57%{opacity:.15}64%,100%{opacity:0}}
+  @keyframes res-mini-box2-hit{0%,43.8%{opacity:0;stroke-width:1}44.6%{opacity:.95;stroke-width:2.1}46.8%,100%{opacity:0;stroke-width:1}}
+  @keyframes res-mini-plus-fill{0%,67.8%{opacity:0}69.0%{opacity:.54}73%{opacity:.34}78%{opacity:.16}84%,100%{opacity:0}}
+  @keyframes res-mini-plus-hit{0%,67.8%{opacity:0;stroke-width:1}68.6%{opacity:.95;stroke-width:2}70.8%,100%{opacity:0;stroke-width:1}}
+  @keyframes res-mini-out-fill{0%,84.8%{opacity:0}86.0%{opacity:.50}90%{opacity:.28}95%{opacity:.12}99%,100%{opacity:0}}
+  @keyframes res-mini-out-hit{0%,84.8%{opacity:0;stroke-width:1}85.6%{opacity:.95;stroke-width:2}87.8%,100%{opacity:0;stroke-width:1}}
+  @keyframes res-mini-skip{0%,100%{stroke-opacity:.12}18%,60%{stroke-opacity:.52}78%{stroke-opacity:.18}}
+  @keyframes res-mini-f0{0%{offset-distance:0%;opacity:0}1%{opacity:1}15.9%{offset-distance:100%;opacity:1}16%,100%{offset-distance:100%;opacity:0}}
+  @keyframes res-mini-f1{0%,15.9%{offset-distance:0%;opacity:0}16.3%{opacity:1}31.9%{offset-distance:100%;opacity:1}32%,100%{offset-distance:100%;opacity:0}}
+  @keyframes res-mini-f2{0%,31.9%{offset-distance:0%;opacity:0}32.3%{opacity:1}43.9%{offset-distance:100%;opacity:1}44%,100%{offset-distance:100%;opacity:0}}
+  @keyframes res-mini-f3{0%,43.9%{offset-distance:0%;opacity:0}44.3%{opacity:1}55.9%{offset-distance:100%;opacity:1}56%,100%{offset-distance:100%;opacity:0}}
+  @keyframes res-mini-f4{0%,15.9%{offset-distance:0%;opacity:0}16.3%{opacity:1}67.9%{offset-distance:100%;opacity:1}68%,100%{offset-distance:100%;opacity:0}}
+  @keyframes res-mini-f5{0%,71.9%{offset-distance:0%;opacity:0}72.3%{opacity:1}83.9%{offset-distance:100%;opacity:1}84%,100%{offset-distance:100%;opacity:0}}
+  .res-mini-box1-fill{animation:res-mini-box1-fill 5.8s linear infinite}
+  .res-mini-box1-hit{animation:res-mini-box1-hit 5.8s linear infinite}
+  .res-mini-box2-fill{animation:res-mini-box2-fill 5.8s linear infinite}
+  .res-mini-box2-hit{animation:res-mini-box2-hit 5.8s linear infinite}
+  .res-mini-plus-fill{animation:res-mini-plus-fill 5.8s linear infinite}
+  .res-mini-plus-hit{animation:res-mini-plus-hit 5.8s linear infinite}
+  .res-mini-out-fill{animation:res-mini-out-fill 5.8s linear infinite}
+  .res-mini-out-hit{animation:res-mini-out-hit 5.8s linear infinite}
+  .res-mini-skip{animation:res-mini-skip 5.8s linear infinite}
+  .res-mini-dot{offset-rotate:0deg;animation-duration:5.8s;animation-timing-function:linear;animation-iteration-count:infinite;animation-fill-mode:both}
+  .res-mini-f0{animation-name:res-mini-f0}.res-mini-f1{animation-name:res-mini-f1}.res-mini-f2{animation-name:res-mini-f2}.res-mini-f3{animation-name:res-mini-f3}.res-mini-f4{animation-name:res-mini-f4}.res-mini-f5{animation-name:res-mini-f5}
+
 </style>
 </head>
 <body>
@@ -386,6 +414,57 @@
           <text x="92" y="34" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(196,181,253,0.35)">Q·Kᵀ</text>
           <text x="110" y="116" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">attention</text>
         </svg>
+      </div>
+
+
+
+
+      <!-- ResNet card -->
+      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+        <a href="/networks/resnet.html" style="text-decoration:none;color:inherit;">
+        <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+          <rect width="220" height="130" fill="#0d0f14"/>
+          <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 110,12 L 110,30" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+            <path d="M 110,50 L 110,64" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+            <path d="M 110,64 L 110,80" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+            <path d="M 110,100 L 110,111" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
+            <path class="res-mini-skip" d="M 110,12 C 172,12 188,43 188,68 C 188,92 173,96 123,96" stroke="#7F77DD" stroke-width="1.2" stroke-opacity=".3"/>
+            <rect x="78" y="30" width="64" height="20" rx="3" stroke="rgba(255,255,255,.28)" stroke-width=".9"/>
+            <rect class="res-mini-box1-fill" x="78" y="30" width="64" height="20" rx="3" fill="rgba(55,138,221,.18)" opacity="0"/>
+            <rect class="res-mini-box1-hit" x="78" y="30" width="64" height="20" rx="3" stroke="#378ADD" fill="none" opacity="0"/>
+            <rect x="78" y="80" width="64" height="20" rx="3" stroke="rgba(255,255,255,.28)" stroke-width=".9"/>
+            <rect class="res-mini-box2-fill" x="78" y="80" width="64" height="20" rx="3" fill="rgba(55,138,221,.18)" opacity="0"/>
+            <rect class="res-mini-box2-hit" x="78" y="80" width="64" height="20" rx="3" stroke="#378ADD" fill="none" opacity="0"/>
+            <circle cx="110" cy="96" r="8.5" fill="#1e2230" stroke="rgba(255,255,255,.24)" stroke-width=".9"/>
+            <circle class="res-mini-plus-fill" cx="110" cy="96" r="8.5" fill="rgba(29,158,117,.24)" opacity="0"/>
+            <circle class="res-mini-plus-hit" cx="110" cy="96" r="8.5" stroke="#1D9E75" fill="none" opacity="0"/>
+            <path d="M 106,96 H 114 M 110,92 V 100" stroke="rgba(255,255,255,.72)" stroke-width=".9"/>
+            <circle cx="110" cy="113" r="6.5" fill="#1e2230" stroke="rgba(255,255,255,.12)"/>
+            <circle class="res-mini-out-fill" cx="110" cy="113" r="6.5" fill="rgba(29,158,117,.22)" opacity="0"/>
+            <circle class="res-mini-out-hit" cx="110" cy="113" r="6.5" stroke="#1D9E75" fill="none" opacity="0"/>
+          </g>
+          <g font-family="'JetBrains Mono',monospace">
+            <text x="104" y="10" text-anchor="end" font-size="6" fill="#e8824a">x</text>
+            <text x="40" y="67" text-anchor="middle" font-size="12" font-style="italic" fill="#378ADD">F(x)</text>
+            <text x="194" y="60" text-anchor="middle" font-size="6.2" fill="#7F77DD">identity</text>
+            <text x="50" y="100" text-anchor="middle" font-size="8" font-style="italic" fill="#1D9E75">F(x)+x</text>
+            <text x="110" y="37.2" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">weight</text>
+            <text x="110" y="43.8" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">layer</text>
+            <text x="123" y="60" font-size="6.5" fill="rgba(255,255,255,.55)">relu</text>
+            <text x="110" y="87.2" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">weight</text>
+            <text x="110" y="93.8" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">layer</text>
+            <text x="110" y="126" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.3)">ResNet</text>
+          </g>
+          <g>
+            <circle class="res-mini-dot res-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 110,12 L 110,30')"/>
+            <circle class="res-mini-dot res-mini-f1" r="2.7" fill="#378ADD" style="offset-path:path('M 110,50 L 110,64')"/>
+            <circle class="res-mini-dot res-mini-f2" r="2.7" fill="#378ADD" style="offset-path:path('M 110,64 L 110,80')"/>
+            <circle class="res-mini-dot res-mini-f3" r="2.7" fill="#378ADD" style="offset-path:path('M 110,100 L 110,104')"/>
+            <circle class="res-mini-dot res-mini-f4" r="2.7" fill="#7F77DD" style="offset-path:path('M 110,12 C 172,12 188,43 188,68 C 188,92 173,96 123,96')"/>
+            <circle class="res-mini-dot res-mini-f5" r="2.7" fill="#1D9E75" style="offset-path:path('M 110,104 L 110,113')"/>
+          </g>
+        </svg></a>
       </div>
 
 
