@@ -176,6 +176,8 @@
 </div>
 
 <main class="home-grid">
+
+  <div class="home-column home-column-left">
   <!-- PageIt -->
   <section class="home-card pageit-card">
     <a class="pageit-visual" href="https://pageit.me" target="_blank" rel="noopener" aria-label="Open PageIt">
@@ -188,27 +190,7 @@
     </div>
   </section>
 
-  <!-- Crowburn Films -->
-  <section class="home-card crowburn-card">
-  <a class="crowburn-grid" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener" aria-label="Open Crowburn Films on YouTube">
-    <img src="/assets/images/projects/crowburn-neptune.webp" alt="Crowburn Films Neptune thumbnail" loading="lazy">
-    <img src="/assets/images/projects/crowburn-mercury.webp" alt="Crowburn Films Mercury thumbnail" loading="lazy">
-    <img src="/assets/images/projects/crowburn-jupiter.webp" alt="Crowburn Films Jupiter thumbnail" loading="lazy">
-    <img src="/assets/images/projects/crowburn-life.webp" alt="Crowburn Films How Life Began thumbnail" loading="lazy">
-  </a>
-
-  <div class="compact-card-copy">
-    <h2>A generative-video project</h2>
-    <p>
-      An experiment with animation and generative-image and generative-video
-      workflows using tools such as ComfyUI, open source video diffusion models, and Runpod. I assembled the final videos by hand in Davinci Resolve: but the voiceover and the motion graphics are both synthetic.
-    </p>
-    <a class="project-link" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener">
-      watch on YouTube →
-    </a>
-  </div>
-</section>
-
+  <!-- Neural-network notes -->
   <section class="home-card neural-card">
   <div class="neural-inner">
     <div class="section-header"><h2>note to self — neural network architectures</h2></div>
@@ -523,6 +505,81 @@
   </div>
 </section>
 
+  <!-- Generative-video project -->
+  <section class="home-card crowburn-card">
+  <a class="crowburn-grid" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener" aria-label="Open Crowburn Films on YouTube">
+    <img src="/assets/images/projects/crowburn-neptune.webp" alt="Crowburn Films Neptune thumbnail" loading="lazy">
+    <img src="/assets/images/projects/crowburn-mercury.webp" alt="Crowburn Films Mercury thumbnail" loading="lazy">
+    <img src="/assets/images/projects/crowburn-jupiter.webp" alt="Crowburn Films Jupiter thumbnail" loading="lazy">
+    <img src="/assets/images/projects/crowburn-life.webp" alt="Crowburn Films How Life Began thumbnail" loading="lazy">
+  </a>
+
+  <div class="compact-card-copy">
+    <h2>A generative-video project</h2>
+    <p>
+      An experiment with animation and generative-image and generative-video
+      workflows using tools such as ComfyUI, open source video diffusion models, and Runpod. I assembled the final videos by hand in Davinci Resolve: but the voiceover and the motion graphics are both synthetic.
+    </p>
+    <a class="project-link" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener">
+      watch on YouTube →
+    </a>
+  </div>
+</section>
+  </div>
+
+  <div class="home-column home-column-right">
+  <!-- GitHub repositories -->
+  <section class="home-card repositories-card">
+    <div class="repositories-inner">
+      <div class="section-header repositories-header">
+        <h2>a few repositories</h2>
+      </div>
+
+      <div class="repository-grid">
+        <a class="repository-tile" href="https://github.com/lorant-nagy/cond_fbm" target="_blank" rel="noopener noreferrer" aria-label="Conditional fractional Brownian motion repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/conditional_fbm.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">conditional_fbm.mp4</div>
+          </div>
+          <span class="repository-name">conditional fractional Brownian motion <span aria-hidden="true">↗</span></span>
+        </a>
+
+        <a class="repository-tile" href="https://github.com/lorant-nagy/karhunen-loeve-fbm" target="_blank" rel="noopener noreferrer" aria-label="Karhunen–Loève expansion of fractional Brownian motion repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/fbm_H03.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">fbm_H03.mp4</div>
+          </div>
+          <span class="repository-name">Karhunen–Loève expansion of fBm <span aria-hidden="true">↗</span></span>
+        </a>
+
+        <a class="repository-tile" href="https://github.com/lorant-nagy/vect_auto_regr" target="_blank" rel="noopener noreferrer" aria-label="Vector autoregression repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/var3_coupled_fading.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">var3_coupled_fading.mp4</div>
+          </div>
+          <span class="repository-name">vector autoregressive dynamics <span aria-hidden="true">↗</span></span>
+        </a>
+
+        <a class="repository-tile" href="https://github.com/lorant-nagy/alpha_stab_levy__sym_disc/tree/main" target="_blank" rel="noopener noreferrer" aria-label="Symmetric alpha-stable Lévy motion repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/alpha_stable_4panel_flicker.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">alpha_stable_4panel_flicker.mp4</div>
+          </div>
+          <span class="repository-name">symmetric α-stable Lévy motion <span aria-hidden="true">↗</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trading / transient price impact -->
   <section class="home-card research-card game-section">
   <div class="section-header">
     <h2>A note on transient price impact</h2>
@@ -543,6 +600,7 @@
   </div>
 </section>
 
+  <!-- Hidden dependence / coin oracle -->
   <section class="home-card research-card next-section">
   <div class="next-section-inner">
     <div style="flex: 1;">
@@ -575,6 +633,7 @@
     <div id="coin-oracle-container"></div>
   </div>
 </section>
+  </div>
 </main>
 
 <!-- Energy prices — grey -->
