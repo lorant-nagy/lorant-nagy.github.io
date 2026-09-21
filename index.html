@@ -152,6 +152,105 @@
   .res-mini-dot{offset-rotate:0deg;animation-duration:5.8s;animation-timing-function:linear;animation-iteration-count:infinite;animation-fill-mode:both}
   .res-mini-f0{animation-name:res-mini-f0}.res-mini-f1{animation-name:res-mini-f1}.res-mini-f2{animation-name:res-mini-f2}.res-mini-f3{animation-name:res-mini-f3}.res-mini-f4{animation-name:res-mini-f4}.res-mini-f5{animation-name:res-mini-f5}
 
+
+    /* Talks & slides */
+    .talks-card {
+      padding: clamp(1.4rem, 2.2vw, 2rem);
+    }
+
+    .talks-card .section-header {
+      margin-bottom: 0.6rem;
+    }
+
+    .talk-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .talk-row {
+      display: grid;
+      grid-template-columns: 3.6rem minmax(0, 1fr) auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.95rem 0.25rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.075);
+      color: inherit;
+      text-decoration: none;
+      transition: background-color 0.18s ease, padding-left 0.18s ease, padding-right 0.18s ease;
+    }
+
+    .talk-row:first-child {
+      border-top: 0;
+    }
+
+    .talk-row:hover {
+      background: rgba(170, 112, 30, 0.055);
+      padding-left: 0.55rem;
+      padding-right: 0.55rem;
+    }
+
+    .talk-year {
+      align-self: start;
+      padding-top: 0.08rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    .talk-info {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.24rem;
+    }
+
+    .talk-title {
+      font-size: 0.92rem;
+      line-height: 1.45;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .talk-venue {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: #777;
+    }
+
+    .talk-pdf {
+      white-space: nowrap;
+      font-size: 0.78rem;
+      color: var(--accent);
+      letter-spacing: 0.025em;
+      transition: transform 0.18s ease;
+    }
+
+    .talk-row:hover .talk-pdf {
+      transform: translateX(2px);
+    }
+
+    @media (max-width: 640px) {
+      .talk-row {
+        grid-template-columns: 2.9rem minmax(0, 1fr);
+        gap: 0.75rem;
+      }
+
+      .talk-pdf {
+        grid-column: 2;
+        justify-self: start;
+        margin-top: 0.08rem;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .talks-card { order: 3; }
+      .neural-card { order: 4; }
+      .game-section { order: 5; }
+      .crowburn-card { order: 6; }
+      .next-section { order: 7; }
+    }
+
 </style>
 </head>
 <body>
@@ -187,6 +286,96 @@
       <h2>PageIt</h2>
       <p>PageIt turns photos into clean, printable PDFs. I built the browser interface and a Dockerised FastAPI service on Azure that generates the finished document, with GitHub Actions handling deployment.</p>
       <a class="project-link" href="https://pageit.me" target="_blank" rel="noopener">visit pageit.me →</a>
+    </div>
+  </section>
+
+  <!-- Talks & slides -->
+  <section class="home-card talks-card">
+    <div class="section-header">
+      <h2>talks &amp; slides</h2>
+    </div>
+
+    <div class="talk-list">
+      <a class="talk-row" href="/assets/pdf/talk_bachelier_2026-v1.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2026</span>
+        <span class="talk-info">
+          <span class="talk-title">On the utility problem in a market where price impact is transient</span>
+          <span class="talk-venue">XIII Bachelier World Congress · Bologna</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/nagy_vcmf_2025.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2025</span>
+        <span class="talk-info">
+          <span class="talk-title">Non-convex optimal investment with transient price impact</span>
+          <span class="talk-venue">Vienna Congress on Mathematical Finance · TU Wien</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/amk.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2024</span>
+        <span class="talk-info">
+          <span class="talk-title">Optimal execution in superlinearly mean-reverting environments</span>
+          <span class="talk-venue">University of Szeged</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/elte_ai_workshop_2023_feb_prez_lorant_nagy.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2023</span>
+        <span class="talk-info">
+          <span class="talk-title">Risk-averse trading</span>
+          <span class="talk-venue">ELTE–Rényi AI Workshop · Eötvös Loránd University</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/rwre.html">
+        <span class="talk-year">2023</span>
+        <span class="talk-info">
+          <span class="talk-title">Random walks in random environments</span>
+          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
+        </span>
+        <span class="talk-pdf"></span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/young_timid_and_risk_takers.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2022</span>
+        <span class="talk-info">
+          <span class="talk-title">Young, Timid, and Risk Takers</span>
+          <span class="talk-venue">Financial Mathematics Seminar · University of Michigan</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/medianofmeans.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2021</span>
+        <span class="talk-info">
+          <span class="talk-title">On sub-Gaussian estimators of the mean</span>
+          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/negative_memory.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2020</span>
+        <span class="talk-info">
+          <span class="talk-title">Long memory in trading</span>
+          <span class="talk-venue">PhD Seminar · Central European University</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/rwre.html">
+        <span class="talk-year">2020</span>
+        <span class="talk-info">
+          <span class="talk-title">How to invest in mean-reverting markets?</span>
+          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
+        </span>
+        <span class="talk-pdf"></span>
+      </a>
     </div>
   </section>
 
@@ -608,8 +797,8 @@
         <h2>Hidden dependence and stochastic volatility: when autocorrelation sees only noise</h2>
         <p>
           Take two fair coins, and add a third character: an oracle that reports only one thing —
-          whether the two coins landed on the same face or on different faces. At first sight,
-          the three objects seem perfectly innocent: whichever pair we pick, one does not reveal anything about the other.
+          whether the two coins landed on the same face or on different faces. Whichever pair we pick,
+          one does not reveal anything about the other.
           But this is deceptive: independence holds at the level of pairs, yet the moment any two are known,
           the third is fixed with certainty. This somewhat paradoxical example is often cited to show that
           full independence in a probabilistic structure is a subtle property.
