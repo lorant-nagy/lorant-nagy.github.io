@@ -11,6 +11,12 @@
   --text: #333333;
   --muted: #666666;
   --accent: #aa701e;
+
+  /* Cloud caption timing: edit these four values to tune its appearance. */
+  --cloud-caption-delay: 2s;
+  --cloud-caption-arrive: 10s;
+  --cloud-caption-hold: 0s;
+  --cloud-caption-depart: 6s;
 }
 
 body {
@@ -91,6 +97,40 @@ body {
   left: calc(50% + clamp(4.5rem, 7vw, 7.5rem));
 }
 
+/* Lower-right note uses the same type treatment as the introduction.
+   Separate animations keep both the arrival and departure times editable. */
+.welcome-cloud-caption {
+  position: absolute;
+  pointer-events: none;
+  right: clamp(1.5rem, 4vw, 4rem);
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  width: min(330px, calc(50% - 2rem));
+  font-family: "JetBrains Mono", "Courier New", monospace;
+  font-size: clamp(0.65rem, 0.8vw, 0.78rem);
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: cloud-caption-arrive var(--cloud-caption-arrive) ease-out var(--cloud-caption-delay) forwards;
+}
+
+.welcome-cloud-caption p {
+  animation: cloud-caption-depart var(--cloud-caption-depart) linear
+    calc(var(--cloud-caption-delay) + var(--cloud-caption-arrive) + var(--cloud-caption-hold)) forwards;
+}
+
+.welcome-cloud-caption p + p { margin-top: 0.7rem; }
+
+@keyframes cloud-caption-arrive {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cloud-caption-depart {
+  to { opacity: 0; }
+}
+
 .welcome-line {
   margin: 0;
   opacity: 0;
@@ -154,6 +194,12 @@ body {
 
   .welcome-copy-right .welcome-line {
     animation: welcome-line-life-reduced 15.9s linear forwards;
+  }
+
+  .welcome-cloud-caption { transform: none; }
+
+  @keyframes cloud-caption-arrive {
+    to { opacity: 1; transform: none; }
   }
 
   @keyframes welcome-line-arrive-reduced {
@@ -811,6 +857,16 @@ body {
   .welcome-copy-right { top: calc(50% + 9rem); }
   .welcome-cv { top: 50%; }
 
+  .welcome-cloud-caption {
+    right: 1.5rem;
+    bottom: 1.5rem;
+    width: min(200px, calc(100% - 3rem));
+    font-size: clamp(0.63rem, 2.5vw, 0.75rem);
+    line-height: 1.55;
+  }
+
+  .welcome-cloud-caption p + p { margin-top: 0.35rem; }
+
   .welcome-line {
     font-size: clamp(0.69rem, 2.85vw, 0.86rem);
     line-height: 1.55;
@@ -839,5 +895,3 @@ body {
     margin: 0 8px;
   }
 }
-
-
