@@ -6,7 +6,7 @@
   <title>Lóránt Nagy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap">
-  <link rel="stylesheet" href="/assets/css/main.css?v=cloud-caption-2">
+  <link rel="stylesheet" href="/assets/css/main.css?v=diffusion-minimal-2">
   <style>
     /* nn card animations */
     @keyframes ff-pulse-i1{0%,100%{fill:#1e2230}10%,20%{fill:#378ADD}40%,50%{fill:#e8824a}}
@@ -244,11 +244,12 @@
     }
 
     @media (max-width: 980px) {
-      .talks-card { order: 3; }
-      .neural-card { order: 4; }
-      .game-section { order: 5; }
-      .crowburn-card { order: 6; }
-      .next-section { order: 7; }
+      .diffusion-card { order: 3; }
+      .talks-card { order: 4; }
+      .neural-card { order: 5; }
+      .game-section { order: 6; }
+      .crowburn-card { order: 7; }
+      .next-section { order: 8; }
     }
 
 </style>
@@ -290,6 +291,38 @@
       <h2>PageIt</h2>
       <p>PageIt turns photos into clean, printable PDFs. I built the browser interface and a Dockerised FastAPI service on Azure that generates the finished document, with GitHub Actions handling deployment.</p>
       <a class="project-link" href="https://pageit.me" target="_blank" rel="noopener">visit pageit.me →</a>
+    </div>
+  </section>
+
+  <!-- Superlinear generative diffusion -->
+  <section class="home-card diffusion-card">
+    <div class="diffusion-intro">
+      <div class="section-header diffusion-section-header">
+        <h2>Ornstein–Uhlenbeck Is Hard to Beat, Yet Superlinear Drift Ships Lower Transport Costs</h2>
+      </div>
+    </div>
+
+    <figure class="diffusion-strip" aria-label="Generated samples from the linear, quadratic and cubic forward diffusions">
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="/assets/videos/pow1_pow2_pow3.mp4" type="video/mp4">
+      </video>
+    </figure>
+
+    <div class="diffusion-summary">
+      <p>A study on score-based image generation with superlinear Langevin forward diffusions as driver processes. Conditional scores are computed numerically with a one-dimensional Fokker–Planck equation. In the experiments the superlinear models achieve higher precision in terms of Wasserstein distances and show less variation across diffusion horizons than the Ornstein–Uhlenbeck baseline.</p>
+    </div>
+
+    <div class="diffusion-minimal-body">
+      <div class="diffusion-math-copy">
+        <p class="diffusion-principle">Intuition suggests that faster convergence to the reference law can reduce the terminal mismatch and shorten the diffusion horizon required for generation, thereby reducing the time over which score-estimation and discretization errors propagate. In this way, multiple sources of error contributing to the discrepancy between the generated samples and the target data distribution can be reduced simultaneously.</p>
+        <a class="project-link diffusion-arxiv" href="https://arxiv.org/abs/2609.37579" target="_blank" rel="noopener">read on arXiv · 2609.37579 ↗</a>
+      </div>
+
+      <figure class="diffusion-wasserstein-figure">
+        <video autoplay muted loop playsinline preload="metadata" aria-label="Wasserstein distance comparison between Ornstein–Uhlenbeck and cubic superlinear diffusion">
+          <source src="/assets/videos/ou_vs_cubic_wasserstein.mp4" type="video/mp4">
+        </video>
+      </figure>
     </div>
   </section>
 
@@ -698,26 +731,6 @@
   </div>
 </section>
 
-  <!-- Generative-video project -->
-  <section class="home-card crowburn-card">
-  <a class="crowburn-grid" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener" aria-label="Open Crowburn Films on YouTube">
-    <img src="/assets/images/projects/crowburn-neptune.webp" alt="Crowburn Films Neptune thumbnail" loading="lazy">
-    <img src="/assets/images/projects/crowburn-mercury.webp" alt="Crowburn Films Mercury thumbnail" loading="lazy">
-    <img src="/assets/images/projects/crowburn-jupiter.webp" alt="Crowburn Films Jupiter thumbnail" loading="lazy">
-    <img src="/assets/images/projects/crowburn-life.webp" alt="Crowburn Films How Life Began thumbnail" loading="lazy">
-  </a>
-
-  <div class="compact-card-copy">
-    <h2>A generative-video project</h2>
-    <p>
-      An experiment with animation and generative-image and generative-video
-      workflows using tools such as ComfyUI, open source video diffusion models, and Runpod. I assembled the final videos by hand in Davinci Resolve: but the voiceover and the motion graphics are both synthetic.
-    </p>
-    <a class="project-link" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener">
-      watch on YouTube →
-    </a>
-  </div>
-</section>
   </div>
 
   <div class="home-column home-column-right">
@@ -781,10 +794,19 @@
   <div class="split-container">
     <div class="publication-info">
       <div class="citation">
-        Nagy, L. &amp; Rásonyi, M. (2025).
-        <em>On the utility problem in a market where price impact is transient</em>.
-        arXiv:2511.12093 [<a href="https://arxiv.org/abs/2511.12093" target="_blank" rel="noopener">arxiv</a>]
-      </div>
+          Nagy, L. &amp; Rásonyi, M. (2025).
+          <em>On the utility problem in a market where price impact is transient</em>.
+          arXiv:2511.12093
+        </div>
+
+        <a
+          class="project-link"
+          href="https://arxiv.org/abs/2511.12093"
+          target="_blank"
+          rel="noopener"
+        >
+          read on arXiv →
+        </a>
       <div class="comic-container" onclick="openModal()">
         <img src="/assets/images/comic0.png" alt="Trading Game Comic" id="comicImg">
       </div>
@@ -826,6 +848,27 @@
     <div id="coin-oracle-container"></div>
   </div>
 </section>
+  <!-- Generative-video project -->
+  <section class="home-card crowburn-card">
+    <a class="crowburn-grid" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener" aria-label="Open Crowburn Films on YouTube">
+      <img src="/assets/images/projects/crowburn-neptune.webp" alt="Crowburn Films Neptune thumbnail" loading="lazy">
+      <img src="/assets/images/projects/crowburn-mercury.webp" alt="Crowburn Films Mercury thumbnail" loading="lazy">
+      <img src="/assets/images/projects/crowburn-jupiter.webp" alt="Crowburn Films Jupiter thumbnail" loading="lazy">
+      <img src="/assets/images/projects/crowburn-life.webp" alt="Crowburn Films How Life Began thumbnail" loading="lazy">
+    </a>
+
+    <div class="compact-card-copy">
+      <h2>A generative-video project</h2>
+      <p>
+        An experiment with animation and generative-image and generative-video
+        workflows using tools such as ComfyUI, open source video diffusion models, and Runpod. I assembled the final videos by hand in Davinci Resolve: but the voiceover and the motion graphics are both synthetic.
+      </p>
+      <a class="project-link" href="https://www.youtube.com/@CrowburnFilms" target="_blank" rel="noopener">
+        watch on YouTube →
+      </a>
+    </div>
+  </section>
+
   </div>
 </main>
 

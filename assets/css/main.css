@@ -286,6 +286,8 @@ body {
 
 .home-card p {
   color: #444;
+  text-align: justify;
+  hyphens: auto;
 }
 
 /* PageIt is one regular grid tile. */
@@ -344,6 +346,93 @@ body {
 .project-link:hover,
 .read-on-link:hover {
   text-decoration: underline;
+}
+
+/* Superlinear generative diffusion */
+.diffusion-card {
+  overflow: hidden;
+}
+
+.diffusion-intro {
+  padding: clamp(1.4rem, 2.2vw, 2rem);
+  padding-bottom: clamp(1.15rem, 1.8vw, 1.55rem);
+}
+
+/* Deliberately use the same title treatment as the transient-price-impact block. */
+.diffusion-section-header {
+  margin-bottom: 0;
+}
+
+.diffusion-summary {
+  padding: clamp(1.4rem, 2.2vw, 2rem);
+  padding-bottom: 0;
+}
+
+.diffusion-summary p {
+  max-width: 72ch;
+  margin: 0;
+  color: #444;
+  font-size: 0.95em;
+  line-height: 1.7;
+}
+
+/* The sample movie is a thin moving separator aligned with the text column. */
+.diffusion-strip {
+  position: relative;
+  width: calc(100% - 2 * clamp(1.4rem, 2.2vw, 2rem));
+  max-width: 72ch;
+  margin: 0 clamp(1.4rem, 2.2vw, 2rem);
+  aspect-ratio: 6000 / 256;
+  overflow: hidden;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  background: #111318;
+}
+
+.diffusion-strip video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.diffusion-minimal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(240px, 1.05fr);
+  gap: clamp(1.4rem, 2.3vw, 2.1rem);
+  align-items: center;
+  padding: clamp(1.4rem, 2.2vw, 2rem);
+}
+
+.diffusion-math-copy {
+  min-width: 0;
+}
+
+.diffusion-principle {
+  margin: 0;
+  color: #444 !important;
+  font-size: 0.95em !important;
+  line-height: 1.7 !important;
+}
+
+.diffusion-arxiv {
+  margin-top: 1.15rem;
+  font-size: 0.82rem;
+}
+
+.diffusion-wasserstein-figure {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.diffusion-wasserstein-figure video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: #f7f7f4;
 }
 
 /* Crowburn */
@@ -457,6 +546,7 @@ body {
 }
 
 .comic-container {
+  margin-top: 1.25rem;
   height: min(340px, 42vw);
   min-height: 220px;
   display: flex;
@@ -815,10 +905,12 @@ body {
 
   .pageit-card { order: 1; grid-column: auto; }
   .repositories-card { order: 2; }
-  .neural-card { order: 3; }
-  .game-section { order: 4; }
-  .crowburn-card { order: 5; }
-  .next-section { order: 6; grid-column: auto; }
+  .diffusion-card { order: 3; }
+  .talks-card { order: 4; }
+  .neural-card { order: 5; }
+  .game-section { order: 6; }
+  .crowburn-card { order: 7; }
+  .next-section { order: 8; grid-column: auto; }
 
   .custom-header {
     flex-direction: column;
@@ -874,6 +966,22 @@ body {
 
   .welcome-line + .welcome-line { margin-top: 0.35rem; }
   .welcome-paragraph-break { height: 0.45rem; }
+
+  .diffusion-strip {
+    width: calc(100% - 2 * 1.4rem);
+    margin-left: 1.4rem;
+    margin-right: 1.4rem;
+  }
+
+  .diffusion-minimal-body {
+    grid-template-columns: 1fr;
+    gap: 1.3rem;
+  }
+
+  .diffusion-wasserstein-figure {
+    width: min(100%, 420px);
+    justify-self: center;
+  }
 
   .neural-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
