@@ -6,15 +6,15 @@
   <title>Lóránt Nagy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap">
-  <link rel="stylesheet" href="/assets/css/main.css?v=diffusion-minimal-2">
+  <link rel="stylesheet" href="/assets/css/main.css?v=theme-1">
   <style>
     /* nn card animations */
-    @keyframes ff-pulse-i1{0%,100%{fill:#1e2230}10%,20%{fill:#378ADD}40%,50%{fill:#e8824a}}
-    @keyframes ff-pulse-i2{0%,100%{fill:#1e2230}15%,25%{fill:#e8824a}45%,55%{fill:#378ADD}}
-    @keyframes ff-pulse-h1{0%,100%{fill:#1e2230}30%,40%{fill:#e8824a}}
-    @keyframes ff-pulse-h2{0%,100%{fill:#1e2230}35%,45%{fill:#378ADD}}
-    @keyframes ff-pulse-h3{0%,100%{fill:#1e2230}32%,42%{fill:#e8824a}}
-    @keyframes ff-pulse-o {0%,100%{fill:#1e2230}55%,70%{fill:#e8824a}}
+    @keyframes ff-pulse-i1{0%,100%{fill:var(--network-node-bg)}10%,20%{fill:var(--network-blue)}40%,50%{fill:var(--network-orange)}}
+    @keyframes ff-pulse-i2{0%,100%{fill:var(--network-node-bg)}15%,25%{fill:var(--network-orange)}45%,55%{fill:var(--network-blue)}}
+    @keyframes ff-pulse-h1{0%,100%{fill:var(--network-node-bg)}30%,40%{fill:var(--network-orange)}}
+    @keyframes ff-pulse-h2{0%,100%{fill:var(--network-node-bg)}35%,45%{fill:var(--network-blue)}}
+    @keyframes ff-pulse-h3{0%,100%{fill:var(--network-node-bg)}32%,42%{fill:var(--network-orange)}}
+    @keyframes ff-pulse-o {0%,100%{fill:var(--network-node-bg)}55%,70%{fill:var(--network-orange)}}
     @keyframes edge-flow  {0%,100%{opacity:0.12}30%,60%{opacity:0.35}}
     .ff-i1{animation:ff-pulse-i1 3s ease-in-out infinite}
     .ff-i2{animation:ff-pulse-i2 3s ease-in-out infinite}
@@ -23,9 +23,9 @@
     .ff-h3{animation:ff-pulse-h3 3s ease-in-out infinite}
     .ff-o {animation:ff-pulse-o  3s ease-in-out infinite}
     .ff-edge{animation:edge-flow 3s ease-in-out infinite}
-    @keyframes rnn-h1{0%,100%{fill:#1e2230}20%,35%{fill:#378ADD}55%,70%{fill:#e8824a}}
-    @keyframes rnn-h2{0%,100%{fill:#1e2230}25%,40%{fill:#e8824a}60%,75%{fill:#378ADD}}
-    @keyframes rnn-x{0%,8%{fill:#1e2230}9%,18%{fill:#378ADD}19%,28%{fill:#e8824a}29%,38%{fill:#378ADD}39%,48%{fill:#1e2230}49%,58%{fill:#e8824a}59%,68%{fill:#378ADD}69%,78%{fill:#e8824a}79%,100%{fill:#1e2230}}
+    @keyframes rnn-h1{0%,100%{fill:var(--network-node-bg)}20%,35%{fill:var(--network-blue)}55%,70%{fill:var(--network-orange)}}
+    @keyframes rnn-h2{0%,100%{fill:var(--network-node-bg)}25%,40%{fill:var(--network-orange)}60%,75%{fill:var(--network-blue)}}
+    @keyframes rnn-x{0%,8%{fill:var(--network-node-bg)}9%,18%{fill:var(--network-blue)}19%,28%{fill:var(--network-orange)}29%,38%{fill:var(--network-blue)}39%,48%{fill:var(--network-node-bg)}49%,58%{fill:var(--network-orange)}59%,68%{fill:var(--network-blue)}69%,78%{fill:var(--network-orange)}79%,100%{fill:var(--network-node-bg)}}
     @keyframes rnn-arc{0%,100%{stroke-opacity:0.1}40%,65%{stroke-opacity:0.6}}
     @keyframes rnn-seq{0%{transform:translateX(0);opacity:0.5}14%{transform:translateX(18px);opacity:0.9}28%{transform:translateX(36px);opacity:0.9}42%{transform:translateX(54px);opacity:0.9}56%{transform:translateX(72px);opacity:0.9}70%{transform:translateX(90px);opacity:0.9}84%{transform:translateX(108px);opacity:0.9}99%{transform:translateX(108px);opacity:0.3}100%{transform:translateX(0);opacity:0.5}}
     .rnn-h1{animation:rnn-h1 4s ease-in-out infinite}
@@ -33,11 +33,11 @@
     .rnn-x{animation:rnn-x 4s steps(1) infinite}
     .rnn-arc{animation:rnn-arc 4s ease-in-out infinite}
     .rnn-seq-dot{animation:rnn-seq 4s linear infinite}
-    @keyframes lstm-cell{0%,100%{fill:#1a1e2a}20%,35%{fill:#0f3a2a}50%,65%{fill:#2a1a0a}80%,90%{fill:#1a2a3a}}
-    @keyframes lstm-gate-f{0%,100%{fill:#378ADD;opacity:0.3}15%,30%{fill:#378ADD;opacity:0.9}}
-    @keyframes lstm-gate-i{0%,100%{fill:#1D9E75;opacity:0.3}30%,45%{fill:#1D9E75;opacity:0.9}}
-    @keyframes lstm-gate-g{0%,100%{fill:#aa701e;opacity:0.3}45%,60%{fill:#aa701e;opacity:0.9}}
-    @keyframes lstm-gate-o{0%,100%{fill:#e8824a;opacity:0.3}60%,75%{fill:#e8824a;opacity:0.9}}
+    @keyframes lstm-cell{0%,100%{fill:var(--network-memory-bg)}20%,35%{fill:var(--network-memory-green)}50%,65%{fill:var(--network-memory-amber)}80%,90%{fill:var(--network-memory-blue)}}
+    @keyframes lstm-gate-f{0%,100%{fill:var(--network-blue);opacity:0.3}15%,30%{fill:var(--network-blue);opacity:0.9}}
+    @keyframes lstm-gate-i{0%,100%{fill:var(--network-green);opacity:0.3}30%,45%{fill:var(--network-green);opacity:0.9}}
+    @keyframes lstm-gate-g{0%,100%{fill:var(--accent);opacity:0.3}45%,60%{fill:var(--accent);opacity:0.9}}
+    @keyframes lstm-gate-o{0%,100%{fill:var(--network-orange);opacity:0.3}60%,75%{fill:var(--network-orange);opacity:0.9}}
     @keyframes lstm-hw{0%,100%{stroke-opacity:0.15}20%,80%{stroke-opacity:0.55}}
     .lstm-cell{animation:lstm-cell 5s ease-in-out infinite}
     .lstm-gate-f{animation:lstm-gate-f 5s ease-in-out infinite}
@@ -45,8 +45,8 @@
     .lstm-gate-g{animation:lstm-gate-g 5s ease-in-out infinite}
     .lstm-gate-o{animation:lstm-gate-o 5s ease-in-out infinite}
     .lstm-hw{animation:lstm-hw 5s ease-in-out infinite}
-    @keyframes lstm-mul{0%,100%{fill:#1e2230}18%,34%{fill:#378ADD}}
-    @keyframes lstm-add{0%,100%{fill:#1e2230}50%,66%{fill:#c8cdd8}}
+    @keyframes lstm-mul{0%,100%{fill:var(--network-node-bg)}18%,34%{fill:var(--network-blue)}}
+    @keyframes lstm-add{0%,100%{fill:var(--network-node-bg)}50%,66%{fill:var(--network-label)}}
     .lstm-mul{animation:lstm-mul 5s ease-in-out infinite}
     .lstm-add{animation:lstm-add 5s ease-in-out infinite}
     /* GRU miniature — mirrors the full computation-graph animation. */
@@ -173,7 +173,7 @@
       gap: 1rem;
       align-items: center;
       padding: 0.95rem 0.25rem;
-      border-top: 1px solid rgba(0, 0, 0, 0.075);
+      border-top: 1px solid var(--tile-border);
       color: inherit;
       text-decoration: none;
       transition: background-color 0.18s ease, padding-left 0.18s ease, padding-right 0.18s ease;
@@ -184,7 +184,7 @@
     }
 
     .talk-row:hover {
-      background: rgba(170, 112, 30, 0.055);
+      background: var(--talk-hover-bg);
       padding-left: 0.55rem;
       padding-right: 0.55rem;
     }
@@ -209,13 +209,13 @@
       font-size: 0.92rem;
       line-height: 1.45;
       font-weight: 600;
-      color: #222;
+      color: var(--talk-title);
     }
 
     .talk-venue {
       font-size: 0.78rem;
       line-height: 1.45;
-      color: #777;
+      color: var(--talk-detail);
     }
 
     .talk-pdf {
@@ -266,14 +266,12 @@
 <div class="welcome-section" id="welcome-section">
   <div class="welcome-layout">
     <div class="welcome-copy welcome-copy-left">
-      <p class="welcome-line welcome-line-1">Hi, I’m Lóránt. </p>
-      <p class="welcome-line welcome-line-2">This is my little place on the internet.</p>
-      <p class="welcome-line welcome-line-3">Here you’ll find some projects, notes, experiments, and other things I make for fun.</p>
+      
     </div>
 
     <a href="/assets/pdf/CV.pdf" class="cv-link welcome-cv" target="_blank" rel="noopener">CV →</a>
     <div class="welcome-cloud-caption" aria-label="About the background">
-      <p>The clouds drifting in the background are domain-warped fractional noise. Use the slider to change roughness of the fractal like structure.</p>
+      <!--<p>The clouds drifting in the background are domain-warped fractional noise. Use the slider to change roughness of the fractal like structure.</p>-->
       <p></p>
     </div>
   </div>
@@ -422,200 +420,200 @@
     <div class="section-header"><h2>note to self — neural network architectures</h2></div>
     <div class="neural-grid">
 
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
-          <g class="ff-edge" stroke="rgba(255,255,255,1)" stroke-width="0.6" fill="none">
+          <rect width="220" height="130" fill="var(--network-bg)"/>
+          <g class="ff-edge" stroke="var(--network-white-alpha-100)" stroke-width="0.6" fill="none">
             <line x1="52" y1="40" x2="110" y2="32"/><line x1="52" y1="40" x2="110" y2="65"/><line x1="52" y1="40" x2="110" y2="98"/>
             <line x1="52" y1="90" x2="110" y2="32"/><line x1="52" y1="90" x2="110" y2="65"/><line x1="52" y1="90" x2="110" y2="98"/>
             <line x1="110" y1="32" x2="168" y2="65"/><line x1="110" y1="65" x2="168" y2="65"/><line x1="110" y1="98" x2="168" y2="65"/>
           </g>
-          <circle class="ff-i1" cx="52" cy="40" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="ff-i2" cx="52" cy="90" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="ff-h1" cx="110" cy="32" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="ff-h2" cx="110" cy="65" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="ff-h3" cx="110" cy="98" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="ff-o"  cx="168" cy="65" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <text x="110" y="120" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">feedforward</text>
+          <circle class="ff-i1" cx="52" cy="40" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <circle class="ff-i2" cx="52" cy="90" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <circle class="ff-h1" cx="110" cy="32" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <circle class="ff-h2" cx="110" cy="65" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <circle class="ff-h3" cx="110" cy="98" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <circle class="ff-o"  cx="168" cy="65" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <text x="110" y="120" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">feedforward</text>
         </svg>
       </div>
 
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
-          <defs><marker id="arr-idx" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="rgba(255,255,255,0.2)"/></marker></defs>
-          <g font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)" text-anchor="middle">
+          <rect width="220" height="130" fill="var(--network-bg)"/>
+          <defs><marker id="arr-idx" markerWidth="5" markerHeight="5" refX="3" refY="2.5" orient="auto"><path d="M0,0 L0,5 L5,2.5 z" fill="var(--network-white-alpha-20)"/></marker></defs>
+          <g font-family="monospace" font-size="7" fill="var(--network-white-alpha-20)" text-anchor="middle">
             <text x="30" y="116">x₁</text><text x="48" y="116">x₂</text><text x="66" y="116">x₃</text>
             <text x="84" y="116">x₄</text><text x="102" y="116">x₅</text><text x="120" y="116">x₆</text><text x="138" y="116">x₇</text>
           </g>
-          <circle class="rnn-seq-dot" cx="30" cy="106" r="4" fill="#aa701e" opacity="0.7"/>
-          <line x1="110" y1="104" x2="110" y2="86" stroke="rgba(255,255,255,0.15)" stroke-width="1" marker-end="url(#arr-idx)"/>
-          <circle class="rnn-x" cx="110" cy="72" r="13" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <line x1="97" y1="66" x2="68" y2="42" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-          <line x1="97" y1="78" x2="68" y2="96" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-          <circle class="rnn-h1" cx="54" cy="34"  r="15" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <circle class="rnn-h2" cx="54" cy="96" r="15" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-          <path class="rnn-arc" d="M 46 19 C 20 4, 20 4, 46 19" fill="none" stroke="#378ADD" stroke-width="1.5"/>
-          <path class="rnn-arc" d="M 46 111 C 20 126, 20 126, 46 111" fill="none" stroke="#e8824a" stroke-width="1.5"/>
-          <path d="M 54 49 Q 30 65 54 81" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="70" y1="65" x2="175" y2="65" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-          <circle cx="185" cy="65" r="9" fill="#1e2230" stroke="rgba(255,255,255,0.1)" stroke-width="0.8" stroke-dasharray="2,2"/>
-          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">Elman network</text>
+          <circle class="rnn-seq-dot" cx="30" cy="106" r="4" fill="var(--accent)" opacity="0.7"/>
+          <line x1="110" y1="104" x2="110" y2="86" stroke="var(--network-white-alpha-15)" stroke-width="1" marker-end="url(#arr-idx)"/>
+          <circle class="rnn-x" cx="110" cy="72" r="13" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <line x1="97" y1="66" x2="68" y2="42" stroke="var(--network-white-alpha-20)" stroke-width="0.8"/>
+          <line x1="97" y1="78" x2="68" y2="96" stroke="var(--network-white-alpha-20)" stroke-width="0.8"/>
+          <circle class="rnn-h1" cx="54" cy="34"  r="15" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <circle class="rnn-h2" cx="54" cy="96" r="15" stroke="var(--network-white-alpha-12)" stroke-width="1"/>
+          <path class="rnn-arc" d="M 46 19 C 20 4, 20 4, 46 19" fill="none" stroke="var(--network-blue)" stroke-width="1.5"/>
+          <path class="rnn-arc" d="M 46 111 C 20 126, 20 126, 46 111" fill="none" stroke="var(--network-orange)" stroke-width="1.5"/>
+          <path d="M 54 49 Q 30 65 54 81" fill="none" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="70" y1="65" x2="175" y2="65" stroke="var(--network-white-alpha-08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <circle cx="185" cy="65" r="9" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-10)" stroke-width="0.8" stroke-dasharray="2,2"/>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">Elman network</text>
         </svg>
       </div>
 
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
-          <rect class="lstm-cell" x="10" y="20" width="200" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
+          <rect width="220" height="130" fill="var(--network-bg)"/>
+          <rect class="lstm-cell" x="10" y="20" width="200" height="10" rx="2" fill="var(--network-node-bg)" opacity="0.5"/>
           <line class="lstm-hw" x1="15" y1="25" x2="205" y2="25" stroke="white" stroke-width="2"/>
-          <text x="110" y="16" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)">cell state</text>
-          <rect class="lstm-gate-i" x="42"  y="44" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
-          <rect class="lstm-gate-g" x="94"  y="44" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
-          <rect class="lstm-gate-o" x="146" y="44" width="28" height="28" rx="4" stroke="#7B5EA7" stroke-width="1"/>
-          <text x="56"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
-          <text x="108" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
-          <text x="160" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
-          <line x1="56"  y1="44" x2="76" y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="108" y1="44" x2="88" y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="160" y1="72" x2="160" y2="94" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <circle class="lstm-add" cx="82" cy="25" r="7" stroke="rgba(255,255,255,0.35)" stroke-width="0.9"/>
-          <text x="82" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.7)">+</text>
-          <line x1="20"  y1="114" x2="20"  y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="195" y1="114" x2="195" y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="20"  y1="96" x2="195" y2="96" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">LSTM 1997</text>
+          <text x="110" y="16" text-anchor="middle" font-family="monospace" font-size="7" fill="var(--network-white-alpha-20)">cell state</text>
+          <rect class="lstm-gate-i" x="42"  y="44" width="28" height="28" rx="4" stroke="var(--network-green)" stroke-width="1"/>
+          <rect class="lstm-gate-g" x="94"  y="44" width="28" height="28" rx="4" stroke="var(--accent)" stroke-width="1"/>
+          <rect class="lstm-gate-o" x="146" y="44" width="28" height="28" rx="4" stroke="var(--network-violet)" stroke-width="1"/>
+          <text x="56"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">i</text>
+          <text x="108" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">c̃</text>
+          <text x="160" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">o</text>
+          <line x1="56"  y1="44" x2="76" y2="31" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="108" y1="44" x2="88" y2="31" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="160" y1="72" x2="160" y2="94" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <circle class="lstm-add" cx="82" cy="25" r="7" stroke="var(--network-white-alpha-35)" stroke-width="0.9"/>
+          <text x="82" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="var(--network-white-alpha-70)">+</text>
+          <line x1="20"  y1="114" x2="20"  y2="96" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="195" y1="114" x2="195" y2="96" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="20"  y1="96" x2="195" y2="96" stroke="var(--network-white-alpha-08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">LSTM 1997</text>
         </svg>
       </div>
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
-          <rect class="lstm-cell" x="10" y="20" width="200" height="10" rx="2" fill="#1e2230" opacity="0.5"/>
+          <rect width="220" height="130" fill="var(--network-bg)"/>
+          <rect class="lstm-cell" x="10" y="20" width="200" height="10" rx="2" fill="var(--network-node-bg)" opacity="0.5"/>
           <line class="lstm-hw" x1="15" y1="25" x2="205" y2="25" stroke="white" stroke-width="2"/>
-          <text x="110" y="16" text-anchor="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.2)">cell state</text>
-          <rect class="lstm-gate-f" x="22"  y="44" width="28" height="28" rx="4" stroke="#378ADD" stroke-width="1"/>
-          <rect class="lstm-gate-i" x="62"  y="44" width="28" height="28" rx="4" stroke="#1D9E75" stroke-width="1"/>
-          <rect class="lstm-gate-g" x="102" y="44" width="28" height="28" rx="4" stroke="#aa701e" stroke-width="1"/>
-          <rect class="lstm-gate-o" x="142" y="44" width="28" height="28" rx="4" stroke="#e8824a" stroke-width="1"/>
-          <text x="36"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">f</text>
-          <text x="76"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">i</text>
-          <text x="116" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">c̃</text>
-          <text x="156" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="rgba(255,255,255,0.7)">o</text>
-          <line x1="36"  y1="44" x2="36"  y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="76"  y1="44" x2="92"  y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="116" y1="44" x2="102" y2="31" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="156" y1="72" x2="156" y2="94" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <circle class="lstm-mul" cx="36" cy="25" r="7" stroke="#378ADD" stroke-width="0.9"/>
-          <text x="36" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.7)">⊙</text>
-          <circle class="lstm-add" cx="97" cy="25" r="7" stroke="rgba(255,255,255,0.35)" stroke-width="0.9"/>
-          <text x="97" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.7)">+</text>
-          <line x1="20"  y1="114" x2="20"  y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="195" y1="114" x2="195" y2="96" stroke="rgba(255,255,255,0.15)" stroke-width="0.8"/>
-          <line x1="20"  y1="96" x2="195" y2="96" stroke="rgba(255,255,255,0.08)" stroke-width="0.8" stroke-dasharray="3,3"/>
-          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">LSTM 2000</text>
+          <text x="110" y="16" text-anchor="middle" font-family="monospace" font-size="7" fill="var(--network-white-alpha-20)">cell state</text>
+          <rect class="lstm-gate-f" x="22"  y="44" width="28" height="28" rx="4" stroke="var(--network-blue)" stroke-width="1"/>
+          <rect class="lstm-gate-i" x="62"  y="44" width="28" height="28" rx="4" stroke="var(--network-green)" stroke-width="1"/>
+          <rect class="lstm-gate-g" x="102" y="44" width="28" height="28" rx="4" stroke="var(--accent)" stroke-width="1"/>
+          <rect class="lstm-gate-o" x="142" y="44" width="28" height="28" rx="4" stroke="var(--network-orange)" stroke-width="1"/>
+          <text x="36"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">f</text>
+          <text x="76"  y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">i</text>
+          <text x="116" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">c̃</text>
+          <text x="156" y="59" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="var(--network-white-alpha-70)">o</text>
+          <line x1="36"  y1="44" x2="36"  y2="31" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="76"  y1="44" x2="92"  y2="31" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="116" y1="44" x2="102" y2="31" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="156" y1="72" x2="156" y2="94" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <circle class="lstm-mul" cx="36" cy="25" r="7" stroke="var(--network-blue)" stroke-width="0.9"/>
+          <text x="36" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="7" fill="var(--network-white-alpha-70)">⊙</text>
+          <circle class="lstm-add" cx="97" cy="25" r="7" stroke="var(--network-white-alpha-35)" stroke-width="0.9"/>
+          <text x="97" y="25" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="8" fill="var(--network-white-alpha-70)">+</text>
+          <line x1="20"  y1="114" x2="20"  y2="96" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="195" y1="114" x2="195" y2="96" stroke="var(--network-white-alpha-15)" stroke-width="0.8"/>
+          <line x1="20"  y1="96" x2="195" y2="96" stroke="var(--network-white-alpha-08)" stroke-width="0.8" stroke-dasharray="3,3"/>
+          <text x="110" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">LSTM 2000</text>
         </svg>
       </div>
 
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="220" height="130" fill="#0d0f14"/>
+                  <rect width="220" height="130" fill="var(--network-bg)"/>
                   <defs>
-                    <radialGradient id="mini-gru-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#1D9E75"/><stop offset="58%" stop-color="#1D9E75" stop-opacity=".72"/><stop offset="100%" stop-color="#1D9E75" stop-opacity=".22"/></radialGradient>
-                    <radialGradient id="mini-gru-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#378ADD"/><stop offset="58%" stop-color="#378ADD" stop-opacity=".72"/><stop offset="100%" stop-color="#378ADD" stop-opacity=".22"/></radialGradient>
-                    <radialGradient id="mini-gru-c" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#aa701e"/><stop offset="58%" stop-color="#aa701e" stop-opacity=".72"/><stop offset="100%" stop-color="#aa701e" stop-opacity=".22"/></radialGradient>
-                    <radialGradient id="mini-gru-s" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#7F77DD"/><stop offset="58%" stop-color="#7F77DD" stop-opacity=".72"/><stop offset="100%" stop-color="#7F77DD" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-gru-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-green)"/><stop offset="58%" stop-color="var(--network-green)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-green)" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-gru-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-blue)"/><stop offset="58%" stop-color="var(--network-blue)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-blue)" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-gru-c" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--accent)"/><stop offset="58%" stop-color="var(--accent)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-gru-s" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-purple)"/><stop offset="58%" stop-color="var(--network-purple)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-purple)" stop-opacity=".22"/></radialGradient>
                   </defs>
                   <g fill="none">
-                    <path d="M 23,40 L 158,40" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
-                    <path d="M 22,36 C 31,31 40,27 48,27" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
-                    <path d="M 20,90 C 30,69 40,45 48,35" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
-                    <path d="M 21,46 C 31,65 40,83 48,91" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
-                    <path d="M 22,98 C 31,98 40,97 48,96" stroke="rgba(255,255,255,.22)" stroke-width=".8"/>
-                    <path d="M 80,95 L 98,95" stroke="#378ADD" stroke-width="1"/>
-                    <path d="M 21,46 C 47,57 77,78 99,90" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
-                    <path d="M 112,95 L 125,95" stroke="#378ADD" stroke-width="1"/>
-                    <path d="M 23,101 C 61,123 104,118 125,103" stroke="rgba(232,130,74,.42)" stroke-width=".9"/>
-                    <path d="M 80,27 C 111,18 143,27 159,36" stroke="#1D9E75" stroke-width="1"/>
-                    <path d="M 80,35 C 111,47 145,62 159,70" stroke="#1D9E75" stroke-width="1"/>
-                    <path d="M 159,94 C 165,90 167,85 166,82" stroke="#aa701e" stroke-width="1"/>
-                    <path d="M 172,44 C 180,47 184,51 185,53" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
-                    <path d="M 172,72 C 180,68 184,63 185,61" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
-                    <path d="M 197,58 L 202,58" stroke="rgba(127,119,221,.48)" stroke-width="1"/>
-                    <path d="M 210,50 C 210,7 48,2 16,32" stroke="rgba(255,255,255,.12)" stroke-width=".8" stroke-dasharray="3,3"/>
+                    <path d="M 23,40 L 158,40" stroke="var(--network-purple-alpha-48)" stroke-width="1"/>
+                    <path d="M 22,36 C 31,31 40,27 48,27" stroke="var(--network-white-alpha-22)" stroke-width=".8"/>
+                    <path d="M 20,90 C 30,69 40,45 48,35" stroke="var(--network-white-alpha-22)" stroke-width=".8"/>
+                    <path d="M 21,46 C 31,65 40,83 48,91" stroke="var(--network-white-alpha-22)" stroke-width=".8"/>
+                    <path d="M 22,98 C 31,98 40,97 48,96" stroke="var(--network-white-alpha-22)" stroke-width=".8"/>
+                    <path d="M 80,95 L 98,95" stroke="var(--network-blue)" stroke-width="1"/>
+                    <path d="M 21,46 C 47,57 77,78 99,90" stroke="var(--network-purple-alpha-48)" stroke-width="1"/>
+                    <path d="M 112,95 L 125,95" stroke="var(--network-blue)" stroke-width="1"/>
+                    <path d="M 23,101 C 61,123 104,118 125,103" stroke="var(--network-orange-alpha-42)" stroke-width=".9"/>
+                    <path d="M 80,27 C 111,18 143,27 159,36" stroke="var(--network-green)" stroke-width="1"/>
+                    <path d="M 80,35 C 111,47 145,62 159,70" stroke="var(--network-green)" stroke-width="1"/>
+                    <path d="M 159,94 C 165,90 167,85 166,82" stroke="var(--accent)" stroke-width="1"/>
+                    <path d="M 172,44 C 180,47 184,51 185,53" stroke="var(--network-purple-alpha-48)" stroke-width="1"/>
+                    <path d="M 172,72 C 180,68 184,63 185,61" stroke="var(--network-purple-alpha-48)" stroke-width="1"/>
+                    <path d="M 197,58 L 202,58" stroke="var(--network-purple-alpha-48)" stroke-width="1"/>
+                    <path d="M 210,50 C 210,7 48,2 16,32" stroke="var(--network-white-alpha-12)" stroke-width=".8" stroke-dasharray="3,3"/>
                   </g>
                   <g font-family="'JetBrains Mono',monospace">
-                    <circle cx="14" cy="40" r="9" fill="#1e2230" stroke="#7F77DD" stroke-width="1"/><text x="14" y="40" text-anchor="middle" dominant-baseline="middle" font-size="6.6" fill="#7F77DD">h<tspan font-size="4.6" dy="1.3">t−1</tspan></text>
-                    <circle cx="14" cy="96" r="9" fill="#1e2230" stroke="#e8824a" stroke-width="1"/><text x="14" y="96" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#e8824a">x<tspan font-size="4.6" dy="1.3">t</tspan></text>
-                    <rect x="48" y="20" width="32" height="20" rx="3" fill="none" stroke="#1D9E75"/><rect class="gru-mini-gate-fill" x="48" y="20" width="32" height="20" rx="3" fill="url(#mini-gru-z)" opacity="0"/><rect class="gru-mini-gate-hit" x="48" y="20" width="32" height="20" rx="3" fill="none" stroke="#1D9E75" opacity="0"/><text x="64" y="30" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#1D9E75">σ</text><text x="64" y="16" text-anchor="middle" font-size="5.3" fill="#1D9E75">z<tspan font-size="3.8" dy="1">t</tspan></text>
-                    <rect x="48" y="85" width="32" height="20" rx="3" fill="none" stroke="#378ADD"/><rect class="gru-mini-gate-fill" x="48" y="85" width="32" height="20" rx="3" fill="url(#mini-gru-r)" opacity="0"/><rect class="gru-mini-gate-hit" x="48" y="85" width="32" height="20" rx="3" fill="none" stroke="#378ADD" opacity="0"/><text x="64" y="95" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#378ADD">σ</text><text x="64" y="112" text-anchor="middle" font-size="5.3" fill="#378ADD">r<tspan font-size="3.8" dy="1">t</tspan></text>
-                    <circle cx="105" cy="95" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-orh-fill" cx="105" cy="95" r="7" fill="url(#mini-gru-r)" opacity="0"/><circle class="gru-mini-orh-hit" cx="105" cy="95" r="7" fill="none" stroke="#378ADD" opacity="0"/><text x="105" y="95" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#c8cdd8">⊙</text>
-                    <rect x="125" y="85" width="34" height="20" rx="3" fill="none" stroke="#aa701e"/><rect class="gru-mini-cand-fill" x="125" y="85" width="34" height="20" rx="3" fill="url(#mini-gru-c)" opacity="0"/><rect class="gru-mini-cand-hit" x="125" y="85" width="34" height="20" rx="3" fill="none" stroke="#aa701e" opacity="0"/><text x="142" y="95" text-anchor="middle" dominant-baseline="middle" font-size="5.7" fill="#aa701e">tanh</text><text x="142" y="112" text-anchor="middle" font-size="5.2" fill="#aa701e">h̃<tspan font-size="3.7" dy="1">t</tspan></text>
-                    <circle cx="165" cy="40" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-o1-fill" cx="165" cy="40" r="7" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-o1-hit" cx="165" cy="40" r="7" fill="none" stroke="#7F77DD" opacity="0"/><text x="165" y="40" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#c8cdd8">⊙</text>
-                    <circle cx="165" cy="75" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-o2-fill" cx="165" cy="75" r="7" fill="url(#mini-gru-c)" opacity="0"/><circle class="gru-mini-o2-hit" cx="165" cy="75" r="7" fill="none" stroke="#aa701e" opacity="0"/><text x="165" y="75" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="#c8cdd8">⊙</text>
-                    <circle cx="190" cy="58" r="7" fill="#1e2230" stroke="rgba(255,255,255,.28)"/><circle class="gru-mini-plus-fill" cx="190" cy="58" r="7" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-plus-hit" cx="190" cy="58" r="7" fill="none" stroke="#7F77DD" opacity="0"/><text x="190" y="58" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#c8cdd8">+</text>
-                    <circle cx="210" cy="58" r="8" fill="#1e2230" stroke="#7F77DD"/><circle class="gru-mini-ht-fill" cx="210" cy="58" r="8" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-ht-hit" cx="210" cy="58" r="8" fill="none" stroke="#7F77DD" opacity="0"/><text x="210" y="58" text-anchor="middle" dominant-baseline="middle" font-size="5.8" fill="#7F77DD">h<tspan font-size="4" dy="1">t</tspan></text>
-                    <text x="119" y="30" text-anchor="middle" font-size="4.8" fill="#1D9E75">1−z<tspan font-size="3.4" dy="1">t</tspan></text>
+                    <circle cx="14" cy="40" r="9" fill="var(--network-node-bg)" stroke="var(--network-purple)" stroke-width="1"/><text x="14" y="40" text-anchor="middle" dominant-baseline="middle" font-size="6.6" fill="var(--network-purple)">h<tspan font-size="4.6" dy="1.3">t−1</tspan></text>
+                    <circle cx="14" cy="96" r="9" fill="var(--network-node-bg)" stroke="var(--network-orange)" stroke-width="1"/><text x="14" y="96" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-orange)">x<tspan font-size="4.6" dy="1.3">t</tspan></text>
+                    <rect x="48" y="20" width="32" height="20" rx="3" fill="none" stroke="var(--network-green)"/><rect class="gru-mini-gate-fill" x="48" y="20" width="32" height="20" rx="3" fill="url(#mini-gru-z)" opacity="0"/><rect class="gru-mini-gate-hit" x="48" y="20" width="32" height="20" rx="3" fill="none" stroke="var(--network-green)" opacity="0"/><text x="64" y="30" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-green)">σ</text><text x="64" y="16" text-anchor="middle" font-size="5.3" fill="var(--network-green)">z<tspan font-size="3.8" dy="1">t</tspan></text>
+                    <rect x="48" y="85" width="32" height="20" rx="3" fill="none" stroke="var(--network-blue)"/><rect class="gru-mini-gate-fill" x="48" y="85" width="32" height="20" rx="3" fill="url(#mini-gru-r)" opacity="0"/><rect class="gru-mini-gate-hit" x="48" y="85" width="32" height="20" rx="3" fill="none" stroke="var(--network-blue)" opacity="0"/><text x="64" y="95" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-blue)">σ</text><text x="64" y="112" text-anchor="middle" font-size="5.3" fill="var(--network-blue)">r<tspan font-size="3.8" dy="1">t</tspan></text>
+                    <circle cx="105" cy="95" r="7" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-28)"/><circle class="gru-mini-orh-fill" cx="105" cy="95" r="7" fill="url(#mini-gru-r)" opacity="0"/><circle class="gru-mini-orh-hit" cx="105" cy="95" r="7" fill="none" stroke="var(--network-blue)" opacity="0"/><text x="105" y="95" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="var(--network-label)">⊙</text>
+                    <rect x="125" y="85" width="34" height="20" rx="3" fill="none" stroke="var(--accent)"/><rect class="gru-mini-cand-fill" x="125" y="85" width="34" height="20" rx="3" fill="url(#mini-gru-c)" opacity="0"/><rect class="gru-mini-cand-hit" x="125" y="85" width="34" height="20" rx="3" fill="none" stroke="var(--accent)" opacity="0"/><text x="142" y="95" text-anchor="middle" dominant-baseline="middle" font-size="5.7" fill="var(--accent)">tanh</text><text x="142" y="112" text-anchor="middle" font-size="5.2" fill="var(--accent)">h̃<tspan font-size="3.7" dy="1">t</tspan></text>
+                    <circle cx="165" cy="40" r="7" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-28)"/><circle class="gru-mini-o1-fill" cx="165" cy="40" r="7" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-o1-hit" cx="165" cy="40" r="7" fill="none" stroke="var(--network-purple)" opacity="0"/><text x="165" y="40" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="var(--network-label)">⊙</text>
+                    <circle cx="165" cy="75" r="7" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-28)"/><circle class="gru-mini-o2-fill" cx="165" cy="75" r="7" fill="url(#mini-gru-c)" opacity="0"/><circle class="gru-mini-o2-hit" cx="165" cy="75" r="7" fill="none" stroke="var(--accent)" opacity="0"/><text x="165" y="75" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="var(--network-label)">⊙</text>
+                    <circle cx="190" cy="58" r="7" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-28)"/><circle class="gru-mini-plus-fill" cx="190" cy="58" r="7" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-plus-hit" cx="190" cy="58" r="7" fill="none" stroke="var(--network-purple)" opacity="0"/><text x="190" y="58" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-label)">+</text>
+                    <circle cx="210" cy="58" r="8" fill="var(--network-node-bg)" stroke="var(--network-purple)"/><circle class="gru-mini-ht-fill" cx="210" cy="58" r="8" fill="url(#mini-gru-s)" opacity="0"/><circle class="gru-mini-ht-hit" cx="210" cy="58" r="8" fill="none" stroke="var(--network-purple)" opacity="0"/><text x="210" y="58" text-anchor="middle" dominant-baseline="middle" font-size="5.8" fill="var(--network-purple)">h<tspan font-size="4" dy="1">t</tspan></text>
+                    <text x="119" y="30" text-anchor="middle" font-size="4.8" fill="var(--network-green)">1−z<tspan font-size="3.4" dy="1">t</tspan></text>
                   </g>
                   <g>
-                    <circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#7F77DD" style="offset-path:path('M 22,36 C 31,31 40,27 48,27')"/><circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 20,90 C 30,69 40,45 48,35')"/>
-                    <circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#7F77DD" style="offset-path:path('M 21,46 C 31,65 40,83 48,91')"/><circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 22,98 C 31,98 40,97 48,96')"/>
-                    <circle class="gru-mini-dot gru-mini-f1" r="2.7" fill="#7F77DD" style="offset-path:path('M 21,46 C 47,57 77,78 99,90')"/><circle class="gru-mini-dot gru-mini-f2" r="2.7" fill="#378ADD" style="offset-path:path('M 80,95 L 98,95')"/>
-                    <circle class="gru-mini-dot gru-mini-f3" r="2.7" fill="#378ADD" style="offset-path:path('M 112,95 L 125,95')"/><circle class="gru-mini-dot gru-mini-f3" r="2.7" fill="#e8824a" style="offset-path:path('M 23,101 C 61,123 104,118 125,103')"/>
-                    <circle class="gru-mini-dot gru-mini-f4" r="2.7" fill="#1D9E75" style="offset-path:path('M 80,27 C 111,18 143,27 159,36')"/><circle class="gru-mini-dot gru-mini-f5" r="2.7" fill="#1D9E75" style="offset-path:path('M 80,35 C 111,47 145,62 159,70')"/>
-                    <circle class="gru-mini-dot gru-mini-f6" r="2.7" fill="#aa701e" style="offset-path:path('M 159,94 C 165,90 167,85 166,82')"/><circle class="gru-mini-dot gru-mini-f7" r="2.7" fill="#7F77DD" style="offset-path:path('M 172,44 C 180,47 184,51 185,53')"/>
-                    <circle class="gru-mini-dot gru-mini-f8" r="2.7" fill="#aa701e" style="offset-path:path('M 172,72 C 180,68 184,63 185,61')"/><circle class="gru-mini-dot gru-mini-f9" r="2.7" fill="#7F77DD" style="offset-path:path('M 197,58 L 202,58')"/>
+                    <circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="var(--network-purple)" style="offset-path:path('M 22,36 C 31,31 40,27 48,27')"/><circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 20,90 C 30,69 40,45 48,35')"/>
+                    <circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="var(--network-purple)" style="offset-path:path('M 21,46 C 31,65 40,83 48,91')"/><circle class="gru-mini-dot gru-mini-f0" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 22,98 C 31,98 40,97 48,96')"/>
+                    <circle class="gru-mini-dot gru-mini-f1" r="2.7" fill="var(--network-purple)" style="offset-path:path('M 21,46 C 47,57 77,78 99,90')"/><circle class="gru-mini-dot gru-mini-f2" r="2.7" fill="var(--network-blue)" style="offset-path:path('M 80,95 L 98,95')"/>
+                    <circle class="gru-mini-dot gru-mini-f3" r="2.7" fill="var(--network-blue)" style="offset-path:path('M 112,95 L 125,95')"/><circle class="gru-mini-dot gru-mini-f3" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 23,101 C 61,123 104,118 125,103')"/>
+                    <circle class="gru-mini-dot gru-mini-f4" r="2.7" fill="var(--network-green)" style="offset-path:path('M 80,27 C 111,18 143,27 159,36')"/><circle class="gru-mini-dot gru-mini-f5" r="2.7" fill="var(--network-green)" style="offset-path:path('M 80,35 C 111,47 145,62 159,70')"/>
+                    <circle class="gru-mini-dot gru-mini-f6" r="2.7" fill="var(--accent)" style="offset-path:path('M 159,94 C 165,90 167,85 166,82')"/><circle class="gru-mini-dot gru-mini-f7" r="2.7" fill="var(--network-purple)" style="offset-path:path('M 172,44 C 180,47 184,51 185,53')"/>
+                    <circle class="gru-mini-dot gru-mini-f8" r="2.7" fill="var(--accent)" style="offset-path:path('M 172,72 C 180,68 184,63 185,61')"/><circle class="gru-mini-dot gru-mini-f9" r="2.7" fill="var(--network-purple)" style="offset-path:path('M 197,58 L 202,58')"/>
                   </g>
-                  <text x="110" y="124" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,.3)">GRU</text>
+                  <text x="110" y="124" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">GRU</text>
                 </svg>
       </div>
 
       <!-- attention card -->
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
+          <rect width="220" height="130" fill="var(--network-bg)"/>
           <!-- X matrix 4x4 small cells -->
           <g opacity="0.5">
-            <rect x="10" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="21" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="32" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="43" y="20" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="10" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="21" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="32" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="43" y="29" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="10" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="21" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="32" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="43" y="38" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="10" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="21" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="32" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
-            <rect x="43" y="47" width="9" height="7" rx="1" fill="#13161d" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+            <rect x="10" y="20" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="21" y="20" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="32" y="20" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="43" y="20" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="10" y="29" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="21" y="29" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="32" y="29" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="43" y="29" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="10" y="38" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="21" y="38" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="32" y="38" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="43" y="38" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="10" y="47" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="21" y="47" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="32" y="47" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
+            <rect x="43" y="47" width="9" height="7" rx="1" fill="var(--network-panel-bg)" stroke="var(--network-white-alpha-08)" stroke-width="0.5"/>
           </g>
-          <text x="30" y="64" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.2)">X</text>
+          <text x="30" y="64" text-anchor="middle" font-family="monospace" font-size="6" fill="var(--network-white-alpha-20)">X</text>
           <!-- attention heatmap 4x4 -->
-          <rect class="ac3" x="140" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac2" x="159" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="178" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="197" y="20" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="140" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac3" x="159" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac2" x="178" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="197" y="35" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac2" x="140" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="159" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac3" x="178" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="197" y="50" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="140" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac2" x="159" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac1" x="178" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <rect class="ac3" x="197" y="65" width="17" height="13" rx="1" fill="#7B5EA7"/>
-          <text x="170" y="90" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.2)">A</text>
+          <rect class="ac3" x="140" y="20" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac2" x="159" y="20" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="178" y="20" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="197" y="20" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="140" y="35" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac3" x="159" y="35" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac2" x="178" y="35" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="197" y="35" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac2" x="140" y="50" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="159" y="50" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac3" x="178" y="50" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="197" y="50" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="140" y="65" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac2" x="159" y="65" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac1" x="178" y="65" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <rect class="ac3" x="197" y="65" width="17" height="13" rx="1" fill="var(--network-violet)"/>
+          <text x="170" y="90" text-anchor="middle" font-family="monospace" font-size="6" fill="var(--network-white-alpha-20)">A</text>
           <!-- flow arrows -->
-          <line class="af" x1="56" y1="38" x2="130" y2="38" stroke="rgba(196,181,253,0.4)" stroke-width="0.8" stroke-dasharray="3,2"/>
-          <line class="af" x1="130" y1="38" x2="138" y2="50" stroke="rgba(196,181,253,0.4)" stroke-width="0.8"/>
-          <text x="92" y="34" text-anchor="middle" font-family="monospace" font-size="6" fill="rgba(196,181,253,0.35)">Q·Kᵀ</text>
-          <text x="110" y="116" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.3)">attention</text>
+          <line class="af" x1="56" y1="38" x2="130" y2="38" stroke="var(--network-lavender-alpha-40)" stroke-width="0.8" stroke-dasharray="3,2"/>
+          <line class="af" x1="130" y1="38" x2="138" y2="50" stroke="var(--network-lavender-alpha-40)" stroke-width="0.8"/>
+          <text x="92" y="34" text-anchor="middle" font-family="monospace" font-size="6" fill="var(--network-lavender-alpha-35)">Q·Kᵀ</text>
+          <text x="110" y="116" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">attention</text>
         </svg>
       </div>
 
@@ -623,106 +621,106 @@
 
 
       <!-- ResNet card -->
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
+          <rect width="220" height="130" fill="var(--network-bg)"/>
           <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M 110,12 L 110,30" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
-            <path d="M 110,50 L 110,64" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
-            <path d="M 110,64 L 110,80" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
-            <path d="M 110,100 L 110,111" stroke="rgba(255,255,255,.22)" stroke-width="1"/>
-            <path class="res-mini-skip" d="M 110,12 C 172,12 188,43 188,68 C 188,92 173,96 123,96" stroke="#7F77DD" stroke-width="1.2" stroke-opacity=".3"/>
-            <rect x="78" y="30" width="64" height="20" rx="3" stroke="rgba(255,255,255,.28)" stroke-width=".9"/>
-            <rect class="res-mini-box1-fill" x="78" y="30" width="64" height="20" rx="3" fill="rgba(55,138,221,.18)" opacity="0"/>
-            <rect class="res-mini-box1-hit" x="78" y="30" width="64" height="20" rx="3" stroke="#378ADD" fill="none" opacity="0"/>
-            <rect x="78" y="80" width="64" height="20" rx="3" stroke="rgba(255,255,255,.28)" stroke-width=".9"/>
-            <rect class="res-mini-box2-fill" x="78" y="80" width="64" height="20" rx="3" fill="rgba(55,138,221,.18)" opacity="0"/>
-            <rect class="res-mini-box2-hit" x="78" y="80" width="64" height="20" rx="3" stroke="#378ADD" fill="none" opacity="0"/>
-            <circle cx="110" cy="96" r="8.5" fill="#1e2230" stroke="rgba(255,255,255,.24)" stroke-width=".9"/>
-            <circle class="res-mini-plus-fill" cx="110" cy="96" r="8.5" fill="rgba(29,158,117,.24)" opacity="0"/>
-            <circle class="res-mini-plus-hit" cx="110" cy="96" r="8.5" stroke="#1D9E75" fill="none" opacity="0"/>
-            <path d="M 106,96 H 114 M 110,92 V 100" stroke="rgba(255,255,255,.72)" stroke-width=".9"/>
-            <circle cx="110" cy="113" r="6.5" fill="#1e2230" stroke="rgba(255,255,255,.12)"/>
-            <circle class="res-mini-out-fill" cx="110" cy="113" r="6.5" fill="rgba(29,158,117,.22)" opacity="0"/>
-            <circle class="res-mini-out-hit" cx="110" cy="113" r="6.5" stroke="#1D9E75" fill="none" opacity="0"/>
+            <path d="M 110,12 L 110,30" stroke="var(--network-white-alpha-22)" stroke-width="1"/>
+            <path d="M 110,50 L 110,64" stroke="var(--network-white-alpha-22)" stroke-width="1"/>
+            <path d="M 110,64 L 110,80" stroke="var(--network-white-alpha-22)" stroke-width="1"/>
+            <path d="M 110,100 L 110,111" stroke="var(--network-white-alpha-22)" stroke-width="1"/>
+            <path class="res-mini-skip" d="M 110,12 C 172,12 188,43 188,68 C 188,92 173,96 123,96" stroke="var(--network-purple)" stroke-width="1.2" stroke-opacity=".3"/>
+            <rect x="78" y="30" width="64" height="20" rx="3" stroke="var(--network-white-alpha-28)" stroke-width=".9"/>
+            <rect class="res-mini-box1-fill" x="78" y="30" width="64" height="20" rx="3" fill="var(--network-blue-alpha-18)" opacity="0"/>
+            <rect class="res-mini-box1-hit" x="78" y="30" width="64" height="20" rx="3" stroke="var(--network-blue)" fill="none" opacity="0"/>
+            <rect x="78" y="80" width="64" height="20" rx="3" stroke="var(--network-white-alpha-28)" stroke-width=".9"/>
+            <rect class="res-mini-box2-fill" x="78" y="80" width="64" height="20" rx="3" fill="var(--network-blue-alpha-18)" opacity="0"/>
+            <rect class="res-mini-box2-hit" x="78" y="80" width="64" height="20" rx="3" stroke="var(--network-blue)" fill="none" opacity="0"/>
+            <circle cx="110" cy="96" r="8.5" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-24)" stroke-width=".9"/>
+            <circle class="res-mini-plus-fill" cx="110" cy="96" r="8.5" fill="var(--network-green-alpha-24)" opacity="0"/>
+            <circle class="res-mini-plus-hit" cx="110" cy="96" r="8.5" stroke="var(--network-green)" fill="none" opacity="0"/>
+            <path d="M 106,96 H 114 M 110,92 V 100" stroke="var(--network-white-alpha-72)" stroke-width=".9"/>
+            <circle cx="110" cy="113" r="6.5" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-12)"/>
+            <circle class="res-mini-out-fill" cx="110" cy="113" r="6.5" fill="var(--network-green-alpha-22)" opacity="0"/>
+            <circle class="res-mini-out-hit" cx="110" cy="113" r="6.5" stroke="var(--network-green)" fill="none" opacity="0"/>
           </g>
           <g font-family="'JetBrains Mono',monospace">
-            <text x="104" y="10" text-anchor="end" font-size="6" fill="#e8824a">x</text>
-            <text x="40" y="67" text-anchor="middle" font-size="12" font-style="italic" fill="#378ADD">F(x)</text>
-            <text x="194" y="60" text-anchor="middle" font-size="6.2" fill="#7F77DD">identity</text>
-            <text x="50" y="100" text-anchor="middle" font-size="8" font-style="italic" fill="#1D9E75">F(x)+x</text>
-            <text x="110" y="37.2" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">weight</text>
-            <text x="110" y="43.8" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">layer</text>
-            <text x="123" y="60" font-size="6.5" fill="rgba(255,255,255,.55)">relu</text>
-            <text x="110" y="87.2" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">weight</text>
-            <text x="110" y="93.8" text-anchor="middle" font-size="5" fill="rgba(255,255,255,.72)">layer</text>
-            <text x="110" y="126" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.3)">ResNet</text>
+            <text x="104" y="10" text-anchor="end" font-size="6" fill="var(--network-orange)">x</text>
+            <text x="40" y="67" text-anchor="middle" font-size="12" font-style="italic" fill="var(--network-blue)">F(x)</text>
+            <text x="194" y="60" text-anchor="middle" font-size="6.2" fill="var(--network-purple)">identity</text>
+            <text x="50" y="100" text-anchor="middle" font-size="8" font-style="italic" fill="var(--network-green)">F(x)+x</text>
+            <text x="110" y="37.2" text-anchor="middle" font-size="5" fill="var(--network-white-alpha-72)">weight</text>
+            <text x="110" y="43.8" text-anchor="middle" font-size="5" fill="var(--network-white-alpha-72)">layer</text>
+            <text x="123" y="60" font-size="6.5" fill="var(--network-white-alpha-55)">relu</text>
+            <text x="110" y="87.2" text-anchor="middle" font-size="5" fill="var(--network-white-alpha-72)">weight</text>
+            <text x="110" y="93.8" text-anchor="middle" font-size="5" fill="var(--network-white-alpha-72)">layer</text>
+            <text x="110" y="126" text-anchor="middle" font-size="9" fill="var(--network-white-alpha-30)">ResNet</text>
           </g>
           <g>
-            <circle class="res-mini-dot res-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 110,12 L 110,30')"/>
-            <circle class="res-mini-dot res-mini-f1" r="2.7" fill="#378ADD" style="offset-path:path('M 110,50 L 110,64')"/>
-            <circle class="res-mini-dot res-mini-f2" r="2.7" fill="#378ADD" style="offset-path:path('M 110,64 L 110,80')"/>
-            <circle class="res-mini-dot res-mini-f3" r="2.7" fill="#378ADD" style="offset-path:path('M 110,100 L 110,104')"/>
-            <circle class="res-mini-dot res-mini-f4" r="2.7" fill="#7F77DD" style="offset-path:path('M 110,12 C 172,12 188,43 188,68 C 188,92 173,96 123,96')"/>
-            <circle class="res-mini-dot res-mini-f5" r="2.7" fill="#1D9E75" style="offset-path:path('M 110,104 L 110,113')"/>
+            <circle class="res-mini-dot res-mini-f0" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 110,12 L 110,30')"/>
+            <circle class="res-mini-dot res-mini-f1" r="2.7" fill="var(--network-blue)" style="offset-path:path('M 110,50 L 110,64')"/>
+            <circle class="res-mini-dot res-mini-f2" r="2.7" fill="var(--network-blue)" style="offset-path:path('M 110,64 L 110,80')"/>
+            <circle class="res-mini-dot res-mini-f3" r="2.7" fill="var(--network-blue)" style="offset-path:path('M 110,100 L 110,104')"/>
+            <circle class="res-mini-dot res-mini-f4" r="2.7" fill="var(--network-purple)" style="offset-path:path('M 110,12 C 172,12 188,43 188,68 C 188,92 173,96 123,96')"/>
+            <circle class="res-mini-dot res-mini-f5" r="2.7" fill="var(--network-green)" style="offset-path:path('M 110,104 L 110,113')"/>
           </g>
         </svg>
       </div>
 
 
       <!-- VAE card -->
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-          <rect width="220" height="130" fill="#0d0f14"/>
+          <rect width="220" height="130" fill="var(--network-bg)"/>
           <defs>
-            <radialGradient id="home-mini-vae-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#1D9E75"/><stop offset="58%" stop-color="#1D9E75" stop-opacity=".72"/><stop offset="100%" stop-color="#1D9E75" stop-opacity=".22"/></radialGradient>
-            <radialGradient id="home-mini-vae-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#aa701e"/><stop offset="58%" stop-color="#aa701e" stop-opacity=".72"/><stop offset="100%" stop-color="#aa701e" stop-opacity=".22"/></radialGradient>
-            <radialGradient id="home-mini-vae-d" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#378ADD"/><stop offset="58%" stop-color="#378ADD" stop-opacity=".72"/><stop offset="100%" stop-color="#378ADD" stop-opacity=".22"/></radialGradient>
+            <radialGradient id="home-mini-vae-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-green)"/><stop offset="58%" stop-color="var(--network-green)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-green)" stop-opacity=".22"/></radialGradient>
+            <radialGradient id="home-mini-vae-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--accent)"/><stop offset="58%" stop-color="var(--accent)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".22"/></radialGradient>
+            <radialGradient id="home-mini-vae-d" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-blue)"/><stop offset="58%" stop-color="var(--network-blue)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-blue)" stop-opacity=".22"/></radialGradient>
           </defs>
-          <g fill="none"><path d="M 25,98 L 48,98" stroke="#1D9E75" stroke-width="1"/><path d="M 108,28 Q 120,40 124,55" stroke="rgba(127,119,221,.18)" stroke-width=".8" stroke-dasharray="3,2"/><path d="M 108,94 Q 120,82 124,69" stroke="#1D9E75" stroke-width="1"/><path d="M 141,62 L 157,62" stroke="rgba(170,112,30,.62)" stroke-width="1"/><path d="M 199,62 L 202,62" stroke="rgba(255,255,255,.10)" stroke-width=".8" stroke-dasharray="3,2"/><path class="cvae-mini-kl" d="M 78,78 L 78,44" stroke="#1D9E75" stroke-width=".8" stroke-dasharray="2,3"/></g>
-          <g font-family="'JetBrains Mono',monospace"><circle cx="16" cy="98" r="9" fill="#1e2230" stroke="#e8824a"/><text x="16" y="98" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#e8824a">x</text><rect x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="#7F77DD"/><text x="78" y="19" text-anchor="middle" font-size="5.2" letter-spacing=".55" fill="#7F77DD">PRIOR</text><text x="78" y="31" text-anchor="middle" font-size="5.7" fill="#7F77DD">p(z)=𝒩(0,I)</text><rect x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="#1D9E75"/><rect class="cvae-mini-box-fill" x="48" y="78" width="60" height="34" rx="3" fill="url(#home-mini-vae-r)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="#1D9E75" opacity="0"/><text x="78" y="87" text-anchor="middle" font-size="5.2" letter-spacing=".45" fill="#1D9E75">ENCODER</text><text x="78" y="99" text-anchor="middle" font-size="5.8" fill="#1D9E75">q<tspan font-size="4" dy="1">φ</tspan><tspan font-size="5.8" dy="-1">(z|x)</tspan></text><text class="cvae-mini-kl" x="83" y="63" font-size="5" fill="#1D9E75">KL</text><circle cx="132" cy="62" r="9" fill="#1e2230" stroke="#aa701e"/><circle class="cvae-mini-z-fill" cx="132" cy="62" r="9" fill="url(#home-mini-vae-z)" opacity="0"/><circle class="cvae-mini-z-hit" cx="132" cy="62" r="9" fill="none" stroke="#aa701e" opacity="0"/><text x="132" y="62" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#aa701e">ẑ</text><rect x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="#378ADD"/><rect class="cvae-mini-dec-fill" x="157" y="45" width="42" height="34" rx="3" fill="url(#home-mini-vae-d)" opacity="0"/><rect class="cvae-mini-dec-hit" x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="#378ADD" opacity="0"/><text x="178" y="54" text-anchor="middle" font-size="5.1" letter-spacing=".55" fill="#378ADD">DECODER</text><text x="178" y="66" text-anchor="middle" font-size="5.2" fill="#378ADD">p<tspan font-size="3.7" dy="1">θ</tspan><tspan font-size="5.2" dy="-1">(x|ẑ)</tspan></text><circle cx="211" cy="62" r="8" fill="#1e2230" stroke="rgba(255,255,255,.12)"/><text x="211" y="62" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="rgba(255,255,255,.18)">x̃</text><text x="116" y="86" text-anchor="middle" font-size="4.3" fill="#1D9E75">sampling</text></g>
-          <g><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 25,98 L 48,98')"/><circle class="cvae-mini-dot cvae-mini-f2" r="2.9" fill="#aa701e" style="offset-path:path('M 108,94 Q 120,82 124,69')"/><circle class="cvae-mini-dot cvae-mini-f3" r="2.9" fill="#aa701e" style="offset-path:path('M 141,62 L 157,62')"/></g>
-          <text x="110" y="124" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,.3)">VAE</text>
+          <g fill="none"><path d="M 25,98 L 48,98" stroke="var(--network-green)" stroke-width="1"/><path d="M 108,28 Q 120,40 124,55" stroke="var(--network-purple-alpha-18)" stroke-width=".8" stroke-dasharray="3,2"/><path d="M 108,94 Q 120,82 124,69" stroke="var(--network-green)" stroke-width="1"/><path d="M 141,62 L 157,62" stroke="var(--accent-alpha-62)" stroke-width="1"/><path d="M 199,62 L 202,62" stroke="var(--network-white-alpha-10)" stroke-width=".8" stroke-dasharray="3,2"/><path class="cvae-mini-kl" d="M 78,78 L 78,44" stroke="var(--network-green)" stroke-width=".8" stroke-dasharray="2,3"/></g>
+          <g font-family="'JetBrains Mono',monospace"><circle cx="16" cy="98" r="9" fill="var(--network-node-bg)" stroke="var(--network-orange)"/><text x="16" y="98" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-orange)">x</text><rect x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="var(--network-purple)"/><text x="78" y="19" text-anchor="middle" font-size="5.2" letter-spacing=".55" fill="var(--network-purple)">PRIOR</text><text x="78" y="31" text-anchor="middle" font-size="5.7" fill="var(--network-purple)">p(z)=𝒩(0,I)</text><rect x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="var(--network-green)"/><rect class="cvae-mini-box-fill" x="48" y="78" width="60" height="34" rx="3" fill="url(#home-mini-vae-r)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="var(--network-green)" opacity="0"/><text x="78" y="87" text-anchor="middle" font-size="5.2" letter-spacing=".45" fill="var(--network-green)">ENCODER</text><text x="78" y="99" text-anchor="middle" font-size="5.8" fill="var(--network-green)">q<tspan font-size="4" dy="1">φ</tspan><tspan font-size="5.8" dy="-1">(z|x)</tspan></text><text class="cvae-mini-kl" x="83" y="63" font-size="5" fill="var(--network-green)">KL</text><circle cx="132" cy="62" r="9" fill="var(--network-node-bg)" stroke="var(--accent)"/><circle class="cvae-mini-z-fill" cx="132" cy="62" r="9" fill="url(#home-mini-vae-z)" opacity="0"/><circle class="cvae-mini-z-hit" cx="132" cy="62" r="9" fill="none" stroke="var(--accent)" opacity="0"/><text x="132" y="62" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--accent)">ẑ</text><rect x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="var(--network-blue)"/><rect class="cvae-mini-dec-fill" x="157" y="45" width="42" height="34" rx="3" fill="url(#home-mini-vae-d)" opacity="0"/><rect class="cvae-mini-dec-hit" x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="var(--network-blue)" opacity="0"/><text x="178" y="54" text-anchor="middle" font-size="5.1" letter-spacing=".55" fill="var(--network-blue)">DECODER</text><text x="178" y="66" text-anchor="middle" font-size="5.2" fill="var(--network-blue)">p<tspan font-size="3.7" dy="1">θ</tspan><tspan font-size="5.2" dy="-1">(x|ẑ)</tspan></text><circle cx="211" cy="62" r="8" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-12)"/><text x="211" y="62" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="var(--network-white-alpha-18)">x̃</text><text x="116" y="86" text-anchor="middle" font-size="4.3" fill="var(--network-green)">sampling</text></g>
+          <g><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 25,98 L 48,98')"/><circle class="cvae-mini-dot cvae-mini-f2" r="2.9" fill="var(--accent)" style="offset-path:path('M 108,94 Q 120,82 124,69')"/><circle class="cvae-mini-dot cvae-mini-f3" r="2.9" fill="var(--accent)" style="offset-path:path('M 141,62 L 157,62')"/></g>
+          <text x="110" y="124" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">VAE</text>
         </svg>
       </div>
 
       <!-- conditional VAE card -->
-      <div style="background:#0d0f14;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+      <div style="background:var(--network-bg);border:0.5px solid var(--network-white-alpha-07);border-radius:8px;overflow:hidden;">
         <svg style="width:100%;height:130px;display:block;" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="220" height="130" fill="#0d0f14"/>
+                  <rect width="220" height="130" fill="var(--network-bg)"/>
                   <defs>
-                    <radialGradient id="mini-cvae-p" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#7F77DD"/><stop offset="58%" stop-color="#7F77DD" stop-opacity=".72"/><stop offset="100%" stop-color="#7F77DD" stop-opacity=".22"/></radialGradient>
-                    <radialGradient id="mini-cvae-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#1D9E75"/><stop offset="58%" stop-color="#1D9E75" stop-opacity=".72"/><stop offset="100%" stop-color="#1D9E75" stop-opacity=".22"/></radialGradient>
-                    <radialGradient id="mini-cvae-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#aa701e"/><stop offset="58%" stop-color="#aa701e" stop-opacity=".72"/><stop offset="100%" stop-color="#aa701e" stop-opacity=".22"/></radialGradient>
-                    <radialGradient id="mini-cvae-d" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="#378ADD"/><stop offset="58%" stop-color="#378ADD" stop-opacity=".72"/><stop offset="100%" stop-color="#378ADD" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-cvae-p" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-purple)"/><stop offset="58%" stop-color="var(--network-purple)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-purple)" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-cvae-r" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-green)"/><stop offset="58%" stop-color="var(--network-green)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-green)" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-cvae-z" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--accent)"/><stop offset="58%" stop-color="var(--accent)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--accent)" stop-opacity=".22"/></radialGradient>
+                    <radialGradient id="mini-cvae-d" cx="50%" cy="48%" r="68%"><stop offset="0%" stop-color="var(--network-blue)"/><stop offset="58%" stop-color="var(--network-blue)" stop-opacity=".72"/><stop offset="100%" stop-color="var(--network-blue)" stop-opacity=".22"/></radialGradient>
                   </defs>
                   <g fill="none">
-                    <path d="M 25,36 Q 36,23 48,25" stroke="rgba(255,255,255,.24)" stroke-width=".8"/>
-                    <path d="M 24,44 Q 36,77 48,90" stroke="rgba(255,255,255,.24)" stroke-width=".8"/>
-                    <path d="M 25,98 L 48,98" stroke="#1D9E75" stroke-width="1"/>
-                    <path d="M 108,28 Q 120,40 124,55" stroke="rgba(127,119,221,.18)" stroke-width=".8" stroke-dasharray="3,2"/>
-                    <path d="M 108,94 Q 120,82 124,69" stroke="#1D9E75" stroke-width="1"/>
-                    <path d="M 24,34 C 76,0 133,4 157,51" stroke="rgba(232,130,74,.34)" stroke-width=".8"/>
-                    <path d="M 141,62 L 157,62" stroke="rgba(170,112,30,.62)" stroke-width="1"/>
-                    <path d="M 199,62 L 202,62" stroke="rgba(255,255,255,.10)" stroke-width=".8" stroke-dasharray="3,2"/>
-                    <path class="cvae-mini-kl" d="M 78,78 L 78,44" stroke="#1D9E75" stroke-width=".8" stroke-dasharray="2,3"/>
+                    <path d="M 25,36 Q 36,23 48,25" stroke="var(--network-white-alpha-24)" stroke-width=".8"/>
+                    <path d="M 24,44 Q 36,77 48,90" stroke="var(--network-white-alpha-24)" stroke-width=".8"/>
+                    <path d="M 25,98 L 48,98" stroke="var(--network-green)" stroke-width="1"/>
+                    <path d="M 108,28 Q 120,40 124,55" stroke="var(--network-purple-alpha-18)" stroke-width=".8" stroke-dasharray="3,2"/>
+                    <path d="M 108,94 Q 120,82 124,69" stroke="var(--network-green)" stroke-width="1"/>
+                    <path d="M 24,34 C 76,0 133,4 157,51" stroke="var(--network-orange-alpha-34)" stroke-width=".8"/>
+                    <path d="M 141,62 L 157,62" stroke="var(--accent-alpha-62)" stroke-width="1"/>
+                    <path d="M 199,62 L 202,62" stroke="var(--network-white-alpha-10)" stroke-width=".8" stroke-dasharray="3,2"/>
+                    <path class="cvae-mini-kl" d="M 78,78 L 78,44" stroke="var(--network-green)" stroke-width=".8" stroke-dasharray="2,3"/>
                   </g>
                   <g font-family="'JetBrains Mono',monospace">
-                    <circle cx="16" cy="40" r="9" fill="#1e2230" stroke="#e8824a"/><text x="16" y="40" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#e8824a">x</text>
-                    <circle cx="16" cy="98" r="9" fill="#1e2230" stroke="#1D9E75"/><text x="16" y="98" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#1D9E75">y</text>
-                    <rect x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="#7F77DD"/><rect class="cvae-mini-box-fill" x="48" y="10" width="60" height="34" rx="3" fill="url(#mini-cvae-p)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="#7F77DD" opacity="0"/><text x="78" y="19" text-anchor="middle" font-size="5.2" letter-spacing=".55" fill="#7F77DD">PRIOR</text><text x="78" y="30" text-anchor="middle" font-size="5.9" fill="#7F77DD">p<tspan font-size="4" dy="1">θ</tspan><tspan font-size="5.9" dy="-1">(z|x)</tspan></text>
-                    <rect x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="#1D9E75"/><rect class="cvae-mini-box-fill" x="48" y="78" width="60" height="34" rx="3" fill="url(#mini-cvae-r)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="#1D9E75" opacity="0"/><text x="78" y="87" text-anchor="middle" font-size="5.2" letter-spacing=".45" fill="#1D9E75">RECOG</text><text x="78" y="99" text-anchor="middle" font-size="5.8" fill="#1D9E75">q<tspan font-size="4" dy="1">φ</tspan><tspan font-size="5.8" dy="-1">(z|x,y)</tspan></text>
-                    <text class="cvae-mini-kl" x="83" y="63" font-size="5" fill="#1D9E75">KL</text>
-                    <circle cx="132" cy="62" r="9" fill="#1e2230" stroke="#aa701e"/><circle class="cvae-mini-z-fill" cx="132" cy="62" r="9" fill="url(#mini-cvae-z)" opacity="0"/><circle class="cvae-mini-z-hit" cx="132" cy="62" r="9" fill="none" stroke="#aa701e" opacity="0"/><text x="132" y="62" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="#aa701e">ẑ</text>
-                    <rect x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="#378ADD"/><rect class="cvae-mini-dec-fill" x="157" y="45" width="42" height="34" rx="3" fill="url(#mini-cvae-d)" opacity="0"/><rect class="cvae-mini-dec-hit" x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="#378ADD" opacity="0"/><text x="178" y="54" text-anchor="middle" font-size="5.1" letter-spacing=".55" fill="#378ADD">DECODER</text><text x="178" y="66" text-anchor="middle" font-size="5.2" fill="#378ADD">p<tspan font-size="3.7" dy="1">θ</tspan><tspan font-size="5.2" dy="-1">(y|x,ẑ)</tspan></text>
-                    <circle cx="211" cy="62" r="8" fill="#1e2230" stroke="rgba(255,255,255,.12)"/><text x="211" y="62" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="rgba(255,255,255,.18)">ỹ</text>
-                    <text x="116" y="86" text-anchor="middle" font-size="4.3" fill="#1D9E75">sampling</text><text x="116" y="42" text-anchor="middle" font-size="4.1" fill="#7F77DD" opacity=".34">sampling</text>
+                    <circle cx="16" cy="40" r="9" fill="var(--network-node-bg)" stroke="var(--network-orange)"/><text x="16" y="40" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-orange)">x</text>
+                    <circle cx="16" cy="98" r="9" fill="var(--network-node-bg)" stroke="var(--network-green)"/><text x="16" y="98" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--network-green)">y</text>
+                    <rect x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="var(--network-purple)"/><rect class="cvae-mini-box-fill" x="48" y="10" width="60" height="34" rx="3" fill="url(#mini-cvae-p)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="10" width="60" height="34" rx="3" fill="none" stroke="var(--network-purple)" opacity="0"/><text x="78" y="19" text-anchor="middle" font-size="5.2" letter-spacing=".55" fill="var(--network-purple)">PRIOR</text><text x="78" y="30" text-anchor="middle" font-size="5.9" fill="var(--network-purple)">p<tspan font-size="4" dy="1">θ</tspan><tspan font-size="5.9" dy="-1">(z|x)</tspan></text>
+                    <rect x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="var(--network-green)"/><rect class="cvae-mini-box-fill" x="48" y="78" width="60" height="34" rx="3" fill="url(#mini-cvae-r)" opacity="0"/><rect class="cvae-mini-box-hit" x="48" y="78" width="60" height="34" rx="3" fill="none" stroke="var(--network-green)" opacity="0"/><text x="78" y="87" text-anchor="middle" font-size="5.2" letter-spacing=".45" fill="var(--network-green)">RECOG</text><text x="78" y="99" text-anchor="middle" font-size="5.8" fill="var(--network-green)">q<tspan font-size="4" dy="1">φ</tspan><tspan font-size="5.8" dy="-1">(z|x,y)</tspan></text>
+                    <text class="cvae-mini-kl" x="83" y="63" font-size="5" fill="var(--network-green)">KL</text>
+                    <circle cx="132" cy="62" r="9" fill="var(--network-node-bg)" stroke="var(--accent)"/><circle class="cvae-mini-z-fill" cx="132" cy="62" r="9" fill="url(#mini-cvae-z)" opacity="0"/><circle class="cvae-mini-z-hit" cx="132" cy="62" r="9" fill="none" stroke="var(--accent)" opacity="0"/><text x="132" y="62" text-anchor="middle" dominant-baseline="middle" font-size="7" fill="var(--accent)">ẑ</text>
+                    <rect x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="var(--network-blue)"/><rect class="cvae-mini-dec-fill" x="157" y="45" width="42" height="34" rx="3" fill="url(#mini-cvae-d)" opacity="0"/><rect class="cvae-mini-dec-hit" x="157" y="45" width="42" height="34" rx="3" fill="none" stroke="var(--network-blue)" opacity="0"/><text x="178" y="54" text-anchor="middle" font-size="5.1" letter-spacing=".55" fill="var(--network-blue)">DECODER</text><text x="178" y="66" text-anchor="middle" font-size="5.2" fill="var(--network-blue)">p<tspan font-size="3.7" dy="1">θ</tspan><tspan font-size="5.2" dy="-1">(y|x,ẑ)</tspan></text>
+                    <circle cx="211" cy="62" r="8" fill="var(--network-node-bg)" stroke="var(--network-white-alpha-12)"/><text x="211" y="62" text-anchor="middle" dominant-baseline="middle" font-size="6.5" fill="var(--network-white-alpha-18)">ỹ</text>
+                    <text x="116" y="86" text-anchor="middle" font-size="4.3" fill="var(--network-green)">sampling</text><text x="116" y="42" text-anchor="middle" font-size="4.1" fill="var(--network-purple)" opacity=".34">sampling</text>
                   </g>
                   <g>
-                    <circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 25,36 Q 36,23 48,25')"/><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#e8824a" style="offset-path:path('M 24,44 Q 36,77 48,90')"/><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="#1D9E75" style="offset-path:path('M 25,98 L 48,98')"/>
-                    <circle class="cvae-mini-dot cvae-mini-f1" r="2.7" fill="#e8824a" style="offset-path:path('M 24,34 C 76,0 133,4 157,51')"/><circle class="cvae-mini-dot cvae-mini-f2" r="2.9" fill="#aa701e" style="offset-path:path('M 108,94 Q 120,82 124,69')"/><circle class="cvae-mini-dot cvae-mini-f3" r="2.9" fill="#aa701e" style="offset-path:path('M 141,62 L 157,62')"/>
+                    <circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 25,36 Q 36,23 48,25')"/><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 24,44 Q 36,77 48,90')"/><circle class="cvae-mini-dot cvae-mini-f0" r="2.7" fill="var(--network-green)" style="offset-path:path('M 25,98 L 48,98')"/>
+                    <circle class="cvae-mini-dot cvae-mini-f1" r="2.7" fill="var(--network-orange)" style="offset-path:path('M 24,34 C 76,0 133,4 157,51')"/><circle class="cvae-mini-dot cvae-mini-f2" r="2.9" fill="var(--accent)" style="offset-path:path('M 108,94 Q 120,82 124,69')"/><circle class="cvae-mini-dot cvae-mini-f3" r="2.9" fill="var(--accent)" style="offset-path:path('M 141,62 L 157,62')"/>
                   </g>
-                  <text x="110" y="124" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,.3)">conditional VAE</text>
+                  <text x="110" y="124" text-anchor="middle" font-family="monospace" font-size="9" fill="var(--network-white-alpha-30)">conditional VAE</text>
                 </svg>
       </div>
 
@@ -883,7 +881,7 @@
 
 <!-- Footer -->
 <div class="custom-footer">
-  <p class="footer-title">c o n n e c t</p>
+<!-- <p class="footer-title">c o n n e c t</p> -->
   <ul class="social-icons">
     <li><a href="https://arxiv.org/a/nagy_l_1.html" target="_blank" rel="noopener noreferrer" title="arXiv" aria-label="View Lóránt Nagy’s papers on arXiv"><img src="/assets/images/arxiv_logo.png" alt="arXiv" style="width: 5em; height: auto; display: inline-block; position: relative; top: 6px;"></a></li>
     <li><a href="https://github.com/lorant-nagy" target="_blank" title="GitHub"><i class="fab fa-fw fa-github" aria-hidden="true" style="font-size: 4em;"></i></a></li>
@@ -891,12 +889,7 @@
     <li><a href="https://m2.mtmt.hu/gui2/?type=authors&mode=browse&sel=10076737" target="_blank" title="MTMT"><img src="/assets/images/mtmt_logo.png" alt="MTMT" style="width: 4em; height: 4em; display: inline-block;"></a></li>
     <li><a href="https://linkedin.com/in/lóránt-nagy-87b5a0101" target="_blank" title="LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true" style="font-size: 4em;"></i></a></li>
   </ul>
-  <div class="visitor-counter">
-    <pre id="analyticsTable">loading site analytics...
-
-
-
-    </pre>
+  
   </div>
 </div>
 
@@ -905,6 +898,7 @@
   <img id="modalImg" alt="Enlarged comic">
 </div>
 
+<script src="/assets/js/theme.js"></script>
 <script src="/assets/js/background-shader.js"></script>
 <script>BackgroundShader.init('welcome-section');</script>
 

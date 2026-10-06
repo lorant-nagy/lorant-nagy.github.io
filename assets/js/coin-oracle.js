@@ -14,6 +14,8 @@ const CoinOracle = (() => {
 precision highp float;
 uniform vec2 res;
 uniform float t;
+uniform vec3 noiseDark;
+uniform vec3 noiseLight;
 uniform float mode;
 float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
 void main(){
@@ -31,13 +33,15 @@ void main(){
   v /= 2.45;
   float noise = hash(uv*680.0 + floor(t*30.0)*vec2(1.0,1.7))*0.28;
   v = clamp(v*0.72 + noise + 0.08, 0.0, 1.0);
-  gl_FragColor = vec4(vec3(v), 1.0);
+  gl_FragColor = vec4(mix(noiseDark, noiseLight, v), 1.0);
 }`;
 
   const FRAG_ORACLE = `
 precision highp float;
 uniform vec2 res;
 uniform float t;
+uniform vec3 noiseDark;
+uniform vec3 noiseLight;
 uniform float c1mode;
 uniform float c2mode;
 uniform float reveal;
@@ -71,7 +75,7 @@ void main(){
     }
     v = clamp(v*1.1+0.06, 0.0, 1.0);
   }
-  gl_FragColor = vec4(vec3(v), 1.0);
+  gl_FragColor = vec4(mix(noiseDark, noiseLight, v), 1.0);
 }`;
 
   function mkGL(canvas, frag) {
@@ -94,6 +98,8 @@ void main(){
     const loc = gl.getAttribLocation(prog, 'p');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform3fv(gl.getUniformLocation(prog, 'noiseDark'), SiteTheme.rgb('--oracle-noise-dark'));
+    gl.uniform3fv(gl.getUniformLocation(prog, 'noiseLight'), SiteTheme.rgb('--oracle-noise-light'));
     return { gl, prog };
   }
 
@@ -115,7 +121,7 @@ void main(){
     btn.style.cssText = [
       'background:none', 'border:none', 'padding:0',
       'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
-      'font-size:0.85em', 'color:#aa701e', 'cursor:pointer',
+      'font-size:0.85em', 'color:var(--accent)', 'cursor:pointer',
       'letter-spacing:0.04em', 'opacity:0.8'
     ].join(';');
     btn.onmouseenter = () => btn.style.opacity = '1';
@@ -130,7 +136,7 @@ void main(){
       `height:${2 * UNIT}px`,
       'border-radius:4px',
       'overflow:hidden',
-      'border:0.5px solid rgba(0,0,0,0.15)'
+      'border:0.5px solid var(--oracle-border)'
     ].join(';');
     container.appendChild(wrap);
 
@@ -155,8 +161,8 @@ void main(){
       ].join(';');
 
       // borders between cells
-      if (i === 0) cell.style.borderBottom = '0.5px solid rgba(0,0,0,0.1)';
-      if (i === 0 || i === 1) cell.style.borderRight = '0.5px solid rgba(0,0,0,0.1)';
+      if (i === 0) cell.style.borderBottom = '0.5px solid var(--oracle-divider)';
+      if (i === 0 || i === 1) cell.style.borderRight = '0.5px solid var(--oracle-divider)';
 
       const cv = document.createElement('canvas');
       cv.width  = c.w * UNIT;
@@ -171,7 +177,7 @@ void main(){
         'text-align:center',
         'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif',
         'font-size:9px', 'letter-spacing:0.1em',
-        'color:rgba(224, 211, 193, 0.61)', 'pointer-events:none'
+        'color:var(--oracle-label)', 'pointer-events:none'
       ].join(';');
       tag.textContent = c.label;
       cell.appendChild(tag);

@@ -6,21 +6,7 @@
  *
  * ── Tunable initial parameters ────────────────────────────────────────────
  */
-const SHADER_CONFIG = {
-  speed:      0.085,
-  octaves:    5,
-  warp:       1.4,
-  zoom:       1.3,
-  parallax:   0.33,
-  brightness: 1.5,   // ← add this (0.5 = darker, 1.5 = brighter)
-
-  c1: [0.01, 0.04, 0.10],
-  c2: [0.03, 0.22, 0.32],
-  c3: [0.55, 0.32, 0.06],
-  c4: [0.88, 0.82, 0.70],
-};
-/* ─────────────────────────────────────────────────────────────────────────*/
-
+// Appearance and animation defaults live in assets/css/theme.css.
 const BackgroundShader = (() => {
 
   const VERT = `
@@ -141,7 +127,18 @@ void main() {
     const uC1 = U('u_c1'), uC2 = U('u_c2'), uC3 = U('u_c3'), uC4 = U('u_c4');
     const uBrightness = U('u_brightness');
 
-    const C = SHADER_CONFIG;
+    const C = {
+      speed: SiteTheme.number('--cloud-speed'),
+      octaves: SiteTheme.number('--cloud-octaves'),
+      warp: SiteTheme.number('--cloud-warp'),
+      zoom: SiteTheme.number('--cloud-zoom'),
+      parallax: SiteTheme.number('--cloud-parallax'),
+      brightness: SiteTheme.number('--cloud-brightness'),
+      c1: SiteTheme.rgb('--cloud-color-deep'),
+      c2: SiteTheme.rgb('--cloud-color-blue'),
+      c3: SiteTheme.rgb('--cloud-color-warm'),
+      c4: SiteTheme.rgb('--cloud-color-light')
+    };
     gl.uniform3fv(uC1, C.c1); gl.uniform3fv(uC2, C.c2);
     gl.uniform3fv(uC3, C.c3); gl.uniform3fv(uC4, C.c4);
 
@@ -155,7 +152,7 @@ void main() {
     const warpSlider = document.createElement('input');
     warpSlider.type = 'range'; warpSlider.min = 0; warpSlider.max = 280;
     warpSlider.value = Math.round(C.warp * 100); warpSlider.title = 'warp';
-    warpSlider.style.cssText = 'width:min(360px,70vw);accent-color:rgba(255,255,255,0.35);opacity:0.45;cursor:pointer;';
+    warpSlider.style.cssText = 'width:min(360px,70vw);accent-color:var(--cloud-slider);opacity:0.45;cursor:pointer;';
 
     ui.appendChild(warpSlider);
     container.appendChild(ui);

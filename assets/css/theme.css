@@ -1,0 +1,127 @@
+/* THEME CONTROL PANEL — edit this file, save, then reload the page.
+ * Colors accept normal CSS syntax: #hex, rgb(...) or rgba(...).
+ * Alpha (the last rgba number) controls transparency: 0 invisible, 1 opaque.
+ * Cloud colors feed WebGL via theme.js. Banner heights accept vh, px, rem, etc.
+ * These controls cover the homepage, its SVG miniatures and coin oracle.
+ * Colors baked into images, logos and videos are part of those media files.
+ */
+:root {
+  
+  /* Page, header, footer and tiles */
+  --page-bg: #bac0c7; /* Page background between tiles */
+  --text: #333333; /* Default text */
+  --muted: #666666; /* Muted text */
+  --accent: #195ee9; /* Links and accent details */
+  --header-bg: rgb(237, 237, 237); /* Header background */
+  --header-title: #333; /* Name in header */
+  --header-contact: #555; /* Contact details */
+  --footer-bg: var(--header-bg); /* Footer background */
+  --footer-icon: #333; /* Social icons */
+  --footer-icon-hover: #007acc; /* Social icon hover */
+  --tile-bg: var(--header-bg); /* Main card / tile background */
+  --tile-border: rgba(0, 0, 0, 0.075); /* Card outlines */
+  --tile-shadow: rgba(0, 0, 0, 0.045); /* Card shadows */
+  --tile-text: #444; /* Paragraphs inside cards */
+  --section-title: #333; /* Section headings */
+  --pageit-media-bg: #e9e9e5; /* PageIt image fallback */
+  --crowburn-media-bg: #fff; /* Gaps between Crowburn images */
+  --citation-bg: #f7f7f4; /* Citation box */
+  --citation-text: #333; /* Citation text */
+  --citation-link: #007acc; /* Citation links */
+  --comic-shadow: rgba(0,0,0,0.12); /* Comic thumbnail shadow */
+  --modal-backdrop: rgba(0,0,0,0.85); /* Enlarged comic backdrop */
+  --game-intro-text: #555; /* Standalone game introduction */
+  --diffusion-strip-bg: #111318; /* Thin diffusion video fallback */
+  --diffusion-strip-border: rgba(0, 0, 0, 0.07); /* Thin video borders */
+  --diffusion-figure-bg: #f7f7f4; /* Square Wasserstein video fallback */
+
+  /* Cloud / parallax banner */
+  --banner-height: 35vh; /* Desktop banner minimum height; vh = percentage of viewport height */
+  --banner-height-mobile: 70vh; /* Banner minimum height at widths up to 640px */
+  --banner-text: white; /* Banner default text / CV label */
+  --banner-copy: rgba(255, 255, 255, 0.96); /* Introduction and cloud caption */
+  --banner-text-shadow: rgba(0, 0, 0, 0.55); /* Text shadow */
+  --banner-overlay-top: rgba(3, 8, 14, 0.08); /* Top of shading overlay */
+  --banner-overlay-bottom: rgba(3, 8, 14, 0.31); /* Bottom of shading overlay */
+  --cv-bg: rgba(0, 0, 0, 0.18); /* CV button background */
+  --cv-border: rgba(255, 255, 255, 0.5); /* CV button outline */
+  --cv-hover-bg: rgba(255, 255, 255, 0.16); /* CV hover background */
+  --cv-hover-border: rgba(255, 255, 255, 0.8); /* CV hover outline */
+  --cloud-slider: rgba(255,255,255,0.35); /* Roughness slider accent */
+  --cloud-color-deep:  #a29191;
+  --cloud-color-blue:  #205568;
+  --cloud-color-warm:  #827d7e;
+  --cloud-color-light: #eee3cb;
+
+  --cloud-brightness: 1.4; /* Cloud color stop 4: pale highlights */
+  --cloud-speed: 0.085; /* Animation speed */
+  --cloud-octaves: 5; /* Noise octaves, integer from 1 to 8 */
+  --cloud-warp: 1.4; /* Initial roughness slider value, 0 to 2.8 */
+  --cloud-zoom: 1.3; /* Noise scale */
+  --cloud-parallax: 0.33; /* Scroll response */
+
+  /* Repository tiles */
+  --repository-bg: #0d0f14; /* Repository tile and video fallback */
+  --repository-text: #fff; /* Default repository text */
+  --repository-border: rgba(0, 0, 0, 0.085); /* Repository outline */
+  --repository-hover-border: rgba(170, 112, 30, 0.55); /* Repository hover outline */
+  --repository-hover-shadow: rgba(0, 0, 0, 0.12); /* Repository hover shadow */
+  --repository-fallback-text: rgba(255, 255, 255, 0.26); /* Video fallback labels */
+  --repository-grid-line: rgba(255,255,255,0.035); /* Placeholder grid lines */
+  --repository-placeholder-text: rgba(255, 255, 255, 0.22); /* Placeholder labels */
+  --repository-name-border: rgba(255, 255, 255, 0.08); /* Name bar separator */
+  --repository-name-text: rgba(255, 255, 255, 0.88); /* Name bar text */
+
+  /* Talk list and coin oracle */
+  --talk-hover-bg: rgba(170, 112, 30, 0.055); /* Talk row hover */
+  --talk-title: #222; /* Talk titles */
+  --talk-detail: #777; /* Talk metadata */
+  --oracle-border: rgba(0,0,0,0.15); /* Oracle outer border */
+  --oracle-divider: rgba(0,0,0,0.1); /* Oracle cell dividers */
+  --oracle-label: rgba(224, 211, 193, 0.61); /* Oracle overlay label */
+  --oracle-noise-dark: #000; /* Dark endpoint for coin and oracle noise */
+  --oracle-noise-light: #fff; /* Light endpoint for coin and oracle noise */
+
+  /* Neural network miniature palette (including translucent edges) */
+  --network-bg: #0d0f14; /* Neural network miniature: bg */
+  --network-panel-bg: #13161d; /* Neural network miniature: panel bg */
+  --network-node-bg: #1e2230; /* Neural network miniature: node bg */
+  --network-memory-bg: #1a1e2a; /* Neural network miniature: memory bg */
+  --network-memory-green: #0f3a2a; /* Neural network miniature: memory green */
+  --network-memory-amber: #2a1a0a; /* Neural network miniature: memory amber */
+  --network-memory-blue: #1a2a3a; /* Neural network miniature: memory blue */
+  --network-blue: #378add; /* Neural network miniature: blue */
+  --network-green: #1d9e75; /* Neural network miniature: green */
+  --network-orange: #e8824a; /* Neural network miniature: orange */
+  --network-purple: #7f77dd; /* Neural network miniature: purple */
+  --network-violet: #7b5ea7; /* Neural network miniature: violet */
+  --network-label: #c8cdd8; /* Neural network miniature: label */
+  --network-white: #fff; /* White labels and edges */
+  --network-lavender: rgb(196,181,253); /* Lavender highlights */
+  --network-white-alpha-07: color-mix(in srgb, var(--network-white) 7%, transparent); /* Translucent network-white at 7% opacity */
+  --network-white-alpha-100: color-mix(in srgb, var(--network-white) 100%, transparent); /* Translucent network-white at 100% opacity */
+  --network-white-alpha-12: color-mix(in srgb, var(--network-white) 12%, transparent); /* Translucent network-white at 12% opacity */
+  --network-white-alpha-30: color-mix(in srgb, var(--network-white) 30%, transparent); /* Translucent network-white at 30% opacity */
+  --network-white-alpha-20: color-mix(in srgb, var(--network-white) 20%, transparent); /* Translucent network-white at 20% opacity */
+  --network-white-alpha-15: color-mix(in srgb, var(--network-white) 15%, transparent); /* Translucent network-white at 15% opacity */
+  --network-white-alpha-08: color-mix(in srgb, var(--network-white) 8%, transparent); /* Translucent network-white at 8% opacity */
+  --network-white-alpha-10: color-mix(in srgb, var(--network-white) 10%, transparent); /* Translucent network-white at 10% opacity */
+  --network-white-alpha-70: color-mix(in srgb, var(--network-white) 70%, transparent); /* Translucent network-white at 70% opacity */
+  --network-white-alpha-35: color-mix(in srgb, var(--network-white) 35%, transparent); /* Translucent network-white at 35% opacity */
+  --network-purple-alpha-48: color-mix(in srgb, var(--network-purple) 48%, transparent); /* Translucent network-purple at 48% opacity */
+  --network-white-alpha-22: color-mix(in srgb, var(--network-white) 22%, transparent); /* Translucent network-white at 22% opacity */
+  --network-orange-alpha-42: color-mix(in srgb, var(--network-orange) 42%, transparent); /* Translucent network-orange at 42% opacity */
+  --network-white-alpha-28: color-mix(in srgb, var(--network-white) 28%, transparent); /* Translucent network-white at 28% opacity */
+  --network-lavender-alpha-40: color-mix(in srgb, var(--network-lavender) 40%, transparent); /* Translucent network-lavender at 40% opacity */
+  --network-lavender-alpha-35: color-mix(in srgb, var(--network-lavender) 35%, transparent); /* Translucent network-lavender at 35% opacity */
+  --network-blue-alpha-18: color-mix(in srgb, var(--network-blue) 18%, transparent); /* Translucent network-blue at 18% opacity */
+  --network-white-alpha-24: color-mix(in srgb, var(--network-white) 24%, transparent); /* Translucent network-white at 24% opacity */
+  --network-green-alpha-24: color-mix(in srgb, var(--network-green) 24%, transparent); /* Translucent network-green at 24% opacity */
+  --network-white-alpha-72: color-mix(in srgb, var(--network-white) 72%, transparent); /* Translucent network-white at 72% opacity */
+  --network-green-alpha-22: color-mix(in srgb, var(--network-green) 22%, transparent); /* Translucent network-green at 22% opacity */
+  --network-white-alpha-55: color-mix(in srgb, var(--network-white) 55%, transparent); /* Translucent network-white at 55% opacity */
+  --network-purple-alpha-18: color-mix(in srgb, var(--network-purple) 18%, transparent); /* Translucent network-purple at 18% opacity */
+  --accent-alpha-62: color-mix(in srgb, var(--accent) 62%, transparent); /* Translucent accent at 62% opacity */
+  --network-white-alpha-18: color-mix(in srgb, var(--network-white) 18%, transparent); /* Translucent network-white at 18% opacity */
+  --network-orange-alpha-34: color-mix(in srgb, var(--network-orange) 34%, transparent); /* Translucent network-orange at 34% opacity */
+}
