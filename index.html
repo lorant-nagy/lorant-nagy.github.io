@@ -292,38 +292,6 @@
     </div>
   </section>
 
-  <!-- Superlinear generative diffusion -->
-  <section class="home-card diffusion-card">
-    <div class="diffusion-intro">
-      <div class="section-header diffusion-section-header">
-        <h2>Ornstein–Uhlenbeck Is Hard to Beat, Yet Superlinear Drift Ships Lower Transport Costs</h2>
-      </div>
-    </div>
-
-    <figure class="diffusion-strip" aria-label="Generated samples from the linear, quadratic and cubic forward diffusions">
-      <video autoplay muted loop playsinline preload="metadata">
-        <source src="/assets/videos/pow1_pow2_pow3.mp4" type="video/mp4">
-      </video>
-    </figure>
-
-    <div class="diffusion-summary">
-      <p>A study on score-based image generation with superlinear Langevin forward diffusions as driver processes. Conditional scores are computed numerically with a one-dimensional Fokker–Planck equation. In the experiments the superlinear models achieve higher precision in terms of Wasserstein distances and show less variation across diffusion horizons than the Ornstein–Uhlenbeck baseline.</p>
-    </div>
-
-    <div class="diffusion-minimal-body">
-      <div class="diffusion-math-copy">
-        <p class="diffusion-principle">Intuition suggests that faster convergence to the reference law can reduce the terminal mismatch and shorten the diffusion horizon required for generation, thereby reducing the time over which score-estimation and discretization errors propagate. In this way, multiple sources of error contributing to the discrepancy between the generated samples and the target data distribution can be reduced simultaneously.</p>
-        <a class="project-link diffusion-arxiv" href="https://arxiv.org/abs/2609.37579" target="_blank" rel="noopener">read on arXiv · 2609.37579 ↗</a>
-      </div>
-
-      <figure class="diffusion-wasserstein-figure">
-        <video autoplay muted loop playsinline preload="metadata" aria-label="Wasserstein distance comparison between Ornstein–Uhlenbeck and cubic superlinear diffusion">
-          <source src="/assets/videos/ou_vs_cubic_wasserstein.mp4" type="video/mp4">
-        </video>
-      </figure>
-    </div>
-  </section>
-
   <!-- GitHub repositories -->
   <section class="home-card repositories-card">
     <div class="repositories-inner">
@@ -375,6 +343,40 @@
     </div>
   </section>
 
+
+  <!-- Superlinear generative diffusion -->
+  <section class="home-card diffusion-card">
+    <div class="diffusion-intro">
+      <div class="section-header diffusion-section-header">
+        <h2>Ornstein–Uhlenbeck Is Hard to Beat, Yet Superlinear Drift Ships Lower Transport Costs</h2>
+      </div>
+    </div>
+
+    <figure class="diffusion-strip" aria-label="Generated samples from the linear, quadratic and cubic forward diffusions">
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="/assets/videos/pow1_pow2_pow3.mp4" type="video/mp4">
+      </video>
+    </figure>
+
+    <div class="diffusion-summary">
+      <p>A study on score-based image generation with superlinear Langevin forward diffusions as driver processes. Conditional scores are computed numerically with a one-dimensional Fokker–Planck equation. In the experiments the superlinear models achieve higher precision in terms of Wasserstein distances and show less variation across diffusion horizons than the Ornstein–Uhlenbeck baseline.</p>
+    </div>
+
+    <div class="diffusion-minimal-body">
+      <div class="diffusion-math-copy">
+        <p class="diffusion-principle">Intuition suggests that faster convergence to the reference law can reduce the terminal mismatch and shorten the diffusion horizon required for generation, thereby reducing the time over which score-estimation and discretization errors propagate. In this way, multiple sources of error contributing to the discrepancy between the generated samples and the target data distribution can be reduced simultaneously.</p>
+        <a class="project-link diffusion-arxiv" href="https://arxiv.org/abs/2609.37579" target="_blank" rel="noopener">read on arXiv · 2609.37579 ↗</a>
+      </div>
+
+      <figure class="diffusion-wasserstein-figure">
+        <video autoplay muted loop playsinline preload="metadata" aria-label="Wasserstein distance comparison between Ornstein–Uhlenbeck and cubic superlinear diffusion">
+          <source src="/assets/videos/ou_vs_cubic_wasserstein.mp4" type="video/mp4">
+        </video>
+      </figure>
+    </div>
+  </section>
+
+  
   <!-- Neural-network notes -->
   <section class="home-card neural-card">
   <div class="neural-inner">
