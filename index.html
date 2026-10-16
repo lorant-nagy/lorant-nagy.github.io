@@ -245,7 +245,7 @@
 
     @media (max-width: 980px) {
       .diffusion-card { order: 3; }
-      .talks-card { order: 4; }
+      .repositories-card { order: 4; }
       .neural-card { order: 5; }
       .game-section { order: 6; }
       .crowburn-card { order: 7; }
@@ -324,93 +324,54 @@
     </div>
   </section>
 
-  <!-- Talks & slides -->
-  <section class="home-card talks-card">
-    <div class="section-header">
-      <h2>talks &amp; slides</h2>
-    </div>
+  <!-- GitHub repositories -->
+  <section class="home-card repositories-card">
+    <div class="repositories-inner">
+      <div class="section-header repositories-header">
+        <h2>a few repositories</h2>
+      </div>
 
-    <div class="talk-list">
-      <a class="talk-row" href="/assets/pdf/talk_bachelier_2026-v1.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2026</span>
-        <span class="talk-info">
-          <span class="talk-title">On the utility problem in a market where price impact is transient</span>
-          <span class="talk-venue">XIII Bachelier World Congress · Bologna</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
+      <div class="repository-grid">
+        <a class="repository-tile" href="https://github.com/lorant-nagy/cond_fbm" target="_blank" rel="noopener noreferrer" aria-label="Conditional fractional Brownian motion repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/conditional_fbm.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">conditional_fbm.mp4</div>
+          </div>
+          <span class="repository-name">conditional fractional Brownian motion <span aria-hidden="true">↗</span></span>
+        </a>
 
-      <a class="talk-row" href="/assets/pdf/nagy_vcmf_2025.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2025</span>
-        <span class="talk-info">
-          <span class="talk-title">Non-convex optimal investment with transient price impact</span>
-          <span class="talk-venue">Vienna Congress on Mathematical Finance · TU Wien</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
+        <a class="repository-tile" href="https://github.com/lorant-nagy/karhunen-loeve-fbm" target="_blank" rel="noopener noreferrer" aria-label="Karhunen–Loève expansion of fractional Brownian motion repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/fbm_H03.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">fbm_H03.mp4</div>
+          </div>
+          <span class="repository-name">Karhunen–Loève expansion of fBm <span aria-hidden="true">↗</span></span>
+        </a>
 
-      <a class="talk-row" href="/assets/pdf/amk.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2024</span>
-        <span class="talk-info">
-          <span class="talk-title">Optimal execution in superlinearly mean-reverting environments</span>
-          <span class="talk-venue">University of Szeged</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
+        <a class="repository-tile" href="https://github.com/lorant-nagy/vect_auto_regr" target="_blank" rel="noopener noreferrer" aria-label="Vector autoregression repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/var3_coupled_fading.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">var3_coupled_fading.mp4</div>
+          </div>
+          <span class="repository-name">vector autoregressive dynamics <span aria-hidden="true">↗</span></span>
+        </a>
 
-      <a class="talk-row" href="/assets/pdf/elte_ai_workshop_2023_feb_prez_lorant_nagy.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2023</span>
-        <span class="talk-info">
-          <span class="talk-title">Risk-averse trading</span>
-          <span class="talk-venue">ELTE–Rényi AI Workshop · Eötvös Loránd University</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
-
-      <a class="talk-row" href="/rwre.html">
-        <span class="talk-year">2023</span>
-        <span class="talk-info">
-          <span class="talk-title">Random walks in random environments</span>
-          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
-        </span>
-        <span class="talk-pdf"></span>
-      </a>
-
-      <a class="talk-row" href="/assets/pdf/young_timid_and_risk_takers.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2022</span>
-        <span class="talk-info">
-          <span class="talk-title">Young, Timid, and Risk Takers</span>
-          <span class="talk-venue">Financial Mathematics Seminar · University of Michigan</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
-
-      <a class="talk-row" href="/assets/pdf/medianofmeans.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2021</span>
-        <span class="talk-info">
-          <span class="talk-title">On sub-Gaussian estimators of the mean</span>
-          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
-
-      <a class="talk-row" href="/assets/pdf/negative_memory.pdf" target="_blank" rel="noopener">
-        <span class="talk-year">2020</span>
-        <span class="talk-info">
-          <span class="talk-title">Long memory in trading</span>
-          <span class="talk-venue">PhD Seminar · Central European University</span>
-        </span>
-        <span class="talk-pdf">slides ↗</span>
-      </a>
-
-      <a class="talk-row" href="/rwre.html">
-        <span class="talk-year">2020</span>
-        <span class="talk-info">
-          <span class="talk-title">How to invest in mean-reverting markets?</span>
-          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
-        </span>
-        <span class="talk-pdf"></span>
-      </a>
+        <a class="repository-tile" href="https://github.com/lorant-nagy/alpha_stab_levy__sym_disc/tree/main" target="_blank" rel="noopener noreferrer" aria-label="Symmetric alpha-stable Lévy motion repository">
+          <div class="repository-media repository-media-video">
+            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
+              <source src="/assets/videos/alpha_stable_4panel_flicker.mp4" type="video/mp4">
+            </video>
+            <div class="repository-video-fallback" aria-hidden="true">alpha_stable_4panel_flicker.mp4</div>
+          </div>
+          <span class="repository-name">symmetric α-stable Lévy motion <span aria-hidden="true">↗</span></span>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -732,54 +693,93 @@
   </div>
 
   <div class="home-column home-column-right">
-  <!-- GitHub repositories -->
-  <section class="home-card repositories-card">
-    <div class="repositories-inner">
-      <div class="section-header repositories-header">
-        <h2>a few repositories</h2>
-      </div>
+  <!-- Talks & slides -->
+  <section class="home-card talks-card">
+    <div class="section-header">
+      <h2>talks &amp; slides</h2>
+    </div>
 
-      <div class="repository-grid">
-        <a class="repository-tile" href="https://github.com/lorant-nagy/cond_fbm" target="_blank" rel="noopener noreferrer" aria-label="Conditional fractional Brownian motion repository">
-          <div class="repository-media repository-media-video">
-            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
-              <source src="/assets/videos/conditional_fbm.mp4" type="video/mp4">
-            </video>
-            <div class="repository-video-fallback" aria-hidden="true">conditional_fbm.mp4</div>
-          </div>
-          <span class="repository-name">conditional fractional Brownian motion <span aria-hidden="true">↗</span></span>
-        </a>
+    <div class="talk-list">
+      <a class="talk-row" href="/assets/pdf/talk_bachelier_2026-v1.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2026</span>
+        <span class="talk-info">
+          <span class="talk-title">On the utility problem in a market where price impact is transient</span>
+          <span class="talk-venue">XIII Bachelier World Congress · Bologna</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
 
-        <a class="repository-tile" href="https://github.com/lorant-nagy/karhunen-loeve-fbm" target="_blank" rel="noopener noreferrer" aria-label="Karhunen–Loève expansion of fractional Brownian motion repository">
-          <div class="repository-media repository-media-video">
-            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
-              <source src="/assets/videos/fbm_H03.mp4" type="video/mp4">
-            </video>
-            <div class="repository-video-fallback" aria-hidden="true">fbm_H03.mp4</div>
-          </div>
-          <span class="repository-name">Karhunen–Loève expansion of fBm <span aria-hidden="true">↗</span></span>
-        </a>
+      <a class="talk-row" href="/assets/pdf/nagy_vcmf_2025.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2025</span>
+        <span class="talk-info">
+          <span class="talk-title">Non-convex optimal investment with transient price impact</span>
+          <span class="talk-venue">Vienna Congress on Mathematical Finance · TU Wien</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
 
-        <a class="repository-tile" href="https://github.com/lorant-nagy/vect_auto_regr" target="_blank" rel="noopener noreferrer" aria-label="Vector autoregression repository">
-          <div class="repository-media repository-media-video">
-            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
-              <source src="/assets/videos/var3_coupled_fading.mp4" type="video/mp4">
-            </video>
-            <div class="repository-video-fallback" aria-hidden="true">var3_coupled_fading.mp4</div>
-          </div>
-          <span class="repository-name">vector autoregressive dynamics <span aria-hidden="true">↗</span></span>
-        </a>
+      <a class="talk-row" href="/assets/pdf/amk.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2024</span>
+        <span class="talk-info">
+          <span class="talk-title">Optimal execution in superlinearly mean-reverting environments</span>
+          <span class="talk-venue">University of Szeged</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
 
-        <a class="repository-tile" href="https://github.com/lorant-nagy/alpha_stab_levy__sym_disc/tree/main" target="_blank" rel="noopener noreferrer" aria-label="Symmetric alpha-stable Lévy motion repository">
-          <div class="repository-media repository-media-video">
-            <video autoplay muted loop playsinline preload="metadata" aria-hidden="true" onerror="this.style.display='none'">
-              <source src="/assets/videos/alpha_stable_4panel_flicker.mp4" type="video/mp4">
-            </video>
-            <div class="repository-video-fallback" aria-hidden="true">alpha_stable_4panel_flicker.mp4</div>
-          </div>
-          <span class="repository-name">symmetric α-stable Lévy motion <span aria-hidden="true">↗</span></span>
-        </a>
-      </div>
+      <a class="talk-row" href="/assets/pdf/elte_ai_workshop_2023_feb_prez_lorant_nagy.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2023</span>
+        <span class="talk-info">
+          <span class="talk-title">Risk-averse trading</span>
+          <span class="talk-venue">ELTE–Rényi AI Workshop · Eötvös Loránd University</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/rwre.html">
+        <span class="talk-year">2023</span>
+        <span class="talk-info">
+          <span class="talk-title">Random walks in random environments</span>
+          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
+        </span>
+        <span class="talk-pdf"></span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/young_timid_and_risk_takers.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2022</span>
+        <span class="talk-info">
+          <span class="talk-title">Young, Timid, and Risk Takers</span>
+          <span class="talk-venue">Financial Mathematics Seminar · University of Michigan</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/medianofmeans.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2021</span>
+        <span class="talk-info">
+          <span class="talk-title">On sub-Gaussian estimators of the mean</span>
+          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/assets/pdf/negative_memory.pdf" target="_blank" rel="noopener">
+        <span class="talk-year">2020</span>
+        <span class="talk-info">
+          <span class="talk-title">Long memory in trading</span>
+          <span class="talk-venue">PhD Seminar · Central European University</span>
+        </span>
+        <span class="talk-pdf">slides ↗</span>
+      </a>
+
+      <a class="talk-row" href="/rwre.html">
+        <span class="talk-year">2020</span>
+        <span class="talk-info">
+          <span class="talk-title">How to invest in mean-reverting markets?</span>
+          <span class="talk-venue">Probability Seminar · Alfréd Rényi Institute of Mathematics</span>
+        </span>
+        <span class="talk-pdf"></span>
+      </a>
     </div>
   </section>
 
