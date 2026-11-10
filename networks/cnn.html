@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convolutional neural network</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap');
+  :root { --bg:#0d0f14; --surface:#13161d; --border:rgba(255,255,255,.07); --text:#c8cdd8; --muted:#565c6e; --neg:#378ADD; --pos:#e8824a; --accent:#aa701e; }
+  *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font:13px 'JetBrains Mono',monospace; height:100dvh; display:grid; grid-template-rows:auto auto 1fr; padding:1.1rem 1.4rem .9rem; gap:.55rem; overflow:hidden; }
+  .back-link { position:fixed; top:1rem; left:1.25rem; font-size:11px; color:var(--muted); text-decoration:none; letter-spacing:.05em; z-index:10; }
+  .back-link:hover { color:var(--text); }
+  h1 { font:300 1.45rem 'Spectral',serif; color:#e8e4dc; letter-spacing:.02em; padding-top:1.4rem; }
+  .equations { color:var(--muted); font-size:12px; line-height:1.85; font-style:italic; }
+  .equations span { font-style:normal; }
+  .page { display:grid; grid-template-columns:minmax(0,1fr) 260px; grid-template-rows:minmax(0,1fr) auto; gap:.7rem; min-height:0; }
+  .canvas-card { grid-column:1; grid-row:1; padding:.8rem 1rem .65rem; display:flex; flex-direction:column; min-height:0; }
+  .controls-card { grid-column:2; grid-row:1; padding:.75rem .85rem; display:flex; flex-direction:column; min-height:0; overflow-y:auto; }
+  .narrative-card { grid-column:1; grid-row:2; padding:.7rem 1rem; }
+  .card-title { font-size:9px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); border-bottom:.5px solid var(--border); padding-bottom:.28rem; margin-bottom:.5rem; flex-shrink:0; }
+  #cnn-svg { width:100%; flex:1; display:block; min-height:0; }
+  .legend { display:flex; justify-content:center; flex-wrap:wrap; gap:1rem; color:var(--muted); font-size:9px; padding-top:.25rem; }
+  .legend i { display:inline-block; width:16px; height:2px; vertical-align:middle; margin-right:5px; }
+  .output-display { text-align:center; color:var(--muted); font-size:10px; margin-top:.25rem; }
+  .output-val { color:var(--pos); font:300 1.1rem 'Spectral',serif; margin-left:.4rem; }
+  .narrative { font-size:10.5px; line-height:1.65; }
+  .narrative .hi { color:var(--pos); } .narrative .lo { color:var(--neg); } .narrative .dim { color:var(--muted); }
+  .ctrl-section-title { font-size:8.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); border-bottom:.5px solid var(--border); padding-bottom:.2rem; margin-top:.55rem; margin-bottom:.32rem; }
+  .ctrl-section-title:first-of-type { margin-top:0; }
+  .ctrl-row { display:flex; align-items:center; gap:.35rem; margin-bottom:.27rem; }
+  .ctrl-label { color:var(--muted); font-size:8.5px; min-width:34px; }
+  .ctrl-val { color:var(--text); font-size:8.5px; min-width:30px; text-align:right; }
+  input[type=range] { min-width:0; flex:1; appearance:none; -webkit-appearance:none; height:2px; background:rgba(255,255,255,.1); outline:none; cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:9px; height:9px; border-radius:50%; background:var(--accent); }
+  input[type=range]::-moz-range-thumb { width:9px; height:9px; border-radius:50%; border:0; background:var(--accent); }
+  .preset-select { background:none; border:.5px solid var(--border); color:var(--text); font:9px 'JetBrains Mono',monospace; border-radius:3px; padding:5px; width:100%; }
+  .btn-row { display:flex; gap:.35rem; margin:.35rem 0; }
+  button { cursor:pointer; background:none; color:var(--muted); border:.5px solid var(--border); border-radius:3px; font:9px 'JetBrains Mono',monospace; padding:5px 8px; flex:1; }
+  button:hover { color:var(--text); border-color:rgba(255,255,255,.25); }
+  button.active { color:var(--accent); border-color:var(--accent); background:rgba(170,112,30,.08); }
+  .ctrl-note { color:var(--muted); font-size:8.5px; line-height:1.6; margin-top:.35rem; }
+  .kernel-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:.25rem; }
+  .kernel-grid .ctrl-row { display:flex; flex-direction:column; gap:3px; align-items:stretch; margin:0; }
+  .kernel-grid .ctrl-label { min-width:0; text-align:center; }
+  .kernel-grid .ctrl-val { min-width:0; text-align:center; }
+  @media(max-width:760px) { body { height:auto; min-height:100dvh; overflow:auto; padding:2.5rem 1rem 2rem; grid-template-rows:auto auto auto; } .page { grid-template-columns:1fr; grid-template-rows:auto auto auto; } .canvas-card { grid-column:1; grid-row:1; } .narrative-card { grid-column:1; grid-row:2; } .controls-card { grid-column:1; grid-row:3; max-height:none; } #cnn-svg { flex:none; height:auto; aspect-ratio:900/350; min-height:190px; } .equations { font-size:10px; } }
+</style>
+</head>
+<body>
+<a class="back-link" href="/networks/">← networks</a>
+<h1>convolutional neural network</h1>
+<div class="equations">
+  input: <span style="color:#e8824a">X</span> ∈ ℝ<sup>6×6</sup> &nbsp;&nbsp;
+  convolution: <span style="color:#e8824a">Z</span><sub>ij</sub> = Σ<sub>u,v</sub> K<sub>uv</sub> X<sub>i+u,j+v</sub> + b &nbsp;&nbsp;
+  activation: <span style="color:#e8824a">A</span> = ReLU(Z) &nbsp;&nbsp;
+  pooling: <span style="color:#378ADD">P</span><sub>ij</sub> = max A<sub>2i+u,2j+v</sub>, u,v ∈ {0,1}
+</div>
+<div class="page">
+  <section class="canvas-card">
+    <div class="card-title">convolution → activation → pooling</div>
+    <svg id="cnn-svg" viewBox="0 0 900 350" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive 6 by 6 input, sliding 3 by 3 convolution kernel, 4 by 4 activation map and 2 by 2 max pooled output"></svg>
+    <div class="legend"><span><i style="background:var(--neg)"></i>negative</span><span><i style="background:rgba(255,255,255,.3)"></i>zero</span><span><i style="background:var(--pos)"></i>positive</span><span><i style="background:var(--accent)"></i>selected receptive field</span></div>
+    <div class="output-display">selected convolution <span class="output-val" id="output-val">—</span></div>
+  </section>
+  <aside class="controls-card">
+    <div class="card-title">parameters</div>
+    <div class="ctrl-section-title">input</div>
+    <select class="preset-select" id="preset" aria-label="Input pattern"><option value="edge">vertical edge</option><option value="cross">cross</option><option value="checker">checkerboard</option><option value="spot">central spot</option></select>
+    <div class="ctrl-section-title">kernel · K ∈ ℝ³ˣ³</div>
+    <div class="kernel-grid" id="kernel-grid"></div>
+    <div class="ctrl-section-title">bias</div>
+    <div class="ctrl-row"><span class="ctrl-label">b</span><input type="range" id="bias" min="-2" max="2" step="0.1" value="0"><span class="ctrl-val" id="bias-val">0.0</span></div>
+    <div class="ctrl-section-title">receptive field</div>
+    <div class="ctrl-row"><span class="ctrl-label">patch</span><input type="range" id="patch" min="0" max="15" step="1" value="5"><span class="ctrl-val" id="patch-val">2,2</span></div>
+    <div class="btn-row"><button id="prev">← previous</button><button id="play">play →</button><button id="next">next →</button></div>
+    <div class="btn-row"><button id="reset">reset kernel</button></div>
+    <div class="ctrl-note">One shared 3×3 filter slides over the input. Click any activation cell to inspect its receptive field. Max pooling has no learned parameters.</div>
+  </aside>
+</div>
+<script>
+(() => {
+  'use strict';
+  const svg=document.getElementById('cnn-svg');
+  const ns='http://www.w3.org/2000/svg';
+  const defaults=[-1,0,1,-1,0,1,-1,0,1];
+  let kernel=[...defaults], bias=0, patch=5, timer=null;
+  const $=id=>document.getElementById(id);
+  function make(tag, attrs={}, parent=svg, content) { const e=document.createElementNS(ns,tag); for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v); if(content!==undefined)e.textContent=content; parent.appendChild(e); return e; }
+  function label(x,y,t,fill='#565c6e',size=12,anchor='middle') {return make('text',{x,y,fill,'font-size':size,'font-family':'JetBrains Mono, monospace','text-anchor':anchor},svg,t);}
+  function presetValue(r,c) {const mode=$('preset').value; if(mode==='edge')return c>=3?1:0; if(mode==='cross')return r===2||r===3||c===2||c===3?1:0; if(mode==='checker')return (r+c)%2?1:0; return r>=2&&r<=3&&c>=2&&c<=3?1:0;}
+  function getInput(){return Array.from({length:6},(_,r)=>Array.from({length:6},(_,c)=>presetValue(r,c)));}
+  function calc() { const x=getInput(), z=[]; for(let r=0;r<4;r++){z[r]=[];for(let c=0;c<4;c++){let v=bias;for(let u=0;u<3;u++)for(let w=0;w<3;w++)v+=x[r+u][c+w]*kernel[u*3+w];z[r][c]=v;}} const a=z.map(row=>row.map(v=>Math.max(0,v)));const pool=Array.from({length:2},(_,r)=>Array.from({length:2},(_,c)=>Math.max(a[2*r][2*c],a[2*r][2*c+1],a[2*r+1][2*c],a[2*r+1][2*c+1])));return {x,z,a,pool}; }
+  const fmt=v=>Number(v).toFixed(1).replace(/\.0$/,'');
+  const fill=v=>v>0?`rgba(232,130,74,${Math.min(.15+Math.abs(v)*.14,.85)})`:v<0?`rgba(55,138,221,${Math.min(.15+Math.abs(v)*.14,.85)})`:'#1e2230';
+  function grid(values,x,y,size,kind,selected=null,onClick=null){const g=make('g'); const rows=values.length,cols=values[0].length;for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const v=values[r][c], sel=selected?.(r,c);let rect=make('rect',{x:x+c*size,y:y+r*size,width:size-3,height:size-3,rx:2,fill:fill(v),stroke:sel?'#aa701e':'rgba(255,255,255,.13)','stroke-width':sel?2.3:.65},g); if(onClick){rect.style.cursor='pointer';rect.addEventListener('click',()=>onClick(r,c));}const tx=make('text',{x:x+c*size+(size-3)/2,y:y+r*size+size/2+3,fill:Math.abs(v)>1.5?'#e8e4dc':'#c8cdd8','font-size':size>=30?11:9,'font-family':'JetBrains Mono, monospace','text-anchor':'middle','pointer-events':'none'},g,fmt(v));}return g;}
+  function arrow(x1,x2,y){make('path',{d:`M ${x1} ${y} H ${x2-7} m -7 -5 l 7 5 -7 5`,fill:'none',stroke:'rgba(255,255,255,.24)','stroke-width':1.2,'stroke-linejoin':'round'});}
+  function render(){ const {x,z,a,pool}=calc(); const row=Math.floor(patch/4),col=patch%4;svg.replaceChildren();
+    label(106,38,'input · 6×6'); label(334,38,'filter · 3×3');label(555,38,'feature map · 4×4');label(794,38,'max pool · 2×2');
+    grid(x,22,80,28,'input',(r,c)=>r>=row&&r<row+3&&c>=col&&c<col+3);
+    grid(Array.from({length:3},(_,r)=>kernel.slice(3*r,3*r+3)),283,120,34,'kernel');
+    grid(a,481,100,38,'activations',(r,c)=>r===row&&c===col,(r,c)=>{patch=r*4+c;stop();render();});
+    grid(pool,736,139,56,'pool',(r,c)=>r===Math.floor(row/2)&&c===Math.floor(col/2));
+    arrow(197,267,185);arrow(389,461,185);arrow(643,722,185);
+    label(110,272,`patch (${row+1}, ${col+1})`, '#aa701e',11);
+    label(334,272,'shared weights', '#565c6e',11);
+    label(554,287,`z = ${fmt(z[row][col])}  →  ReLU = ${fmt(a[row][col])}`,'#e8824a',11);
+    label(792,287,'2×2 / stride 2','#378ADD',11);
+    make('path',{d:`M ${22+(col+1.5)*28} ${80+(row+3)*28+3} L ${22+(col+1.5)*28} 241`,fill:'none',stroke:'#aa701e','stroke-width':1,'stroke-dasharray':'3 4','stroke-opacity':.65});
+    $('output-val').textContent=fmt(z[row][col]);$('patch-val').textContent=`${row+1},${col+1}`; }
+  function stop(){if(timer!==null)clearInterval(timer);timer=null;$('play').textContent='play →';$('play').classList.remove('active');}
+  function move(d){patch=(patch+d+16)%16;$('patch').value=patch;render();}
+  const kg=$('kernel-grid');kernel.forEach((v,i)=>{const wrap=document.createElement('div');wrap.className='ctrl-row';wrap.innerHTML=`<label class="ctrl-label" for="k${i}">K${Math.floor(i/3)+1}${i%3+1}</label><input id="k${i}" type="range" min="-2" max="2" step="0.1" value="${v}"><span class="ctrl-val" id="kv${i}">${v.toFixed(1)}</span>`;kg.appendChild(wrap);$('k'+i).addEventListener('input',e=>{kernel[i]=+e.target.value;$('kv'+i).textContent=kernel[i].toFixed(1);render();});});
+  $('bias').addEventListener('input',e=>{bias=+e.target.value;$('bias-val').textContent=bias.toFixed(1);render();});
+  $('patch').addEventListener('input',e=>{patch=+e.target.value;stop();render();});
+  $('preset').addEventListener('change',()=>{stop();render();});
+  $('prev').addEventListener('click',()=>{stop();move(-1);});$('next').addEventListener('click',()=>{stop();move(1);});
+  $('play').addEventListener('click',()=>{if(timer!==null){stop();return;}$('play').textContent='pause';$('play').classList.add('active');timer=setInterval(()=>move(1),650);});
+  $('reset').addEventListener('click',()=>{stop();kernel=[...defaults];bias=0;$('bias').value=0;$('bias-val').textContent='0.0';kernel.forEach((v,i)=>{$('k'+i).value=v;$('kv'+i).textContent=v.toFixed(1);});render();});
+  render();
+})();
+</script>
+</body>
+</html>

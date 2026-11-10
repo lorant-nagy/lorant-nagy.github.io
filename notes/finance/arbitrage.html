@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arbitrage</title>
+<style>
+:root{--ink:#1b3036;--muted:#6a7878;--green:#236c59;--line:#dce2d8;--paper:#fffef9}*{box-sizing:border-box}body{margin:0;padding:28px 18px;background:#eaf0e9;color:var(--ink);font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1120px;margin:auto}.toolbar{display:flex;justify-content:flex-end;align-items:center;margin:0 2px 12px;color:var(--muted);font-size:11px}button{font:inherit;color:var(--ink);background:#fffef9;border:1px solid #c9d3c7;border-radius:5px;padding:6px 11px;cursor:pointer}button:focus-visible{outline:3px solid #7fae98;outline-offset:3px}.card{background:var(--paper);border:1px solid #d1dbcd;border-radius:12px;overflow:hidden;box-shadow:0 10px 35px #233d2509}.content{padding:21px 29px 24px}.columns{display:grid;grid-template-columns:1fr 1fr;gap:30px}.column{min-width:0}.item{padding:0 0 13px;margin:0 0 13px;border-bottom:1px solid var(--line)}.item:last-child{border:0;padding-bottom:0;margin-bottom:0}h2{font-size:12px;color:var(--green);font-weight:700;margin:0 0 6px;line-height:1.4}p{margin:5px 0;font-size:12.5px}.m,.eq{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:16px;letter-spacing:.05px}.m sub,.m sup,.eq sub,.eq sup{font-size:.72em;line-height:0}.eq{margin:7px 0;line-height:1.65;overflow-wrap:anywhere}.box{padding:7px 10px;background:#f0f5ed;border-left:2px solid #83a58b;border-radius:0 4px 4px 0}.small{font-size:11.5px;color:#52676b}.small .m{font-size:15px}.bar{text-decoration:overline;text-decoration-thickness:1px}b{font-weight:650}ul{margin:5px 0;padding-left:17px}li{margin:3px 0;font-size:12.5px}footer{padding:12px 29px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);background:#fafbf5}
+@media(max-width:760px){body{padding:14px 10px}.content{padding:20px}.columns{grid-template-columns:1fr;gap:15px}.column:first-child .item:last-child{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:0}footer{padding:12px 20px}}
+@media print{@page{size:A4;margin:10mm}body{padding:0;background:white}.toolbar{display:none}.card{border:0;box-shadow:none;border-radius:0}.content{padding:14px 0}.columns{gap:23px}.item{break-inside:avoid;padding-bottom:9px;margin-bottom:9px}h2{font-size:10.5px}p,li{font-size:10.5px;line-height:1.35}.m,.eq{font-size:14px}.eq{margin:5px 0}.box{padding:5px 8px;print-color-adjust:exact}.small{font-size:10px}.small .m{font-size:13px}footer{padding:8px 0;background:white;font-size:9px}}
+
+/* Header aligned with the Interest rates study note, in this note's green palette. */
+.card > header { padding:22px 29px; background:#236c59; color:#fffef9; }
+.card > header h1 { margin:0; font:normal 29px/1.2 Georgia,"Times New Roman",serif; letter-spacing:-.3px; }
+@media(max-width:760px) { .card > header { padding:20px; } .card > header h1 { font-size:26px; } }
+@media print { .card > header { padding:0 0 12px; background:white; color:#236c59; border-bottom:2px solid #236c59; } .card > header h1 { font-size:24px; } }
+</style>
+</head>
+<body><main>
+<div class="toolbar"><button id="print" type="button">Print / PDF</button></div>
+<article class="card"><header><h1>Arbitrage</h1></header>
+<div class="content"><div class="columns">
+<div class="column">
+<section class="item">
+<h2>Market notation</h2>
+<div class="eq">π̄ = (π⁰, π) ∈ [0,∞)<sup>d+1</sup>, &nbsp; π⁰ = 1;<br>S̄ = (S⁰, S), &nbsp; Sⁱ : (Ω,ℱ,P) → [0,∞);<br>S⁰ ≡ 1+r, &nbsp; r &gt; −1, &nbsp; ξ̄ = (ξ⁰,ξ) ∈ ℝ<sup>d+1</sup>.</div>
+<p>Cost: <span class="m">π̄·ξ̄</span>; payoff: <span class="m">S̄·ξ̄</span>. Negative holdings allow borrowing and short sales; no transaction costs. Under NA, discard zero-price assets and take <span class="m">πⁱ &gt; 0</span>.</p>
+</section>
+<section class="item">
+<h2>Definition · Arbitrage</h2>
+<div class="eq box">π̄·ξ̄ ≤ 0, &nbsp; S̄·ξ̄ ≥ 0 P-a.s.,<br>P(S̄·ξ̄ &gt; 0) &gt; 0.</div>
+</section>
+<section class="item">
+<h2>Lemma · Risky-asset criterion</h2>
+<p>Arbitrage exists iff some <span class="m">ξ ∈ ℝ<sup>d</sup></span> satisfies</p>
+<div class="eq">ξ·S ≥ (1+r)ξ·π &nbsp; P-a.s.,<br>P(ξ·S &gt; (1+r)ξ·π) &gt; 0.</div>
+</section>
+<section class="item">
+<h2>Lemma · Zero-cost and negative-cost portfolios</h2>
+<ul><li>Arbitrage exists iff a <b>zero-cost</b> arbitrage exists.</li><li><span class="m">π̄·η̄ &lt; 0</span> and <span class="m">S̄·η̄ ≥ 0</span> P-a.s. imply arbitrage.</li><li>Arbitrage need not imply the existence of such a negative-cost portfolio.</li></ul>
+</section>
+<section class="item">
+<h2>Definition · Risk-neutral (martingale) measure</h2>
+<div class="eq">πⁱ = 𝔼<sup>*</sup>[Sⁱ/(1+r)], &nbsp; i = 0,…,d.<br>𝒫 ≔ {P<sup>*</sup> : P<sup>*</sup> ∼ P, &nbsp; P<sup>*</sup> risk-neutral}.</div>
+<p class="small"><span class="m">P<sup>*</sup> ∼ P</span>: same null sets, equivalently <span class="m">dP<sup>*</sup>/dP &gt; 0</span> P-a.s.</p>
+</section>
+<section class="item">
+<h2>Fundamental Theorem of Asset Pricing</h2>
+<div class="eq box">No arbitrage ⇔ 𝒫 ≠ ∅.</div>
+<p>In this case some <span class="m">P<sup>*</sup> ∈ 𝒫</span> has bounded density <span class="m">dP<sup>*</sup>/dP</span>.</p>
+</section>
+<section class="item">
+<h2>Discounted net gains</h2>
+<div class="eq">Yⁱ ≔ Sⁱ/(1+r) − πⁱ, &nbsp; i = 1,…,d.</div>
+<p><b>Lemma.</b></p>
+<div class="eq box">NA ⇔ ∀ξ ∈ ℝ<sup>d</sup>:<br>[ξ·Y ≥ 0 P-a.s. ⇒ ξ·Y = 0 P-a.s.].</div>
+<p><b>Lemma.</b></p>
+<div class="eq">P<sup>*</sup> risk-neutral ⇔ 𝔼<sup>*</sup>[Y] = 0.</div>
+</section>
+</div>
+<div class="column">
+<section class="item">
+<h2>Numéraire</h2>
+<p>A strictly positive asset used as the unit of account. The bond gives <span class="m">Sⁱ/(1+r)</span>. Taking asset 1, with <span class="m">π¹ &gt; 0</span>, <span class="m">S¹ &gt; 0</span> P-a.s., gives prices <span class="m">πⁱ/π¹</span>, <span class="m">Sⁱ/S¹</span> and pricing measures</p>
+<div class="eq box">𝒫̃ = {P̃<sup>*</sup> : dP̃<sup>*</sup>/dP<sup>*</sup> = S¹/𝔼<sup>*</sup>[S¹]<br>for some P<sup>*</sup> ∈ 𝒫}.</div>
+</section>
+<section class="item">
+<h2>Attainable payoffs · Law of one price</h2>
+<div class="eq">𝒱 ≔ {ξ̄·S̄ : ξ̄ ∈ ℝ<sup>d+1</sup>}.</div>
+<p>Under NA,</p>
+<div class="eq">ξ̄·S̄ = ζ̄·S̄ P-a.s. ⇒ π̄·ξ̄ = π̄·ζ̄.</div>
+<p>Define the price of <span class="m">V ∈ 𝒱</span>:</p>
+<div class="eq">π(V) ≔ π̄·ξ̄ &nbsp; when V = ξ̄·S̄.</div>
+<p><b>Remark.</b> π is a linear form on the finite-dimensional space 𝒱. Each <span class="m">P<sup>*</sup> ∈ 𝒫</span> gives a linear extension to <span class="m">L¹(P<sup>*</sup>)</span> via</p>
+<div class="eq">π(V) = 𝔼<sup>*</sup>[V/(1+r)], &nbsp; V ∈ 𝒱.</div>
+<p class="small">These extensions need not be unique.</p>
+</section>
+<section class="item">
+<h2>Definition · Nonredundancy</h2>
+<div class="eq">ξ̄·S̄ = 0 P-a.s. ⇒ ξ̄ = 0.</div>
+<p>Otherwise, under NA, one asset is a linear combination of the others in both payoff and price; remove it.</p>
+</section>
+<section class="item">
+<h2>Lemma · Piecewise-constant pricing density</h2>
+<p>Under NA, with one risky asset, <span class="m">π¹ &gt; 0</span> and <span class="m">𝔼[S¹] &lt; ∞</span>, there exists <span class="m">P<sup>*</sup> ∈ 𝒫</span> whose density is constant on each of</p>
+<div class="eq">{S¹ &lt; c}, &nbsp; {S¹ = c}, &nbsp; {S¹ &gt; c},<br>c ≔ π¹(1+r).</div>
+</section>
+<section class="item">
+<h2>Lemma · One price does not imply no arbitrage</h2>
+<p>The law of one price does <b>not</b> imply NA.</p>
+<p class="small">Example: <span class="m">r=0, π¹=1, S¹∈{1,2}</span>, both states possible. Payoff vectors are independent, but <span class="m">ξ̄=(−1,1)</span> costs 0 and pays <span class="m">(0,1)</span>.</p>
+</section>
+<section class="item">
+<h2>Return · Definition &amp; combination rule</h2>
+<div class="eq">R(V) ≔ (V−π(V))/π(V), &nbsp; π(V) ≠ 0.</div>
+<p>For <span class="m">V = ∑<sub>k</sub> α<sub>k</sub>V<sub>k</sub></span>, with nonzero relevant prices,</p>
+<div class="eq">R(V) = ∑<sub>k</sub> β<sub>k</sub>R(V<sub>k</sub>),<br>β<sub>k</sub> = α<sub>k</sub>π(V<sub>k</sub>)/π(V), &nbsp; ∑<sub>k</sub>β<sub>k</sub> = 1.</div>
+<p class="small">β<sub>k</sub> is the fraction of the investment in V<sub>k</sub>.</p>
+</section>
+<section class="item">
+<h2>Proposition · Expected returns</h2>
+<p>Under NA, for <span class="m">V ∈ 𝒱</span> with <span class="m">π(V) ≠ 0</span>:</p>
+<div class="eq box">(a) &nbsp; 𝔼<sup>*</sup>[R(V)] = r.<br>(b) &nbsp; 𝔼<sub>Q</sub>[R(V)] = r − Cov<sub>Q</sub>(dP<sup>*</sup>/dQ, R(V)).</div>
+<p class="small">In (a), P<sup>*</sup> is any risk-neutral measure. In (b), <span class="m">Q ∼ P</span>, <span class="m">𝔼<sub>Q</sub>|S| &lt; ∞</span>, and <span class="m">P<sup>*</sup> ∈ 𝒫</span>.</p>
+</section>
+</div>
+</div></div>
+<footer>NA means no arbitrage. Barred symbols include the bond; unbarred vectors contain risky assets. All payoff comparisons are P-a.s.</footer>
+</article></main>
+<script>document.getElementById('print').addEventListener('click',()=>window.print());</script>
+</body></html>

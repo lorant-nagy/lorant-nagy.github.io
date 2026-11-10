@@ -73,6 +73,8 @@
   }
 
   /* ── animations ── */
+  @keyframes cnn-mini-scan { 0%,12% {transform:translate(0,0)} 24% {transform:translate(36px,0)} 48% {transform:translate(36px,36px)} 72% {transform:translate(0,36px)} 88%,100% {transform:translate(0,0)} }
+  .cnn-mini-patch { animation:cnn-mini-scan 5s steps(1,end) infinite; }
   @keyframes ff-pulse-i1{0%,100%{fill:#1e2230}10%,20%{fill:#378ADD}40%,50%{fill:#e8824a}}
   @keyframes ff-pulse-i2{0%,100%{fill:#1e2230}15%,25%{fill:#e8824a}45%,55%{fill:#378ADD}}
   @keyframes ff-pulse-h1{0%,100%{fill:#1e2230}30%,40%{fill:#e8824a}}
@@ -252,6 +254,24 @@
   </a>
 
 
+
+  <!-- CNN -->
+  <a class="card" href="/networks/cnn.html">
+    <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" aria-label="Convolution kernel moving over an image into feature maps">
+      <rect width="200" height="120" fill="#0d0f14"/>
+      <g stroke="rgba(255,255,255,.16)" stroke-width=".5">
+        <rect x="14" y="17" width="73" height="73" rx="2" fill="#13161d"/>
+        <path d="M 26 17V90 M 38 17V90 M 50 17V90 M 62 17V90 M 74 17V90 M 14 29H87 M 14 41H87 M 14 53H87 M 14 65H87 M 14 77H87"/>
+      </g>
+      <g fill="#e8824a" opacity=".4"><rect x="50" y="17" width="36" height="72"/><rect x="14" y="53" width="72" height="36" opacity=".4"/></g>
+      <rect class="cnn-mini-patch" x="14" y="17" width="36" height="36" fill="none" stroke="#aa701e" stroke-width="2"/>
+      <path d="M95 54 H111 m-6 -4 l6 4 -6 4" fill="none" stroke="rgba(255,255,255,.3)"/>
+      <g stroke="rgba(255,255,255,.2)" stroke-width=".6"><rect x="119" y="23" width="53" height="53" rx="2" fill="#13161d"/><path d="M132.25 23V76 M145.5 23V76 M158.75 23V76 M119 36.25H172 M119 49.5H172 M119 62.75H172"/></g>
+      <g fill="#e8824a"><rect x="145.5" y="23" width="13" height="13" opacity=".6"/><rect x="158.75" y="23" width="13" height="13" opacity=".75"/><rect x="145.5" y="36.25" width="13" height="13" opacity=".5"/><rect x="158.75" y="36.25" width="13" height="13" opacity=".75"/></g>
+      <g fill="#565c6e" font-family="JetBrains Mono,monospace" font-size="8" text-anchor="middle"><text x="50" y="105">input</text><text x="145" y="91">feature map</text></g>
+    </svg>
+    <div class="card-body"><div class="card-title">CNN</div><div class="card-desc">sliding filters, feature maps, and pooling</div></div>
+  </a>
 
   <!-- ResNet -->
   <a class="card" href="/networks/resnet.html">

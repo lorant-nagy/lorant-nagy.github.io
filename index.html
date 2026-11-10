@@ -252,6 +252,29 @@
       .next-section { order: 8; }
     }
 
+
+    /* Finance notes — compact study-card previews, using the home-page card grammar. */
+    .finance-notes-card { width: 100%; align-self: stretch; padding: clamp(1.4rem, 2.2vw, 2rem); }
+    .finance-notes-card .section-header { margin-bottom: 0.7rem; }
+    .finance-notes-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
+    .finance-note { display: block; min-width: 0; color: inherit; text-decoration: none; }
+    .finance-note-preview { aspect-ratio: 1.55; border: 1px solid var(--tile-border); border-radius: 6px; overflow: hidden; background: var(--tile-bg); }
+    .finance-note-rates { background: #fffafb; color: #36252c; }
+    .finance-note-arbitrage { background: #fffef9; color: #1b3036; }
+    .finance-note-arbitrage .finance-preview-heading { background: #236c59; color: #fffef9; }
+    .finance-preview-heading { background: #641e36; color: #fff8fa; font-family: Georgia,serif; padding: .55rem .8rem; font-size: 1rem; }
+    .finance-preview-content { padding: .8rem .9rem; font-size: .65rem; line-height: 1.4; }
+    .finance-preview-content div { font-weight: 650; color: #7b2944; }
+    .finance-note-arbitrage .finance-preview-content div { color: #236c59; }
+    .finance-preview-content strong { font: 1rem Georgia,serif; display: inline-block; margin-top: .3rem; }
+    .finance-preview-content hr { border: 0; border-top: 1px solid #ead5dd; margin: .6rem 0; }
+    .finance-note-arbitrage .finance-preview-content hr { border-color: #dce2d8; }
+    .finance-note:hover .finance-note-preview { filter: brightness(.975); }
+    .finance-note-title { display: block; font-size: .89rem; line-height: 1.45; font-weight: 600; margin-top: .65rem; color: var(--talk-title); }
+    .finance-note-title span { color: var(--accent); font-weight: 400; }
+    .finance-note:hover .finance-note-title { color: var(--accent); }
+    .finance-note:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    @media (max-width: 460px) { .finance-notes-grid { gap: .7rem; } .finance-note-title { font-size: .8rem; } }
 </style>
 </head>
 <body>
@@ -691,6 +714,23 @@
     <a href="/networks/" class="project-link neural-link">explore →</a>
   </div>
 </section>
+
+  <!-- Finance notes: standalone study cards -->
+  <section class="home-card finance-notes-card" aria-labelledby="finance-notes-heading">
+    <div class="section-header">
+      <h2 id="finance-notes-heading">finance notes</h2>
+    </div>
+    <div class="finance-notes-grid">
+      <a class="finance-note" href="/notes/finance/interest-rate-models.html" aria-label="Read Interest rate models">
+        <div class="finance-note-preview finance-note-rates" aria-hidden="true"><div class="finance-preview-heading">Interest rates</div><div class="finance-preview-content"><div>Zero-coupon bond</div><strong>P(t,T)</strong><hr><div>Instantaneous forward rate</div><strong>f(t,T) = −∂<sub>T</sub> log P(t,T)</strong></div></div>
+        <span class="finance-note-title">Interest rate models <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="finance-note" href="/notes/finance/arbitrage.html" aria-label="Read Arbitrage">
+        <div class="finance-note-preview finance-note-arbitrage" aria-hidden="true"><div class="finance-preview-heading">Arbitrage</div><div class="finance-preview-content"><div>Market notation</div><strong>π̄ · ξ̄</strong><hr><div>Definition · Arbitrage</div><strong>π̄ · ξ̄ ≤ 0</strong><br><strong>S̄ · ξ̄ ≥ 0</strong></div></div>
+        <span class="finance-note-title">Arbitrage <span aria-hidden="true">↗</span></span>
+      </a>
+    </div>
+  </section>
 
   </div>
 
